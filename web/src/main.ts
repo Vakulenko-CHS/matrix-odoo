@@ -11,6 +11,7 @@ import {
   type ValidationResult,
 } from "./pipeline";
 import { mountShop } from "./shop-view";
+import { SPEC_TEMPLATE } from "./spec-template";
 import "./styles.css";
 
 const SPLIT_KEY = "matrix-spec-raw-split";
@@ -23,7 +24,7 @@ const CHROME_KEY = "matrix-spec-chrome";
 const ISSUES_H_KEY = "matrix-spec-issues-h";
 const DEBOUNCE_MS = 480;
 const SHOP_MS = 240;
-const UNDO_LIMIT = 80;
+const UNDO_LIMIT = 100;
 
 const BULB_SVG = `
 <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -95,6 +96,11 @@ const fixPop = document.querySelector<HTMLDivElement>("#fix-pop")!;
 const issuesSplit = document.querySelector<HTMLElement>("#issues-split")!;
 const btnDock = document.querySelector<HTMLButtonElement>("#btn-dock")!;
 const btnHints = document.querySelector<HTMLButtonElement>("#btn-hints")!;
+const btnTemplate = document.querySelector<HTMLButtonElement>("#btn-template")!;
+const paneRaw = document.querySelector<HTMLElement>("#pane-raw")!;
+const paneRawTitle = document.querySelector<HTMLElement>("#pane-raw-title")!;
+const paneRawLead = document.querySelector<HTMLElement>("#pane-raw-lead")!;
+const templateView = document.querySelector<HTMLPreElement>("#template-view")!;
 const modal = document.querySelector<HTMLDivElement>("#confirm-modal")!;
 const confirmTitle = document.querySelector<HTMLHeadingElement>("#confirm-title")!;
 const confirmBody = document.querySelector<HTMLParagraphElement>("#confirm-body")!;
@@ -404,19 +410,34 @@ function bindCounts(): void {
   });
 }
 
+function appendPlain(el: HTMLElement, text: string): void {
+  const re = /%[^%\n]+%/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    if (m.index > last) el.append(text.slice(last, m.index));
+    const span = document.createElement("span");
+    span.className = "arg";
+    span.textContent = m[0];
+    el.append(span);
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) el.append(text.slice(last));
+}
+
 function appendLineText(el: HTMLElement, line: string): void {
   const re = /<!--[\s\S]*?-->/g;
   let last = 0;
   let m: RegExpExecArray | null;
   while ((m = re.exec(line))) {
-    if (m.index > last) el.append(line.slice(last, m.index));
+    if (m.index > last) appendPlain(el, line.slice(last, m.index));
     const span = document.createElement("span");
     span.className = /<!--\s*TODO/i.test(m[0]) ? "cmt-todo" : "cmt";
     span.textContent = m[0];
     el.append(span);
     last = m.index + m[0].length;
   }
-  if (last < line.length) el.append(line.slice(last));
+  if (last < line.length) appendPlain(el, line.slice(last));
   if (!line) el.append(" ");
 }
 
@@ -712,12 +733,19 @@ function paintResult(result: ValidationResult, writeEditor: boolean): void {
   persistDraft();
 }
 
-function askOverwrite(): Promise<boolean> {
-  if (!editor.value.trim() || !raw.value.trim()) return Promise.resolve(true);
+function askOverwrite(opts?: {
+  skipIfEmpty?: boolean;
+  title?: string;
+  body?: string;
+}): Promise<boolean> {
+  const skipIfEmpty = opts?.skipIfEmpty ?? true;
+  if (skipIfEmpty && (!editor.value.trim() || !raw.value.trim())) {
+    return Promise.resolve(true);
+  }
   const needCopyWarn = !copiedAfterEdit;
   return new Promise((resolve) => {
-    confirmTitle.textContent = CONFIRM_DEFAULT_TITLE;
-    confirmBody.textContent = CONFIRM_DEFAULT_BODY;
+    confirmTitle.textContent = opts?.title ?? CONFIRM_DEFAULT_TITLE;
+    confirmBody.textContent = opts?.body ?? CONFIRM_DEFAULT_BODY;
     confirmCopyWarn.hidden = !needCopyWarn;
     confirmCopy.hidden = !needCopyWarn;
     confirmYes.textContent = needCopyWarn ? "Все одно перезаписати" : "Перезаписати";
@@ -727,6 +755,8 @@ function askOverwrite(): Promise<boolean> {
       modal.hidden = true;
       confirmCopyWarn.hidden = true;
       confirmCopy.hidden = true;
+      confirmTitle.textContent = CONFIRM_DEFAULT_TITLE;
+      confirmBody.textContent = CONFIRM_DEFAULT_BODY;
       confirmYes.textContent = "Перезаписати";
       modal.removeEventListener("click", onBackdrop);
       confirmYes.removeEventListener("click", onYes);
@@ -848,6 +878,7 @@ async function readFile(file: File): Promise<void> {
   fileName = file.name.replace(/\.txt$/i, ".md");
   last = null;
   raw.value = text;
+  setTemplateMode(false);
   fileHint.textContent = `Відкрито: ${fileName}`;
   setStamp("idle");
   await runFull();
@@ -885,10 +916,38 @@ async function copyText(): Promise<void> {
   }
 }
 
-function applySplit(percent: number): void {
+function renderTemplateView(): void {
+  templateView.replaceChildren();
+  for (const line of SPEC_TEMPLATE.split("\n")) {
+    const hl = document.createElement("div");
+    hl.className = "hl";
+    appendLineText(hl, line);
+    templateView.append(hl);
+  }
+}
+
+function setTemplateMode(on: boolean): void {
+  paneRaw.dataset.mode = on ? "template" : "raw";
+  templateView.hidden = !on;
+  raw.hidden = on;
+  paneRawTitle.textContent = on ? "Шаблон" : "Сирий текст";
+  paneRawLead.textContent = on
+    ? "Каркас з 73 диванів. %модель% / кількість — підстав свої. Порожній цех без виробу не лишай живим заголовком."
+    : "Вставка з OneDrive. Стисни майже в нуль, трохи відкрий коли треба звірити як було. «Шаблон» — порівняти каркас зі специфікацією.";
+  btnTemplate.textContent = on ? "Сирий текст" : "Шаблон";
+  btnTemplate.setAttribute("aria-pressed", on ? "true" : "false");
+  btnTemplate.title = on
+    ? "Повернути сирий текст зліва. Специфікація справа не зміниться."
+    : "Показати шаблон зліва, поруч зі специфікацією. Ширина колонки та специфікація не змінюються.";
+  fileHint.textContent = on
+    ? "Зліва шаблон, справа специфікація. Сирий текст схований, не стертий."
+    : `Файл: ${fileName}. Зліва сирий, справа специфікація.`;
+}
+
+function applySplit(percent: number, persist = true): void {
   const clamped = Math.min(50, Math.max(8, percent));
   workspace.style.setProperty("--split", `${clamped}%`);
-  localStorage.setItem(SPLIT_KEY, String(clamped));
+  if (persist) localStorage.setItem(SPLIT_KEY, String(clamped));
 }
 
 function splitFromEvent(event: PointerEvent): void {
@@ -1125,6 +1184,9 @@ function bindHints(): void {
   });
 }
 
+btnTemplate.addEventListener("click", () => {
+  setTemplateMode(paneRaw.dataset.mode !== "template");
+});
 btnCheck.addEventListener("click", () => void runFull());
 btnRecheckSpec.addEventListener("click", () => void runFromSpec());
 btnRewriteAttrs.addEventListener("click", () => runRewriteAttrs());
@@ -1239,6 +1301,7 @@ window.addEventListener("resize", () => {
 });
 new ResizeObserver(() => requestAnimationFrame(syncGutterHeights)).observe(editor);
 raw.addEventListener("input", persistDraft);
+renderTemplateView();
 if (!restoreDraft()) {
   renderDecorations(editor.value);
   renderShopNow();

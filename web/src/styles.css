@@ -311,6 +311,14 @@ textarea:focus-visible,
   flex-shrink: 0;
 }
 
+.pane-raw .pane-head {
+  flex-wrap: wrap;
+}
+
+.pane-raw .dock-btn {
+  min-width: 0;
+}
+
 .pane-title {
   margin: 0;
   font-family: var(--display);
@@ -459,12 +467,54 @@ textarea:focus-visible,
   min-height: 0;
 }
 
+.raw-crop {
+  position: relative;
+}
+
 .raw-crop textarea {
   flex: 1;
   min-width: 0;
   min-height: 0;
   height: auto;
   background: var(--sheet);
+}
+
+.raw-crop textarea[hidden] {
+  display: none;
+}
+
+.template-view {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: var(--doc-pad-y) var(--doc-pad-x);
+  overflow: auto;
+  font-family: var(--spec);
+  font-size: var(--doc-size);
+  line-height: var(--doc-lh);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  color: var(--graphite);
+  background:
+    repeating-linear-gradient(
+      -28deg,
+      transparent 0 10px,
+      rgba(42, 38, 34, 0.025) 10px 11px
+    ),
+    var(--sheet);
+  user-select: text;
+}
+
+.template-view[hidden] {
+  display: none;
+}
+
+.hl .arg {
+  background: rgba(180, 83, 9, 0.16);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .spec-crop {

@@ -88,17 +88,25 @@
 
       <main class="workspace" id="workspace" data-issues="right" data-shop="open">
         <div class="work-row" id="work-row">
-        <section class="pane pane-raw" id="pane-raw">
+        <section class="pane pane-raw" id="pane-raw" data-mode="raw">
           <div class="pane-head">
-            <h2 class="pane-title">Сирий текст</h2>
+            <h2 class="pane-title" id="pane-raw-title">Сирий текст</h2>
+            <button
+              type="button"
+              id="btn-template"
+              class="dock-btn"
+              aria-pressed="false"
+              title="Показати стандартний шаблон зліва, поруч зі специфікацією справа. Сирий текст і специфікація не змінюються."
+            >Шаблон</button>
           </div>
-          <p class="pane-lead hint">Вставка з OneDrive. Стисни майже в нуль, трохи відкрий коли треба звірити як було.</p>
+          <p class="pane-lead hint" id="pane-raw-lead">Вставка з OneDrive. Стисни майже в нуль, трохи відкрий коли треба звірити як було. «Шаблон» — порівняти каркас зі специфікацією.</p>
           <div class="crop raw-crop" id="drop-zone">
             <textarea
               id="raw"
               spellcheck="false"
               placeholder="Встав сирий текст з доки — разом із «Синтаксис:». Потім «Перевірити»."
             ></textarea>
+            <pre id="template-view" class="template-view" hidden aria-label="Стандартний шаблон специфікації"></pre>
           </div>
         </section>
 
