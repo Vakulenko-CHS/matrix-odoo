@@ -1,0 +1,45 @@
+---
+description: Read-only BOM spec check for agents (npm run ai-check). Do not guess errors — run this command.
+alwaysApply: true
+---
+
+# AI spec check (read-only)
+
+When checking a furniture BOM markdown spec (цехи, `[Товар]`, qty/UOM), **do not** eyeball the whole file and invent a list. Run the shared checker. It uses the same pipeline as the web UI (`diagnoseSpec` → prep/format, attrs, chain, bom, catalog `right_names_odoo_base.md`, lint).
+
+## Command
+
+From repo root. **Never writes** the spec or `docs/validated/`.
+
+```bash
+npm run ai-check -- "path/to/file.md"
+```
+
+Several files:
+
+```bash
+npm run ai-check -- "a.md" "b.md"
+```
+
+Check the file **exactly as on disk** (skip in-memory prep/format):
+
+```bash
+npm run ai-check -- --as-is "path/to/file.md"
+```
+
+## How to read stdout
+
+- `STATUS ready` — no issues. Stop.
+- `STATUS fixed` — only `auto` (formatter/tools would fix). Disk still unchanged. Report autos; do not rewrite unless the user asked to edit.
+- `STATUS bad` — `blocking` and/or `error` must be fixed. `warning` is secondary.
+- Lines: `L12 [source] message` then optional `  | original line`.
+- Sources: `prep` `format` `check` `attrs` `chain` `bom` `lint`.
+- Exit `1` = blocking/errors. Exit `2` = missing file / usage. Exit `0` = no blocking/errors.
+
+## Rules of use
+
+1. Run `ai-check` **before** claiming a spec is clean or listing problems in chat.
+2. Quote the command output. Do not re-run formatter/`validate`/`check-all` for this — those **write** files.
+3. Do not “fix” `auto` items on disk unless the user wants a file change.
+4. After you edit a spec, run `ai-check` again on that path.
+5. `npm run check` is Odoo product lookup, not this. `npm run validate` writes `docs/validated/`.

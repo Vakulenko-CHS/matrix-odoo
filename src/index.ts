@@ -44,6 +44,12 @@ async function main() {
       break;
     }
 
+    case "ai-check": {
+      const { runAiCheck } = await import("./commands/aiCheck");
+      runAiCheck(args);
+      break;
+    }
+
     case "add-fabric": {
       const { runAddFabric } = await import("./commands/addFabric");
       await runAddFabric(args[0]);
@@ -65,6 +71,7 @@ async function main() {
   npm run validate "<файл>"       — авто-форматування + список помилок
   npm run validate-all [папка]   — валідація всіх .md у папці
   npm run web                    — сторінка перевірки специфікації
+  npm run ai-check -- "<файл.md>" — звіт помилок у stdout, файли не чіпає
 
   Жива база (потрібен ODOO_API_KEY в .env):
   npm run import "<файл>"

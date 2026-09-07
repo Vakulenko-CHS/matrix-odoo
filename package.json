@@ -9,6 +9,7 @@
     "validate-all": "ts-node src/index.ts validate-all",
     "import": "ts-node src/index.ts import",
     "check": "ts-node src/index.ts check",
+    "ai-check": "ts-node src/index.ts ai-check",
     "add-fabric": "ts-node src/index.ts add-fabric",
     "snapshot": "ts-node src/index.ts snapshot",
     "restore": "ts-node src/index.ts restore",

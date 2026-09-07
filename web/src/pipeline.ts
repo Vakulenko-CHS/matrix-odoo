@@ -1,9 +1,13 @@
 import { runAttributeCheck } from "../../src/tools/check-attributes";
 import {
+  diagnoseSpec,
+  type DiagnoseIssue,
+  type DiagnoseResult,
+} from "../../src/validator/diagnose";
+import {
   checkSpecContent,
   isAutoIssue,
   isBlockingIssue,
-  prepareSpecContent,
   runSpecTools,
   type SpecToolPass,
 } from "../../src/validator/specPipeline";
@@ -83,27 +87,6 @@ function lineFromSnippet(content: string, message: string): number | null {
 
 function resolveLine(content: string, message: string): number | null {
   return lineFromText(message) ?? lineFromSnippet(content, message);
-}
-
-function suggestFileName(content: string, fallback: string): string {
-  if (fallback && fallback !== "специфікація.md") return fallback;
-  for (const line of content.split("\n")) {
-    const t = line.trim();
-    if (!t) continue;
-    if (
-      t.startsWith("#") ||
-      t.startsWith("//") ||
-      t.startsWith("<<") ||
-      t.startsWith("[") ||
-      t.startsWith("Цех") ||
-      t.startsWith("Синтаксис")
-    ) {
-      continue;
-    }
-    const cleaned = t.replace(/[\\/:*?"<>|]/g, "").slice(0, 80).trim();
-    if (cleaned.length > 2) return `${cleaned}.md`;
-  }
-  return "специфікація.md";
 }
 
 function inferFixes(message: string, line: number | null, content: string): QuickFix[] {
@@ -295,41 +278,29 @@ function collectCatalogIssues(
   }
 }
 
+function toUiResult(d: DiagnoseResult): ValidationResult {
+  const issues: UiIssue[] = d.issues.map((issue: DiagnoseIssue, i) => {
+    const line = issue.line;
+    const inferred = inferFixes(issue.message, line, d.content);
+    return {
+      id: `${issue.source}-${i}`,
+      kind: issue.kind,
+      source: issue.source,
+      line,
+      message: issue.message,
+      original: issue.original,
+      fixes: issue.fixes?.length ? issue.fixes : inferred,
+    };
+  });
+  return finish(d.original, d.content, d.fileName, issues);
+}
+
 export function runValidation(
   raw: string,
   fileName: string,
   knownNamesMd: string,
 ): ValidationResult {
-  const original = raw.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n");
-  const issues: UiIssue[] = [];
-  const prepared = prepareSpecContent(original);
-
-  for (const change of prepared.prepChanges) {
-    pushIssue(issues, "auto", "prep", change, prepared.content);
-  }
-  for (const change of prepared.formatChanges) {
-    pushIssue(issues, "auto", "format", change, prepared.content);
-  }
-
-  const tools = runSpecTools(stripAutoTodoLines(prepared.content), prepared.fileName, {
-    applyTodos: false,
-    applyContent: true,
-  });
-  let working = stripAutoTodoLines(tools.content);
-  collectToolIssues(issues, tools.attr, working, true);
-  collectToolIssues(issues, tools.chain, working, true);
-  collectToolIssues(issues, tools.bom, working, true);
-  collectCatalogIssues(issues, working, knownNamesMd);
-  appendLint(issues, working);
-
-  return finish(
-    original,
-    working,
-    prepared.fileName !== "специфікація.md"
-      ? prepared.fileName
-      : suggestFileName(working, fileName),
-    issues,
-  );
+  return toUiResult(diagnoseSpec(raw, fileName, knownNamesMd, "validate"));
 }
 
 export function recheckSpec(
@@ -337,20 +308,7 @@ export function recheckSpec(
   fileName: string,
   knownNamesMd: string,
 ): ValidationResult {
-  const working = stripAutoTodoLines(spec.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n"));
-  const issues: UiIssue[] = [];
-  const tools = runSpecTools(working, fileName, {
-    applyTodos: false,
-    applyContent: false,
-  });
-
-  collectToolIssues(issues, tools.attr, working, false);
-  collectToolIssues(issues, tools.chain, working, false);
-  collectToolIssues(issues, tools.bom, working, false);
-  collectCatalogIssues(issues, working, knownNamesMd);
-  appendLint(issues, working);
-
-  return finish(working, working, fileName, issues);
+  return toUiResult(diagnoseSpec(spec, fileName, knownNamesMd, "as-is"));
 }
 
 /** Rewrite %Attr% / %Attr❌% from current ✅/❌ list, then recheck (no further rewrites). */
