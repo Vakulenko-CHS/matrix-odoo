@@ -133,18 +133,46 @@ function safeFileName(title: string): string {
   return `${cleaned || "специфікація"}.md`;
 }
 
-function parseExistingFlags(content: string): Record<string, boolean> | null {
-  const listMatch = content.match(
-    /# СПИСОК АТРИБУТІВ[^\n]*\n([\s\S]*?)(?=\n##|\n#[^#]|$)/,
-  );
-  if (!listMatch) return null;
+const CATALOG_NAMES = new Set(ATTR_CATALOG.map((a) => a.name));
+const QUOTED_FLAG_RE = /"([^"]+)",?\s*(✅|❌)/gu;
+const QUOTED_FLAG_LINE_RE = /^\s*"[^"]+",?\s*(?:✅|❌)/u;
+
+function parseQuotedFlags(content: string): Record<string, boolean> | null {
   const flags: Record<string, boolean> = {};
-  const re = /"([^"]+)",?\s*(✅|❌)/gu;
+  const re = new RegExp(QUOTED_FLAG_RE.source, "gu");
   let m: RegExpExecArray | null;
-  while ((m = re.exec(listMatch[1])) !== null) {
+  while ((m = re.exec(content)) !== null) {
+    if (!CATALOG_NAMES.has(m[1])) continue;
     flags[m[1]] = m[2] === "✅";
   }
   return Object.keys(flags).length ? flags : null;
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function stripInstructionBlock(content: string): string {
+  return content.replace(
+    /^##\s*Інструкції[^\n]*\n[\s\S]*?(?=^Цехи\s*:|^(?:#+\s*)?Цех\s*№)/mu,
+    "",
+  );
+}
+
+/** %Name% → active, %Name❌% → inactive. Params only — not «Інструкції» `%Name%:`. */
+function parseFlagsFromArgs(content: string): Record<string, boolean> | null {
+  const hay = stripInstructionBlock(content);
+  const flags: Record<string, boolean> = {};
+  let found = false;
+  for (const attr of ATTR_CATALOG) {
+    const escaped = escapeRegExp(attr.name);
+    const hasInactive = new RegExp(`%${escaped}❌%`, "u").test(hay);
+    const hasActive = new RegExp(`%${escaped}%(?!❌)(?!:)`, "u").test(hay);
+    if (!hasActive && !hasInactive) continue;
+    found = true;
+    flags[attr.name] = hasActive;
+  }
+  return found ? flags : null;
 }
 
 function inferFlags(notes: string, body: string): Record<string, boolean> {
@@ -202,14 +230,17 @@ function extractTitle(head: string): string {
 }
 
 function extractNotes(head: string): string {
-  return head
+  const beforeInstr = head.split(/^##\s*Інструкції/imu)[0] ?? head;
+  return beforeInstr
     .split("\n")
     .filter((line) => {
       const t = line.trim();
       if (!t) return false;
       if (/^диван\b|^ліжко\b/i.test(t)) return false;
-      if (/^# СПИСОК АТРИБУТІВ/i.test(t)) return false;
-      if (/^## Інструкції/i.test(t)) return false;
+      if (/^#/.test(t)) return false;
+      if (QUOTED_FLAG_LINE_RE.test(t)) return false;
+      const quoted = /^"([^"]+)"/.exec(t)?.[1];
+      if (quoted && CATALOG_NAMES.has(quoted)) return false;
       return true;
     })
     .join("\n");
@@ -232,15 +263,19 @@ export function toNoValidContent(raw: string): ToNoValidResult {
     changes.push("прибрано шаблон «Синтаксис:»");
   }
 
-  const existingFlags = parseExistingFlags(text);
+  const quotedFlags = parseQuotedFlags(text);
+  const argFlags = quotedFlags ? null : parseFlagsFromArgs(text);
   const hasInstructions = /##\s*Інструкції/u.test(text);
   const { head, body } = splitHeadBody(text);
   const title = extractTitle(head);
   const notes = extractNotes(head);
-  const flags = existingFlags ?? inferFlags(notes, body);
+  const flags = quotedFlags ?? argFlags ?? inferFlags(notes, body);
 
-  if (!existingFlags)
+  if (!quotedFlags && argFlags) {
+    changes.push("згенеровано «# СПИСОК АТРИБУТІВ» з %аргументів% специфікації");
+  } else if (!quotedFlags) {
     changes.push("згенеровано «# СПИСОК АТРИБУТІВ» з нотаток технолога");
+  }
   if (!hasInstructions) changes.push("додано шаблон «## Інструкції»");
 
   const header = [
