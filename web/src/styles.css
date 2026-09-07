@@ -11,7 +11,7 @@
   --rule: #d4c4ae;
   --tick-warn: #c47b1a;
   --focus: #3a5a6a;
-  --gutter: 22px;
+  --gutter: 56px;
   --split: 18%;
   --issues: 32%;
   --shop: 280px;
@@ -243,7 +243,7 @@ button.is-pending:hover:not(:disabled) {
 
 button:focus-visible,
 .file-btn:focus-visible,
-textarea:focus-visible,
+.raw-crop textarea:focus-visible,
 .splitter:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
@@ -390,17 +390,50 @@ textarea:focus-visible,
 }
 
 .gutter-line {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(var(--doc-size) * var(--doc-lh));
-  height: calc(var(--doc-size) * var(--doc-lh));
+  display: grid;
+  grid-template-columns: minmax(2.4em, 1fr) 18px;
+  align-items: start;
+  min-height: 0;
+  height: auto;
+  overflow: hidden;
   position: relative;
+}
+
+.gutter-num {
+  grid-column: 1;
+  grid-row: 1;
+  padding: 0 4px 0 6px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: calc(var(--doc-size) * var(--doc-lh));
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.gutter-line.active .gutter-num {
+  color: var(--grease);
+  font-weight: 600;
+}
+
+.gutter-line.active::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--grease);
+  pointer-events: none;
 }
 
 .gutter-line[data-kind="blocking"]::before,
 .gutter-line[data-kind="error"]::before {
   content: "";
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  align-self: start;
+  margin-top: 5px;
   width: 0;
   height: 0;
   border-style: solid;
@@ -410,20 +443,28 @@ textarea:focus-visible,
 
 .gutter-line[data-kind="warning"]::before {
   content: "";
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  align-self: start;
+  margin-top: 6px;
   box-sizing: border-box;
   width: 8px;
   height: 8px;
   border: 2px solid var(--tick-warn);
   transform: rotate(45deg);
-  flex-shrink: 0;
 }
 
 .gutter-line[data-kind="auto"]::before {
   content: "";
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  align-self: start;
+  margin-top: 10px;
   width: 8px;
   height: 2px;
   background: var(--steel);
-  flex-shrink: 0;
 }
 
 .gutter-line.has-fix[data-kind]::before {
@@ -431,13 +472,16 @@ textarea:focus-visible,
 }
 
 .bulb {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
   width: 18px;
   height: 18px;
+  margin-top: 2px;
   padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -521,6 +565,10 @@ textarea:focus-visible,
   min-height: 0;
 }
 
+.editor-stack textarea:focus-visible {
+  outline: none;
+}
+
 .backdrop,
 textarea {
   margin: 0;
@@ -572,7 +620,7 @@ textarea {
 }
 
 .hl.active {
-  box-shadow: inset 3px 0 0 var(--grease);
+  background: rgba(180, 35, 24, 0.06);
 }
 
 textarea {

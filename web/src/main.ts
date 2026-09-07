@@ -72,6 +72,7 @@ const raw = document.querySelector<HTMLTextAreaElement>("#raw")!;
 const editor = document.querySelector<HTMLTextAreaElement>("#editor")!;
 const gutter = document.querySelector<HTMLDivElement>("#gutter")!;
 const backdrop = document.querySelector<HTMLPreElement>("#backdrop")!;
+const specCrop = document.querySelector<HTMLElement>(".spec-crop")!;
 const dropZone = document.querySelector<HTMLElement>("#drop-zone")!;
 const stamp = document.querySelector<HTMLElement>("#stamp")!;
 const stampHint = document.querySelector<HTMLElement>("#stamp-hint")!;
@@ -451,15 +452,44 @@ function syncGutterHeights(): void {
   const ticks = gutter.children;
   const marks = backdrop.children;
   const n = Math.min(ticks.length, marks.length);
+  if (!n) return;
+  const top0 = (marks[0] as HTMLElement).getBoundingClientRect().top;
+  let prev = top0;
   for (let i = 0; i < n; i++) {
-    (ticks[i] as HTMLElement).style.height = `${(marks[i] as HTMLElement).offsetHeight}px`;
+    const bottom = (marks[i] as HTMLElement).getBoundingClientRect().bottom;
+    (ticks[i] as HTMLElement).style.height = `${bottom - prev}px`;
+    prev = bottom;
   }
+}
+
+const hlRo = new ResizeObserver(() => scheduleGutterSync());
+let gutterSyncQueued = false;
+
+function scheduleGutterSync(): void {
+  if (gutterSyncQueued) return;
+  gutterSyncQueued = true;
+  requestAnimationFrame(() => {
+    syncGutterHeights();
+    requestAnimationFrame(() => {
+      syncGutterHeights();
+      gutterSyncQueued = false;
+    });
+  });
+}
+
+function observeLineMarks(): void {
+  hlRo.disconnect();
+  for (const mark of backdrop.children) hlRo.observe(mark);
 }
 
 function highlightIssuesForLine(n: number | null): void {
   activeLine = n;
   for (const el of backdrop.querySelectorAll(".hl.active")) el.classList.remove("active");
-  if (n) document.getElementById(`HL${n}`)?.classList.add("active");
+  for (const el of gutter.querySelectorAll(".gutter-line.active")) el.classList.remove("active");
+  if (n) {
+    document.getElementById(`HL${n}`)?.classList.add("active");
+    gutter.querySelector(`[data-line="${n}"]`)?.classList.add("active");
+  }
   for (const el of issuesEl.querySelectorAll("li.active")) el.classList.remove("active");
   shop.highlightLine(n);
   if (!n || !last) return;
@@ -487,7 +517,12 @@ function renderDecorations(text: string): void {
 
     const tick = document.createElement("div");
     tick.className = "gutter-line";
+    tick.dataset.line = String(n);
     if (kind) tick.dataset.kind = kind;
+    const num = document.createElement("span");
+    num.className = "gutter-num";
+    num.textContent = String(n);
+    tick.append(num);
     if (fixes.length) {
       tick.classList.add("has-fix");
       const bulb = document.createElement("button");
@@ -502,6 +537,7 @@ function renderDecorations(text: string): void {
       });
       tick.append(bulb);
     }
+    if (activeLine === n) tick.classList.add("active");
     gutter.append(tick);
 
     const hl = document.createElement("div");
@@ -513,7 +549,8 @@ function renderDecorations(text: string): void {
     backdrop.append(hl);
   });
   syncScroll();
-  requestAnimationFrame(syncGutterHeights);
+  observeLineMarks();
+  scheduleGutterSync();
 }
 
 function syncScroll(): void {
@@ -965,6 +1002,7 @@ function applySplit(percent: number, persist = true): void {
   const clamped = Math.min(50, Math.max(8, percent));
   workspace.style.setProperty("--split", `${clamped}%`);
   if (persist) localStorage.setItem(SPLIT_KEY, String(clamped));
+  scheduleGutterSync();
 }
 
 function splitFromEvent(event: PointerEvent): void {
@@ -1031,6 +1069,7 @@ function bindDock(): void {
     const now =
       Number(getComputedStyle(workspace).getPropertyValue("--shop").replace("px", "")) || 280;
     applyShopHeight(now);
+    scheduleGutterSync();
   });
 }
 
@@ -1049,6 +1088,7 @@ function applyIssuesSize(px: number): void {
   const prop = right ? "--issues" : "--issues-h";
   workspace.style.setProperty(prop, `${clamped}px`);
   localStorage.setItem(ISSUES_H_KEY, String(clamped));
+  scheduleGutterSync();
 }
 
 function issuesSizeFromEvent(event: PointerEvent): void {
@@ -1136,7 +1176,7 @@ function setChrome(on: boolean): void {
     const now =
       Number(getComputedStyle(workspace).getPropertyValue("--shop").replace("px", "")) || 280;
     applyShopHeight(now);
-    syncGutterHeights();
+    scheduleGutterSync();
     renderShopNow();
   });
 }
@@ -1222,10 +1262,7 @@ fileInput.addEventListener("change", () => {
   fileInput.value = "";
 });
 
-editor.addEventListener("scroll", () => {
-  syncScroll();
-  syncGutterHeights();
-});
+editor.addEventListener("scroll", syncScroll);
 editor.addEventListener("click", () => highlightIssuesForLine(lineFromCaret()));
 editor.addEventListener("keyup", () => highlightIssuesForLine(lineFromCaret()));
 editor.addEventListener("beforeinput", () => {
@@ -1314,9 +1351,13 @@ window.addEventListener("resize", () => {
   const now =
     Number(getComputedStyle(workspace).getPropertyValue("--shop").replace("px", "")) || 280;
   applyShopHeight(now);
-  requestAnimationFrame(syncGutterHeights);
+  scheduleGutterSync();
 });
-new ResizeObserver(() => requestAnimationFrame(syncGutterHeights)).observe(editor);
+const paneRo = new ResizeObserver(() => scheduleGutterSync());
+paneRo.observe(specCrop);
+paneRo.observe(editor);
+void document.fonts.ready.then(scheduleGutterSync);
+document.fonts.addEventListener("loadingdone", scheduleGutterSync);
 raw.addEventListener("input", persistDraft);
 renderTemplateView();
 if (!restoreDraft()) {
