@@ -1,9 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
+import { SOFA_START_RE, stripSpecComment } from "./specLine";
 
 const EMOJI_RE = /^[🪵🧩🪤🧽]+/u;
 const BRACKET_START = /^\[.+\]\s*\(/u;
-const SOFA_START = /^Диван\s+/u;
 const SECTION_RE = /^#+\s*(Цех\s*№[\d\-]+)/u;
 
 // Broad qty pattern: "- N unit?" OR "- unit" at end of line.
@@ -31,10 +31,7 @@ const SPELLING_FIXES: Array<{ wrong: RegExp; correct: string }> = [
 const SERVICE_ITEMS = new Set(["Перевірка Якості"]);
 
 function stripComment(line: string): string {
-  let s = line.replace(/<!--.*?-->/g, "");
-  const idx = s.indexOf("//");
-  if (idx >= 0) s = s.slice(0, idx);
-  return s.trim();
+  return stripSpecComment(line);
 }
 
 function isOutputLine(t: string): boolean {
@@ -42,7 +39,7 @@ function isOutputLine(t: string): boolean {
   return (
     (EMOJI_RE.test(t) && t.includes("[")) ||
     BRACKET_START.test(t) ||
-    SOFA_START.test(t)
+    SOFA_START_RE.test(t)
   );
 }
 

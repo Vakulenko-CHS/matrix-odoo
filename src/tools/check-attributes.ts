@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { SOFA_START_RE, stripSpecComment } from "./specLine";
 
 interface Attribute {
   paramName: string; // e.g. "%Тканина%"
@@ -126,7 +127,7 @@ function parseAttributeRules(content: string): Attribute[] {
 
 const EMOJI_RE = /^[🪵🧩🪤🧽]+/u;
 const BRACKET_PREFIX_RE = /^\[.+\]\s*\(/u;
-const SOFA_PREFIX_RE = /^Диван\s+/u;
+const SOFA_PREFIX_RE = SOFA_START_RE;
 
 function isProductLine(line: string): boolean {
   const t = line.trim();
@@ -138,8 +139,7 @@ function isProductLine(line: string): boolean {
 }
 
 function stripLineComment(line: string): string {
-  const idx = line.indexOf("//");
-  return idx >= 0 ? line.slice(0, idx).trim() : line.trim();
+  return stripSpecComment(line);
 }
 
 /**

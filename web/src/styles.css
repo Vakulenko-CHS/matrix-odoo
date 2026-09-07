@@ -700,6 +700,15 @@ textarea {
 
 .issues-head {
   margin-bottom: 0;
+  gap: 8px;
+}
+
+.issues-shown {
+  margin: 0;
+  margin-right: auto;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .dock-btn {
@@ -824,6 +833,12 @@ textarea {
 .issue-fixes button {
   font-size: 12px;
   padding: 4px 8px;
+}
+
+.issue-fixes button.is-goto,
+.fix-pop button.is-goto {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .fix-pop {

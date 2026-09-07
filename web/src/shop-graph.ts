@@ -1,4 +1,5 @@
 import type { IssueKind, QuickFix, UiIssue } from "./pipeline";
+import { SOFA_START_RE, stripSpecComment } from "../../src/tools/specLine";
 
 export type ShopNodeKind = "output" | "input" | "material";
 export type ShopEdgeStatus = "ok" | "break" | "orphan" | "mismatch";
@@ -60,16 +61,13 @@ const QTY_RE =
 const RAW_UNIT_RE =
   /[-]\s*[\d.,]*\s*(кг|kg|кg|m³|м³|m²|м²|дм²|m3|м3|m2|м2|m|м|г|g)\.?\s*$/iu;
 const EMOJI_RE = /^[\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}🪵🧩🪤🧽]+/u;
-const SOFA_RE = /^(Диван|Ліжко)(?=[\s("«]|$)/u;
+const SOFA_RE = SOFA_START_RE;
 const SKIP_LINE =
   /^(синтаксис|цехи|або|і|---|#\s*список|##\s*інструкц|ціна|<<)/i;
 const FINISHED_RE = /^\[(диван|ліжко|угол)\]$/i;
 
 function stripComment(line: string): string {
-  let s = line.replace(/<!--[\s\S]*?-->/g, "");
-  const slash = s.indexOf("//");
-  if (slash >= 0) s = s.slice(0, slash);
-  return s.trim();
+  return stripSpecComment(line);
 }
 
 function isCommented(line: string): boolean {
@@ -221,6 +219,13 @@ function makeNode(
 function isPrefixPair(a: string, b: string): boolean {
   if (!a || !b || a === b) return false;
   return a.startsWith(`${b} `) || b.startsWith(`${a} `);
+}
+
+function replaceProductId(raw: string, fromId: string, toId: string): string {
+  if (!fromId || fromId === toId) return raw;
+  const idx = raw.indexOf(fromId);
+  if (idx < 0) return raw;
+  return raw.slice(0, idx) + toId + raw.slice(idx + fromId.length);
 }
 
 export function buildShopGraph(text: string, issues: UiIssue[] = []): ShopGraph {
@@ -401,21 +406,41 @@ export function buildShopGraph(text: string, issues: UiIssue[] = []): ShopGraph 
         if (mismatch) {
           const fromBase = from.raw.replace(QTY_RE, "").trim();
           const qtyPart = input.qty ? ` - ${input.qty}` : "";
-          const replacement = `${fromBase}${qtyPart}`;
-          const fix: QuickFix = {
-            id: `fix-mismatch-${input.line}`,
-            label: `Замінити на: ${fromBase}`,
-            action: "replace-line",
-            line: input.line,
-            replacement,
-          };
+          const consumerLine = `${fromBase}${qtyPart}`;
+          const producerLine = replaceProductId(
+            from.raw,
+            from.productId,
+            input.productId,
+          );
+          const fixes: QuickFix[] = [
+            {
+              id: `fix-mismatch-in-${input.line}-${from.line}`,
+              label: `Споживач → «${from.productId}»`,
+              action: "replace-line",
+              line: input.line,
+              replacement: consumerLine,
+            },
+            {
+              id: `fix-mismatch-out-${input.line}-${from.line}`,
+              label: `Виробник → «${input.productId}»`,
+              action: "replace-line",
+              line: from.line,
+              replacement: producerLine,
+            },
+            {
+              id: `goto-mismatch-${input.line}-${from.line}`,
+              label: `→ ${from.workshopKey}, ряд. ${from.line}`,
+              action: "goto-line",
+              line: from.line,
+            },
+          ];
           mismatchIssues.push({
             id: `graph-mismatch-${mismatchIssues.length}`,
             kind: "error",
             source: "chain",
             line: input.line,
             message: `[MISMATCH] Назва не збігається з виробником (${from.workshopKey}): «${input.productId}» замість «${from.productId}». Виробник має повнішу назву.`,
-            fixes: [fix],
+            fixes,
           });
         }
       }

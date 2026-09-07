@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { SOFA_START_RE, stripSpecComment } from "./specLine";
 
 interface BomBlock {
   output: string;
@@ -259,7 +260,6 @@ const CHAINS: Chain[] = [
 const EMOJI_PREFIX = /^[🪵🧩🪤🧽]/u;
 // also match lines like "[Подушка] (...)" or "Диван Угол Леон-Люкс (...)"
 const BRACKET_PREFIX = /^\[.+\]\s*\(/u;
-const SOFA_PREFIX = /^Диван\s+/u;
 // matches "- 2 шт." or "-2шт." at end of line — used for stripping qty
 const QTY_SUFFIX = /-\s*\d*\s*шт\.?\s*$/;
 // matches "- шт." anywhere in line (allows trailing garbage) — used for detection
@@ -268,13 +268,7 @@ const QTY_RE = /-\s*\d*\s*шт/;
 const SECTION_HEADER = /^#+\s*(Цех\s*№[\d\-]+)/u;
 
 function stripLineComment(line: string): string {
-  let s = line;
-  // Strip <!-- ... --> HTML comments
-  s = s.replace(/<!--.*?-->/g, "");
-  // Strip // inline comments
-  const slashIdx = s.indexOf("//");
-  if (slashIdx >= 0) s = s.slice(0, slashIdx);
-  return s.trim();
+  return stripSpecComment(line);
 }
 
 function hasQty(line: string): boolean {
@@ -290,7 +284,7 @@ function isProductLine(line: string): boolean {
   return (
     (EMOJI_PREFIX.test(t) && t.includes("[")) ||
     BRACKET_PREFIX.test(t) ||
-    SOFA_PREFIX.test(t)
+    SOFA_START_RE.test(t)
   );
 }
 

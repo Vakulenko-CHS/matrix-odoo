@@ -77,6 +77,7 @@ const stamp = document.querySelector<HTMLElement>("#stamp")!;
 const stampHint = document.querySelector<HTMLElement>("#stamp-hint")!;
 const countsEl = document.querySelector<HTMLElement>("#counts")!;
 const issuesEl = document.querySelector<HTMLOListElement>("#issues")!;
+const issuesShownEl = document.querySelector<HTMLElement>("#issues-shown")!;
 const fileHint = document.querySelector<HTMLElement>("#file-hint")!;
 const fileInput = document.querySelector<HTMLInputElement>("#file-input")!;
 const btnCheck = document.querySelector<HTMLButtonElement>("#btn-check")!;
@@ -546,14 +547,7 @@ function openFixes(line: number, anchor: HTMLElement, fixes: QuickFix[]): void {
   title.textContent = `Рядок ${line}`;
   fixPop.append(title);
   for (const fix of fixes) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = fix.label;
-    btn.addEventListener("click", () => {
-      runFix(fix);
-      closeFixes();
-    });
-    fixPop.append(btn);
+    fixPop.append(makeFixButton(fix, () => closeFixes()));
   }
   fixPop.hidden = false;
   const rect = anchor.getBoundingClientRect();
@@ -567,9 +561,25 @@ function openFixes(line: number, anchor: HTMLElement, fixes: QuickFix[]): void {
   });
 }
 
+function setIssuesShown(result: ValidationResult, visible: number): void {
+  const total = result.issues.length;
+  const hidden = total - visible;
+  if (total === 0) {
+    issuesShownEl.textContent = "";
+    return;
+  }
+  issuesShownEl.textContent =
+    hidden > 0
+      ? `у списку ${visible} · ще ${hidden} сховано (клік по лічильнику)`
+      : visible > 1
+        ? `у списку ${visible} · гортай`
+        : `у списку ${visible}`;
+}
+
 function renderIssues(result: ValidationResult): void {
   issuesEl.replaceChildren();
   const visible = result.issues.filter((i) => shownKinds.has(i.kind));
+  setIssuesShown(result, visible.length);
 
   if (result.issues.length === 0) {
     const li = document.createElement("li");
@@ -620,14 +630,7 @@ function renderIssues(result: ValidationResult): void {
       const row = document.createElement("div");
       row.className = "issue-fixes";
       for (const fix of issue.fixes) {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = fix.label;
-        btn.addEventListener("click", (event) => {
-          event.stopPropagation();
-          runFix(fix);
-        });
-        row.append(btn);
+        row.append(makeFixButton(fix, (event) => event.stopPropagation()));
       }
       li.append(row);
     }
@@ -710,24 +713,19 @@ function paintResult(result: ValidationResult, writeEditor: boolean): void {
     setSpec(result.content);
     markAttrsApplied(result.content);
   }
-  last = result;
   fileName = result.fileName;
   fileHint.textContent = `Файл: ${result.fileName}. Зліва сирий, справа специфікація.`;
 
   const graphIssues = renderShopNow();
-  if (graphIssues.length > 0) {
-    result.issues.push(...graphIssues);
-    result.counts.errors += graphIssues.filter((i) => i.kind === "error").length;
-    result.counts.warnings += graphIssues.filter((i) => i.kind === "warning").length;
-    if (result.counts.blocking > 0 || result.counts.errors > 0) {
-      result.status = "bad";
-    }
-  }
+  const rest = result.issues.filter(
+    (i) => !String(i.id).startsWith("graph-mismatch-"),
+  );
+  last = recount(result, [...rest, ...graphIssues]);
 
-  setStamp(result.status);
-  setCounts(result);
-  applySpecMarks(result.issues);
-  renderIssues(result);
+  setStamp(last.status);
+  setCounts(last);
+  applySpecMarks(last.issues);
+  renderIssues(last);
   if (activeLine) highlightIssuesForLine(activeLine);
   enableExport();
   persistDraft();
@@ -855,7 +853,26 @@ function onSpecInput(): void {
   persistDraft();
 }
 
+function makeFixButton(
+  fix: QuickFix,
+  onClick?: (event: MouseEvent) => void,
+): HTMLButtonElement {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = fix.label;
+  if (fix.action === "goto-line") btn.classList.add("is-goto");
+  btn.addEventListener("click", (event) => {
+    onClick?.(event);
+    runFix(fix);
+  });
+  return btn;
+}
+
 function runFix(fix: QuickFix): void {
+  if (fix.action === "goto-line") {
+    jumpToLine(fix.line);
+    return;
+  }
   const prev = editor.value;
   const next = applyFix(prev, fix);
   if (next === prev) return;

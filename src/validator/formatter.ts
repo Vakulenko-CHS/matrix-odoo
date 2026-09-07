@@ -12,6 +12,7 @@ const MATERIAL_FIXES: Record<string, string> = {
   деровина: "деревина",
   компонети: "компоненти",
   "крошка ппу": "Крихта ППУ",
+  холофайбер: "Холлофайбер", // 1 «л» — типова помилка; канон = right_names
   холофайдер: "Холлофайбер", // product template name in Odoo
   карказ: "Каркас",
   cинтепон: "Синтепон", // латинська C замість кириличної С
@@ -170,8 +171,11 @@ function fixPriceTypo(line: string): string {
 }
 
 function fixWorkshopHeaders(line: string): string {
-  if (/^Цех\s+№/.test(line.trim())) {
-    return "# " + line.trimStart();
+  const t = line.trimStart();
+  if (/^#/.test(t)) return line;
+  // \b не працює з кирилицею — лише lookahead пробіл/кінець
+  if (/^Цех\s+№/.test(t) || /^ВТК(?=\s|$)/.test(t)) {
+    return "# " + t;
   }
   return line;
 }
@@ -200,20 +204,16 @@ function fixUnclosedParen(line: string): string {
   return line.replace(/(\([^)]+?)\s*(-\s*[\d,.]+)/, "$1) $2");
 }
 
-// ") -qty uom" / ")-qty uom" → ") - qty uom"
-// Також bare: "Ножка 115x115 -4 шт." → "… - 4 шт."
+// ") -qty uom" / ")-2шт" / "name -4 шт." → "… - qty uom"
 // Безпечно: не чіпає "9-1", "ST-2535", "Нео-3" (немає UOM в кінці)
 function fixDashBeforeQty(line: string): string {
-  let result = line.replace(
-    /([\]\)])\s*-(\d[\d,.]*\s*[а-яА-ЯҐЄІЇa-zA-Z²³])/g,
-    "$1 - $2",
+  return line.replace(
+    /([\s\]\)])-(\d[\d,.]*)\s*([а-яА-ЯҐЄІЇa-zA-Z][а-яА-ЯҐЄІЇa-zA-Z0-9.²³]*)\s*$/u,
+    (_m, pre: string, qty: string, uom: string) => {
+      const head = pre === "]" || pre === ")" ? `${pre} ` : pre;
+      return `${head}- ${qty} ${uom}`;
+    },
   );
-  // Bare material / accessory lines without ] or ) before the dash
-  result = result.replace(
-    /^(\s*(?:[^\[\]#].*?|[^\[]*?))\s+-(\d[\d,.]*)\s+([а-яА-ЯҐЄІЇa-zA-Z][а-яА-ЯҐЄІЇa-zA-Z0-9.²³]*)\s*$/u,
-    "$1 - $2 $3",
-  );
-  return result;
 }
 
 // "…)). - qty" / "…). - qty" → "…) - qty" — сміттєва крапка після дужок
@@ -258,15 +258,23 @@ function normalizePorolonLine(line: string): string {
   return `${indent}[Поролон] (${code} (${dims})) - ${qtyMatch[1]} ${qtyMatch[2]}`;
 }
 
-// Нормалізація одиниць виміру: "1.60 kg" → "1.60 кг", "0.042 m³" → "0.042 m³"
+function uomKey(raw: string): string {
+  return raw
+    .replace(/\.$/, "")
+    .toLowerCase()
+    .replace(/²/g, "2")
+    .replace(/³/g, "3");
+}
+
+// Нормалізація одиниць: "1.60 kg" → "1.60 кг", "2.7m²" → "2.7 m²", "2,3 m" → "2.3 m"
 function fixUom(line: string): string {
   return line.replace(
-    /(-\s*)([\d,.]+)\s*([а-яА-ЯҐЄІЇa-zA-Z][а-яА-ЯҐЄІЇa-zA-Z0-9]*\.?)\s*$/,
-    (_match, dash, qty, uom) => {
-      const raw = uom.replace(/\.$/, "");
-      const normalized =
-        UOM_NORMALIZE[raw.toLowerCase()] ?? UOM_NORMALIZE[raw] ?? uom;
-      return `${dash}${qty} ${normalized}`;
+    /(-\s*)([\d,.]+)(\s*)([а-яА-ЯҐЄІЇa-zA-Z][а-яА-ЯҐЄІЇa-zA-Z0-9²³]*\.?)\s*$/u,
+    (_match, dash, qty, _space, uom) => {
+      const qtyNorm = String(qty).replace(",", ".");
+      const key = uomKey(uom);
+      const normalized = UOM_NORMALIZE[key] ?? UOM_NORMALIZE[uom] ?? uom;
+      return `${dash}${qtyNorm} ${normalized}`;
     },
   );
 }

@@ -1,7 +1,13 @@
 export interface QuickFix {
   id: string;
   label: string;
-  action: "delete-line" | "replace-line" | "merge-next" | "replace-all" | "insert-after";
+  action:
+    | "delete-line"
+    | "replace-line"
+    | "merge-next"
+    | "replace-all"
+    | "insert-after"
+    | "goto-line";
   line: number;
   extraLines?: number;
   replacement?: string;
@@ -21,6 +27,7 @@ const TYPOS: Array<{ re: RegExp; correct: string }> = [
   { re: /обємі/gi, correct: "об'ємі" },
   { re: /труегольн/gi, correct: "трикутн" },
   { re: /накладная/gi, correct: "Накладна" },
+  { re: /холофайбер/gi, correct: "Холлофайбер" },
   { re: /холофайдер/gi, correct: "Холлофайбер" },
   { re: /крошка ппу/gi, correct: "Крихта ППУ" },
   { re: /cинтепон/gi, correct: "Синтепон" },
@@ -156,6 +163,59 @@ export function lintSpec(content: string): LintHit[] {
             label: "Видалити рядок",
             action: "delete-line",
             line: n,
+          },
+        ],
+      });
+    }
+
+    const gluedDash = t.match(
+      /([\s\]\)])-(\d[\d,.]*)\s*([а-яА-ЯҐЄІЇa-zA-Z][а-яА-ЯҐЄІЇa-zA-Z0-9.²³]*)\s*$/u,
+    );
+    if (gluedDash && !/\s-\s/.test(t.slice(Math.max(0, t.lastIndexOf("-") - 1)))) {
+      const pre =
+        gluedDash[1] === "]" || gluedDash[1] === ")"
+          ? `${gluedDash[1]} `
+          : gluedDash[1];
+      const replacement = t.replace(
+        /([\s\]\)])-(\d[\d,.]*)\s*([а-яА-ЯҐЄІЇa-zA-Z][а-яА-ЯҐЄІЇa-zA-Z0-9.²³]*)\s*$/u,
+        `${pre}- ${gluedDash[2]} ${gluedDash[3]}`,
+      );
+      hits.push({
+        kind: "error",
+        source: "lint",
+        line: n,
+        message: "Немає пробілу після «-» перед кількістю. Має бути «- N uom».",
+        original: t,
+        fixes: [
+          {
+            id: `dash-qty-${seq++}`,
+            label: `Пробіл: «- ${gluedDash[2]} ${gluedDash[3]}»`,
+            action: "replace-line",
+            line: n,
+            replacement,
+          },
+        ],
+      });
+    }
+
+    const gluedUom = t.match(/(-\s*[\d,.]+)([а-яА-ЯҐЄІЇa-zA-Z²³])/u);
+    if (gluedUom) {
+      hits.push({
+        kind: "error",
+        source: "lint",
+        line: n,
+        message: "Немає пробілу між числом і одиницею виміру.",
+        original: t,
+        fixes: [
+          {
+            id: `uom-space-${seq++}`,
+            label: "Вставити пробіл перед UOM",
+            action: "replace-line",
+            line: n,
+            replacement: t.replace(
+              /(-\s*[\d,.]+)([а-яА-ЯҐЄІЇa-zA-Z²³])/u,
+              "$1 $2",
+            ),
           },
         ],
       });
@@ -305,6 +365,7 @@ export function lintSpec(content: string): LintHit[] {
 }
 
 export function applyFix(content: string, fix: QuickFix): string {
+  if (fix.action === "goto-line") return content;
   const lines = content.split("\n");
   const idx = fix.line - 1;
   if (idx < 0 || idx >= lines.length) return content;
