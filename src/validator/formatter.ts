@@ -392,55 +392,6 @@ function fixMissingNapivfabrykatAttr(
   return result;
 }
 
-// Document-level: insert "Ціна 0 грн" before next workshop header when price is missing
-function insertMissingPrices(lines: string[], changes: string[]): string[] {
-  const result: string[] = [];
-  let inWorkshop = false;
-  let workshopHasPrice = false;
-  let workshopHasContent = false;
-  let workshopLabel = "";
-
-  const closeWorkshop = () => {
-    if (inWorkshop && !workshopHasPrice && workshopHasContent) {
-      result.push("Ціна 0 грн <!-- ? -->");
-      result.push("");
-      changes.push(
-        `Цех "${workshopLabel}": додано відсутню "Ціна 0 грн <!-- ? -->"`,
-      );
-    }
-  };
-
-  for (let i = 0; i < lines.length; i++) {
-    const trimmed = lines[i].trim();
-    const isHeader = trimmed.startsWith("#") && trimmed.includes("№");
-
-    if (isHeader) {
-      closeWorkshop();
-      workshopLabel = trimmed.match(/^#+\s*(Цех\s+№[\w-]+)/)?.[1] ?? trimmed;
-      workshopHasPrice = false;
-      workshopHasContent = false;
-      inWorkshop = true;
-    } else if (inWorkshop && trimmed) {
-      workshopHasContent = true;
-    }
-
-    if (inWorkshop && /^ціна\s+[\d.]+\s*грн/i.test(trimmed)) {
-      workshopHasPrice = true;
-    }
-
-    result.push(lines[i]);
-  }
-
-  if (inWorkshop && !workshopHasPrice && workshopHasContent) {
-    result.push("Ціна 0 грн <!-- ? -->");
-    changes.push(
-      `Цех "${workshopLabel}": додано відсутню "Ціна 0 грн <!-- ? -->"`,
-    );
-  }
-
-  return result;
-}
-
 // "[Ламінат] (712x220)" → "🧩[Ламінат - лист] (712x220)", Cyrillicx→ Latin x in sizes
 function fixLaminateName(line: string): string {
   return line.replace(
@@ -605,7 +556,6 @@ export function formatDocumentContent(original: string): FormatterResult {
   processedLines = fixAttrMarkersOnProducts(processedLines, changes, activeAttrs);
   processedLines = insertDnoKarkasuComment(processedLines, changes, activeAttrs);
   processedLines = removeDuplicateAboBlocks(processedLines, changes);
-  processedLines = insertMissingPrices(processedLines, changes);
   processedLines = mergeDanglingQty(processedLines, changes);
   processedLines = compressWorkshopBlanks(processedLines, changes);
 

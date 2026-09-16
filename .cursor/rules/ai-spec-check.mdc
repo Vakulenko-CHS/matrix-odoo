@@ -33,6 +33,7 @@ npm run ai-check -- --as-is "path/to/file.md"
 - `STATUS fixed` — only `auto` (formatter/tools would fix). Disk still unchanged. Report autos; do not rewrite unless the user asked to edit.
 - `STATUS bad` — `blocking` and/or `error` must be fixed. `warning` is secondary.
 - Lines: `L12 [source] message` then optional `  | original line`.
+- Optional `  [btn] label` — same web quick-fix buttons (one line per button).
 - Sources: `prep` `format` `check` `attrs` `chain` `bom` `lint`.
 - Exit `1` = blocking/errors. Exit `2` = missing file / usage. Exit `0` = no blocking/errors.
 

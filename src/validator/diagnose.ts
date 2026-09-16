@@ -6,6 +6,7 @@ import {
   runSpecTools,
   type SpecToolPass,
 } from "./specPipeline";
+import { inferFixes } from "./inferFixes";
 import { lintSpec, type QuickFix } from "./lint";
 
 const AUTO_TODO_LINE =
@@ -186,6 +187,14 @@ export function appendLint(issues: DiagnoseIssue[], content: string): void {
   }
 }
 
+function attachInferredFixes(issues: DiagnoseIssue[], content: string): void {
+  for (const issue of issues) {
+    if (issue.fixes?.length) continue;
+    const inferred = inferFixes(issue.message, issue.line, content);
+    if (inferred.length) issue.fixes = inferred;
+  }
+}
+
 function finish(
   original: string,
   content: string,
@@ -193,6 +202,7 @@ function finish(
   mode: DiagnoseMode,
   issues: DiagnoseIssue[],
 ): DiagnoseResult {
+  attachInferredFixes(issues, content);
   const counts = {
     blocking: issues.filter((i) => i.kind === "blocking").length,
     errors: issues.filter((i) => i.kind === "error").length,
@@ -287,6 +297,9 @@ export function formatDiagnoseReport(
       const loc = issue.line == null ? "L?" : `L${issue.line}`;
       lines.push(`${loc} [${issue.source}] ${issue.message}`);
       if (issue.original) lines.push(`  | ${issue.original}`);
+      for (const fix of issue.fixes ?? []) {
+        if (fix.label) lines.push(`  [btn] ${fix.label}`);
+      }
     }
     lines.push("");
   }
