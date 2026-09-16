@@ -713,8 +713,8 @@ function scanForSpringMarker(lines: string[], fromIdx: number): string {
     const m = t.match(/^\[Войлок\].*-\s*([\d.,]+)\s*m/);
     if (m) {
       return parseFloat(m[1].replace(",", ".")) >= 3
-        ? "Посилений Блок"
-        : "Звичайний Блок";
+        ? "Посилений"
+        : "Звичайний";
     }
   }
   return "";
