@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { SOFA_START_RE, stripSpecComment } from "./specLine";
+import { lineHtmlCommentFlags } from "./htmlComment";
 
 const EMOJI_RE = /^[🪵🧩🪤🧽]+/u;
 const BRACKET_START = /^\[.+\]\s*\(/u;
@@ -66,6 +67,7 @@ export function runBomCheck(
 ): { content: string; issues: string[] } {
   console.log(`\nBOM: ${fileName}`);
   const lines = content.split("\n");
+  const commented = lineHtmlCommentFlags(content);
   const issues: string[] = [];
   const fixes: Fix[] = [];
   const pendingTodos = new Map<number, string[]>(); // lineIdx → todo messages
@@ -74,6 +76,7 @@ export function runBomCheck(
   // Проходимо всі рядки ДО основного циклу. Pre-pass обробляє ВСІ рядки
   // (включно з # ВТК яку основний цикл пропускає бо вона не є "Цех №").
   for (let i = 0; i < lines.length; i++) {
+    if (commented[i]) continue;
     // Spelling auto-fix: виправляємо відомі орфографічні варіанти назв
     // сировини/фурнітури що є ключовими словами у RAW_MATERIAL_CATEGORY.
     for (const rule of SPELLING_FIXES) {
@@ -135,6 +138,7 @@ export function runBomCheck(
   }
 
   for (let i = 0; i < lines.length; i++) {
+    if (commented[i]) continue;
     const raw = lines[i];
     const t = stripComment(raw);
 

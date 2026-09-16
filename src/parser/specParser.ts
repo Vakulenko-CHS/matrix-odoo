@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { BomDef, ComponentSpec, OperationSpec, UOM } from "../bom/types";
+import { lineHtmlCommentFlags } from "../tools/htmlComment";
 
 interface WorkshopHeader {
   number: string;
@@ -206,6 +207,7 @@ function parsePrice(line: string): number | undefined {
 export function parseSpecFile(filePath: string): BomDef[] {
   const content = fs.readFileSync(filePath, "utf-8");
   const lines = content.split("\n");
+  const commented = lineHtmlCommentFlags(content);
   const boms: BomDef[] = [];
 
   let currentWorkshop: WorkshopHeader | null = null;
@@ -236,6 +238,7 @@ export function parseSpecFile(filePath: string): BomDef[] {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmed = line.trim();
+    if (commented[i]) continue;
 
     // Workshop header: "# Цех №N ..."
     if (trimmed.startsWith("#") && trimmed.includes("Цех")) {

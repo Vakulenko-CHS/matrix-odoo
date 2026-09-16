@@ -4,6 +4,7 @@ import {
   ComponentEntry,
   OperationEntry,
 } from "./types";
+import { lineHtmlCommentFlags } from "../htmlComment";
 
 const DEFAULT_ATTR_NAMES = ["Модель", "Тканина", "Наповнювач"];
 
@@ -457,6 +458,7 @@ function parseWorkshopHeader(line: string): WorkshopInfo | null {
 // Main parsing function — returns array of BomEntry
 export function parseDoc(content: string): BomEntry[] {
   const lines = content.split("\n");
+  const commented = lineHtmlCommentFlags(content);
   const boms: BomEntry[] = [];
 
   let currentWorkshop: WorkshopInfo | null = null;
@@ -520,8 +522,9 @@ export function parseDoc(content: string): BomEntry[] {
     flushBom();
   }
 
-  for (const rawLine of lines) {
-    const line = rawLine;
+  for (let i = 0; i < lines.length; i++) {
+    if (commented[i]) continue;
+    const line = lines[i];
     const trimmed = line.trim();
 
     // Workshop header

@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { lineHtmlCommentFlags } from "../tools/htmlComment";
 
 // Авто-виправлення типових помилок форматування сирих документів.
 // Не змінює смислову структуру — тільки текстові артефакти.
@@ -520,12 +521,14 @@ export interface FormatterResult {
 
 export function formatDocumentContent(original: string): FormatterResult {
   const originalLines = original.split("\n");
+  const commented = lineHtmlCommentFlags(original);
   const changes: string[] = [];
 
   const activeAttrs = parseActiveAttrs(original);
 
   const fixedLines = originalLines.map((line, i) => {
     const lineNum = i + 1;
+    if (commented[i]) return line;
     let fixed = line;
 
     const apply = (fn: (l: string) => string, msg: string) => {
@@ -916,10 +919,13 @@ function compressWorkshopBlanks(lines: string[], changes: string[]): string[] {
   });
   if (start < 0) return lines;
 
+  const commented = lineHtmlCommentFlags(lines.join("\n"));
   const kept: Array<{ kind: WorkshopLineKind; line: string }> = [];
   let dropped = 0;
   for (let i = start; i < lines.length; i++) {
-    const kind = classifyWorkshopLine(lines[i]);
+    const kind = commented[i]
+      ? "comment"
+      : classifyWorkshopLine(lines[i]);
     if (kind === "blank") {
       dropped++;
       continue;

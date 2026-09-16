@@ -1,4 +1,5 @@
 import type { IssueKind, QuickFix, UiIssue } from "./pipeline";
+import { lineHtmlCommentFlags } from "../../src/tools/htmlComment";
 import { SOFA_START_RE, stripSpecComment } from "../../src/tools/specLine";
 
 export type ShopNodeKind = "output" | "input" | "material";
@@ -230,6 +231,7 @@ function replaceProductId(raw: string, fromId: string, toId: string): string {
 
 export function buildShopGraph(text: string, issues: UiIssue[] = []): ShopGraph {
   const lines = text.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n").split("\n");
+  const commented = lineHtmlCommentFlags(lines.join("\n"));
   const workshops: ShopWorkshop[] = [];
   const nodes: ShopNode[] = [];
   const mismatchIssues: UiIssue[] = [];
@@ -250,7 +252,7 @@ export function buildShopGraph(text: string, issues: UiIssue[] = []): ShopGraph 
     const t = stripComment(rawLine);
     const n = i + 1;
     if (!t) continue;
-    if (isCommented(rawLine)) continue;
+    if (commented[i] || isCommented(rawLine)) continue;
     if (/^---+$/.test(t)) {
       title = "";
       continue;

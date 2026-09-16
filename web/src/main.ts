@@ -12,6 +12,11 @@ import {
 } from "./pipeline";
 import { mountShop } from "./shop-view";
 import { SPEC_TEMPLATE } from "./spec-template";
+import {
+  findHtmlComments,
+  toggleHtmlComment,
+  type HtmlCommentRange,
+} from "../../src/tools/htmlComment";
 import "./styles.css";
 
 const SPLIT_KEY = "matrix-spec-raw-split";
@@ -427,19 +432,33 @@ function appendPlain(el: HTMLElement, text: string): void {
   if (last < text.length) el.append(text.slice(last));
 }
 
-function appendLineText(el: HTMLElement, line: string): void {
-  const re = /<!--[\s\S]*?-->/g;
-  let last = 0;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(line))) {
-    if (m.index > last) appendPlain(el, line.slice(last, m.index));
-    const span = document.createElement("span");
-    span.className = /<!--\s*TODO/i.test(m[0]) ? "cmt-todo" : "cmt";
-    span.textContent = m[0];
-    el.append(span);
-    last = m.index + m[0].length;
+function appendLineText(
+  el: HTMLElement,
+  line: string,
+  lineStart: number,
+  comments: HtmlCommentRange[],
+): void {
+  let i = 0;
+  while (i < line.length) {
+    const abs = lineStart + i;
+    const hit = comments.find((c) => abs >= c.start && abs < c.end);
+    if (hit) {
+      const take = Math.min(line.length, hit.end - lineStart) - i;
+      const span = document.createElement("span");
+      span.className = hit.todo ? "cmt-todo" : "cmt";
+      span.textContent = line.slice(i, i + take);
+      el.append(span);
+      i += take;
+      continue;
+    }
+    let next = lineStart + line.length;
+    for (const c of comments) {
+      if (c.start > abs && c.start < next) next = c.start;
+    }
+    const take = next - abs;
+    appendPlain(el, line.slice(i, i + take));
+    i += take;
   }
-  if (last < line.length) appendPlain(el, line.slice(last));
   if (!line) el.append(" ");
 }
 
@@ -508,8 +527,10 @@ function highlightIssuesForLine(n: number | null): void {
 
 function renderDecorations(text: string): void {
   const lines = text.split("\n");
+  const comments = findHtmlComments(text);
   gutter.replaceChildren();
   backdrop.replaceChildren();
+  let offset = 0;
   lines.forEach((line, i) => {
     const n = i + 1;
     const kind = lineKinds.get(n);
@@ -543,10 +564,11 @@ function renderDecorations(text: string): void {
     const hl = document.createElement("div");
     hl.className = "hl";
     hl.id = `HL${n}`;
-    appendLineText(hl, line);
+    appendLineText(hl, line, offset, comments);
     if (kind) hl.dataset.kind = kind;
     if (activeLine === n) hl.classList.add("active");
     backdrop.append(hl);
+    offset += line.length + 1;
   });
   syncScroll();
   observeLineMarks();
@@ -877,6 +899,34 @@ function scheduleShop(): void {
   shopTimer = window.setTimeout(renderShopNow, SHOP_MS);
 }
 
+function applySpecPatch(next: string, selStart: number, selEnd: number): void {
+  if (next === editor.value) return;
+  pushUndo(editor.value);
+  applyingHistory = true;
+  const scroll = editor.scrollTop;
+  editor.value = next;
+  editor.setSelectionRange(selStart, selEnd);
+  editor.scrollTop = scroll;
+  applyingHistory = false;
+  typingBurst = false;
+  closeFixes();
+  markSpecEdited();
+  if (last) last = { ...last, content: next };
+  enableExport();
+  renderDecorations(next);
+  highlightIssuesForLine(lineFromCaret());
+  scheduleLint();
+  scheduleShop();
+  persistDraft();
+}
+
+function toggleEditorComment(): void {
+  const from = editor.selectionStart ?? 0;
+  const to = editor.selectionEnd ?? from;
+  const next = toggleHtmlComment(editor.value, from, to);
+  applySpecPatch(next.text, next.start, next.end);
+}
+
 function onSpecInput(): void {
   if (applyingHistory) return;
   closeFixes();
@@ -972,11 +1022,14 @@ async function copyText(): Promise<void> {
 
 function renderTemplateView(): void {
   templateView.replaceChildren();
+  const comments = findHtmlComments(SPEC_TEMPLATE);
+  let offset = 0;
   for (const line of SPEC_TEMPLATE.split("\n")) {
     const hl = document.createElement("div");
     hl.className = "hl";
-    appendLineText(hl, line);
+    appendLineText(hl, line, offset, comments);
     templateView.append(hl);
+    offset += line.length + 1;
   }
 }
 
@@ -1310,6 +1363,12 @@ document.addEventListener(
       return;
     }
     const code = e.code;
+    if (code === "Slash" || e.key === "/") {
+      if (document.activeElement !== editor) return;
+      e.preventDefault();
+      toggleEditorComment();
+      return;
+    }
     if (e.key === "Enter") {
       e.preventDefault();
       void runFull();

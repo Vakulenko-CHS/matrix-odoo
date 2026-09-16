@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { lineHtmlCommentFlags } from "../tools/htmlComment";
 
 export interface CheckError {
   line: number;
@@ -182,6 +183,7 @@ export function checkDocumentContent(
   knownLabels: string[] = [...knownProducts],
 ): CheckResult {
   const lines = content.split("\n");
+  const commented = lineHtmlCommentFlags(content);
   const errors: CheckError[] = [];
   const warnings: CheckError[] = [];
   const knownTemplatePrefixes = extractTemplatePrefixes(knownLabels);
@@ -269,6 +271,7 @@ export function checkDocumentContent(
     const trimmed = line.trim();
 
     if (!trimmed) continue;
+    if (commented[i]) continue;
 
     // Workshop header (тільки якщо є "№" — щоб не чіпати "## Цехи:" тощо)
     if (trimmed.startsWith("#") && trimmed.includes("№")) {

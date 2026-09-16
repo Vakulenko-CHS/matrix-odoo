@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { SOFA_START_RE, stripSpecComment } from "./specLine";
+import { findHtmlComments, lineHtmlCommentFlags } from "./htmlComment";
 
 interface BomBlock {
   output: string;
@@ -293,6 +294,7 @@ function isProductLine(line: string): boolean {
 function parseDocument(
   fileLines: string[],
 ): Map<string, { header: string; boms: BomBlock[] }> {
+  const commented = lineHtmlCommentFlags(fileLines.join("\n"));
   const sections = new Map<string, { header: string; boms: BomBlock[] }>();
 
   let currentKey: string | null = null;
@@ -325,6 +327,7 @@ function parseDocument(
   }
 
   for (i = 0; i < fileLines.length; i++) {
+    if (commented[i]) continue;
     const raw = fileLines[i];
     const trimmed = raw.trim();
 
@@ -445,9 +448,9 @@ function isCommentedOutInFile(
   fileLines: string[],
   normProduct: string,
 ): boolean {
-  return fileLines.some((line) => {
-    if (!line.includes("<!--")) return false;
-    const content = line.replace(/<!--/g, "").replace(/-->/g, "");
+  const text = fileLines.join("\n");
+  return findHtmlComments(text).some((r) => {
+    const content = text.slice(r.start, r.end).replace(/<!--|-->/g, "");
     return normalizeProduct(content).includes(normProduct);
   });
 }
@@ -958,13 +961,13 @@ function verify(
 
         // Check commented-out inputs — already acknowledged on a previous run
         const searchStart = bom.outputLineIdx + 1;
-        const commentedPresent = fileLines
-          .slice(searchStart, Math.min(fileLines.length, searchStart + 30))
-          .some((line) => {
-            if (!line.includes("<!--")) return false;
-            const content = line.replace(/<!--/g, "").replace(/-->/g, "");
-            return normalizeProduct(content).includes(normRequired);
-          });
+        const commentedPresent = isCommentedOutInFile(
+          fileLines.slice(
+            searchStart,
+            Math.min(fileLines.length, searchStart + 30),
+          ),
+          normRequired,
+        );
         if (commentedPresent) continue;
 
         const fixKey = `${bom.outputLineIdx}::${required}`;

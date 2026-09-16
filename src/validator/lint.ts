@@ -1,3 +1,5 @@
+import { lineHtmlCommentFlags } from "../tools/htmlComment";
+
 export interface QuickFix {
   id: string;
   label: string;
@@ -99,6 +101,7 @@ export interface LintHit {
 
 export function lintSpec(content: string): LintHit[] {
   const lines = content.split("\n");
+  const commented = lineHtmlCommentFlags(content);
   const hits: LintHit[] = [];
   let seq = 0;
 
@@ -107,7 +110,7 @@ export function lintSpec(content: string): LintHit[] {
     const t = line.trim();
     const n = i + 1;
 
-    if (t.startsWith("<!--")) {
+    if (commented[i] || t.startsWith("<!--")) {
       if (/<!--\s*TODO/i.test(t)) {
         hits.push({
           kind: "blocking",
@@ -223,6 +226,7 @@ export function lintSpec(content: string): LintHit[] {
   }
 
   for (let i = 0; i < lines.length; i++) {
+    if (commented[i]) continue;
     const t = lines[i].trim();
     if (!t.includes("[") || /-\s*[\d.,]+\s*\S+\s*$/.test(t)) continue;
     let j = i + 1;
@@ -254,6 +258,7 @@ export function lintSpec(content: string): LintHit[] {
 
   const counts = new Map<string, { raw: string; lines: number[] }>();
   lines.forEach((line, i) => {
+    if (commented[i]) return;
     for (const name of extractNames(line)) {
       const key = normalizeName(name);
       if (!key || SKIP_NAME.test(key)) continue;
@@ -337,6 +342,7 @@ export function lintSpec(content: string): LintHit[] {
   for (let i = 0; i < lines.length; i++) {
     const raw = lines[i];
     const t = raw.trim();
+    if (commented[i]) continue;
 
     if (WORKSHOP_HDR.test(t)) { flushBom(); inWs = true; continue; }
     if (!inWs) continue;
