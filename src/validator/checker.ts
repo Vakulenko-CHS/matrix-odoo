@@ -191,11 +191,12 @@ export function checkDocumentContent(
   let inWorkshop = false;
   let hasWorkshops = false;
   let workshopHasPrice = false;
+  let workshopHasContent = false;
   let workshopLabel = "";
   let workshopHeaderLine = 0;
 
   const warnMissingPrice = () => {
-    if (inWorkshop && !workshopHasPrice) {
+    if (inWorkshop && !workshopHasPrice && workshopHasContent) {
       warnings.push({
         line: workshopHeaderLine,
         severity: "warning",
@@ -290,6 +291,7 @@ export function checkDocumentContent(
       workshopLabel = trimmed.match(/^#+\s*(Цех\s+№[\w-]+)/)?.[1] ?? trimmed;
       workshopHeaderLine = lineNum;
       workshopHasPrice = false;
+      workshopHasContent = false;
       inWorkshop = true;
       hasWorkshops = true;
       if (inWorkshop5) validateFoam5();
@@ -318,6 +320,8 @@ export function checkDocumentContent(
     }
 
     if (!inWorkshop) continue;
+
+    workshopHasContent = true;
 
     if (inWorkshop5) {
       if (trimmed === "або" || trimmed === "Або") {
