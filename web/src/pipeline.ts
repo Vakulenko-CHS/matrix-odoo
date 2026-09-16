@@ -146,6 +146,18 @@ function inferChainOutFixes(message: string, line: number | null, content: strin
   return fixes;
 }
 
+function lastWorkshopBodyLine(content: string, headerLine: number): number {
+  const docLines = content.split("\n");
+  const start = Math.max(0, headerLine - 1);
+  let last = start;
+  for (let i = start + 1; i < docLines.length; i++) {
+    const t = docLines[i].trim();
+    if (t.startsWith("#") && t.includes("№")) break;
+    if (t) last = i;
+  }
+  return last + 1;
+}
+
 function inferFixes(message: string, line: number | null, content: string): QuickFix[] {
   if (message.startsWith("[CHAIN-OUT]")) {
     return inferChainOutFixes(message, line, content);
@@ -163,6 +175,24 @@ function inferFixes(message: string, line: number | null, content: string): Quic
         line,
       },
     ];
+  }
+  if (/не має рядка "Ціна"/.test(message)) {
+    const insertAt = lastWorkshopBodyLine(content, line);
+    if (insertAt > line) {
+      const inserted = "\nЦіна 0 грн".split("\n");
+      const rel = inserted.findIndex((l) => /^Ціна\s/i.test(l));
+      return [
+        {
+          id: `add-price-${line}`,
+          label: "Додати ціну 0 грн",
+          action: "insert-after",
+          line: insertAt,
+          replacement: "\nЦіна 0 грн",
+          focusLine: insertAt + 1 + rel,
+          selectText: "0",
+        },
+      ];
+    }
   }
   if (/Ціна = 0/.test(message) || /не підтверджена/.test(message)) {
     const original = content.split("\n")[line - 1] ?? "";

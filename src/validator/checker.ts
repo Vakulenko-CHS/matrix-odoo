@@ -200,7 +200,7 @@ export function checkDocumentContent(
       warnings.push({
         line: workshopHeaderLine,
         severity: "warning",
-        message: `Цех "${workshopLabel}" не має рядка "Ціна". Додати: "Ціна 0 грн"`,
+        message: `Цех "${workshopLabel}" не має рядка "Ціна"`,
         original: "",
       });
     }

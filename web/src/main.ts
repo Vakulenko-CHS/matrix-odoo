@@ -708,16 +708,18 @@ function jumpToLine(line: number): void {
   });
 }
 
-function jumpTo(issue: UiIssue): void {
+function jumpTo(issue: UiIssue, range?: { from: number; to: number }): void {
   highlightIssuesForLine(issue.line);
   if (!issue.line) return;
 
   const lines = editor.value.split("\n");
   let start = 0;
   for (let i = 0; i < issue.line - 1; i++) start += lines[i].length + 1;
-  const end = start + (lines[issue.line - 1]?.length ?? 0);
+  const lineText = lines[issue.line - 1] ?? "";
+  const from = range ? start + Math.max(0, range.from) : start;
+  const to = range ? start + Math.min(lineText.length, range.to) : start + lineText.length;
   editor.focus();
-  editor.setSelectionRange(start, end);
+  editor.setSelectionRange(from, to);
 
   const hl = document.getElementById(`HL${issue.line}`);
   hl?.scrollIntoView({ block: "center" });
@@ -966,15 +968,26 @@ function runFix(fix: QuickFix): void {
   setSpec(next);
   enableExport();
   runLintNow();
-  if (fix.line) {
-    jumpTo({
+  const focusLine = fix.focusLine ?? fix.line;
+  if (!focusLine) return;
+  const lines = next.split("\n");
+  const lineNo = Math.min(focusLine, lines.length);
+  const lineText = lines[lineNo - 1] ?? "";
+  let range: { from: number; to: number } | undefined;
+  if (fix.selectText) {
+    const i = lineText.indexOf(fix.selectText);
+    if (i >= 0) range = { from: i, to: i + fix.selectText.length };
+  }
+  jumpTo(
+    {
       id: "after-fix",
       kind: "warning",
       source: "lint",
-      line: Math.min(fix.line, next.split("\n").length),
+      line: lineNo,
       message: "",
-    });
-  }
+    },
+    range,
+  );
 }
 
 async function readFile(file: File): Promise<void> {

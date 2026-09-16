@@ -14,6 +14,10 @@ export interface QuickFix {
   extraLines?: number;
   replacement?: string;
   find?: string;
+  /** 1-indexed line to focus after apply. Defaults to `line`. */
+  focusLine?: number;
+  /** Select first occurrence of this text on the focus line. */
+  selectText?: string;
 }
 
 const SKIP_NAME =
