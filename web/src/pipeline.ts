@@ -89,7 +89,67 @@ function resolveLine(content: string, message: string): number | null {
   return lineFromText(message) ?? lineFromSnippet(content, message);
 }
 
+function inferChainOutFixes(message: string, line: number | null, content: string): QuickFix[] {
+  const fixes: QuickFix[] = [];
+  const docLines = content.split("\n");
+
+  // Canonical product name = first non-empty, non-special line of the document (line 1).
+  const docTitle = docLines.find(l => {
+    const t = l.trim();
+    return t && !t.startsWith("#") && !t.startsWith("//") && !t.startsWith("<!--") && !t.startsWith("<<");
+  })?.trim() ?? "";
+
+  // Fix 1: Any Диван/Угол/Ліжко sofa output line whose name (before "(") doesn't match
+  // the document title → offer to replace with the document title.
+  // This covers both wrong case ("угол" instead of "Угол") and wrong/partial names.
+  const SOFA_ANY = /^(диван|ліжко|угол)\s+/iu;
+  for (let i = 0; i < docLines.length; i++) {
+    const t = docLines[i].trim();
+    if (!SOFA_ANY.test(t)) continue;
+    const parenIdx = t.indexOf("(");
+    const namePart = (parenIdx >= 0 ? t.slice(0, parenIdx) : t).trim();
+    const attrsPart = parenIdx >= 0 ? t.slice(parenIdx) : "";
+    if (!docTitle || namePart === docTitle) continue;
+    const fixedLine = attrsPart ? `${docTitle} ${attrsPart}` : docTitle;
+    fixes.push({
+      id: `chain-title-${i}`,
+      label: `Замінити «${namePart}» → «${docTitle}»`,
+      action: "replace-line",
+      line: i + 1,
+      replacement: fixedLine,
+    });
+  }
+
+  // Fix 2: When the output product ID differs from how it's consumed downstream,
+  // propagate the canonical name from the output (earlier source) to all consumers.
+  // Message: "... споживається як: "ConsumedId" у Цех №Y"
+  const outIdMatch = message.match(/\[CHAIN-OUT\][^"]*"([^"]+)"/u);
+  const consumedBlock = message.match(/споживається як:\s*(.+)$/u)?.[1];
+  if (outIdMatch && consumedBlock) {
+    const outId = outIdMatch[1];
+    const consumedIds = [...consumedBlock.matchAll(/"([^"]+)"/gu)]
+      .map(m => m[1])
+      .filter(id => id !== outId);
+    for (let ci = 0; ci < Math.min(consumedIds.length, 2); ci++) {
+      const wrongId = consumedIds[ci];
+      fixes.push({
+        id: `chain-rename-${ci}`,
+        label: `Замінити «${wrongId}» → «${outId}» (скрізь у файлі)`,
+        action: "replace-all",
+        line: line ?? 1,
+        find: wrongId,
+        replacement: outId,
+      });
+    }
+  }
+
+  return fixes;
+}
+
 function inferFixes(message: string, line: number | null, content: string): QuickFix[] {
+  if (message.startsWith("[CHAIN-OUT]")) {
+    return inferChainOutFixes(message, line, content);
+  }
   if (!line) return [];
   if (
     message.startsWith("[ZERO]") ||
