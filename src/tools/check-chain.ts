@@ -260,7 +260,7 @@ const CHAINS: Chain[] = [
 
 const EMOJI_PREFIX = /^[🪵🧩🪤🧽]/u;
 // also match lines like "[Подушка] (...)" or "Диван Угол Леон-Люкс (...)"
-const BRACKET_PREFIX = /^\[.+\]\s*\(/u;
+const BRACKET_PREFIX = /^\[.+\](\s*\(|\s+[^(%])/u;
 // matches "- 2 шт." or "-2шт." at end of line — used for stripping qty
 const QTY_SUFFIX = /-\s*\d*\s*шт\.?\s*$/;
 // matches "- шт." anywhere in line (allows trailing garbage) — used for detection
@@ -376,6 +376,10 @@ function parseDocument(
  *      "🪵[Каркас - нарізана деревина] (Д.Леон-Люкс Колеса"
  */
 function normalizeProduct(s: string): string {
+  const type = getProductType(s);
+  const id = getProductId(s);
+  if (type && id) return `${type} ${id}`;
+  if (type) return type;
   const parenOpen = s.indexOf("(");
   if (parenOpen < 0) return s.trim();
   const inner = s.slice(parenOpen + 1);
@@ -476,9 +480,27 @@ function buildKnownOutputs(): Set<string> {
  * "🪤[Накладка] (%Attr%)"          → "" (only attribute, no id)
  */
 function getProductId(output: string): string {
-  const parenOpen = output.indexOf("(");
+  const noQty = output.replace(/\s*-\s*[\d.,]+\s*\S+\s*$/u, "").trim();
+  const after = noQty.match(/\]\s+(.+)$/);
+  if (after) {
+    const rest = after[1].trim();
+    if (rest.startsWith("(")) {
+      const inner = rest.slice(1);
+      const sepIdx = inner.search(/[,%]/);
+      const content =
+        sepIdx >= 0
+          ? inner.slice(0, sepIdx).trim()
+          : inner.replace(/\).*/, "").trim();
+      if (content.startsWith("%")) return "";
+      return content;
+    }
+    const paren = rest.indexOf("(");
+    const model = (paren < 0 ? rest : rest.slice(0, paren)).trim();
+    if (model && !model.startsWith("%")) return model;
+  }
+  const parenOpen = noQty.indexOf("(");
   if (parenOpen < 0) return "";
-  const inner = output.slice(parenOpen + 1);
+  const inner = noQty.slice(parenOpen + 1);
   const sepIdx = inner.search(/[,%]/);
   const content =
     sepIdx >= 0

@@ -16,6 +16,8 @@ const MATERIAL_FIXES: Record<string, string> = {
   холофайбер: "Холлофайбер", // 1 «л» — типова помилка; канон = right_names
   холофайдер: "Холлофайбер", // product template name in Odoo
   карказ: "Каркас",
+  сборка: "збірка",
+  "напівфабрікат": "напівфабрикат",
   cинтепон: "Синтепон", // латинська C замість кириличної С
 };
 
@@ -141,10 +143,11 @@ function fixAttributeCapitalization(line: string): string {
 }
 
 function fixAttributeSpacing100dsp(line: string): string {
-  return line.replace(/\(([^)]*)\)/g, (match, inner) => {
-    const fixed = inner.replace(/100\s+ДСП/g, "100ДСП");
-    return `(${fixed})`;
-  });
+  return line.replace(/100ДСП/g, "100 ДСП");
+}
+
+function fixMcNeo(line: string): string {
+  return line.replace(/М Ч /g, "М.Ч.");
 }
 
 function fixMaterialNames(line: string): string {
@@ -185,7 +188,14 @@ function fixWorkshopHeaders(line: string): string {
 function fixMissingAttrParens(line: string): string {
   return line.replace(
     /(\[[^\]]+\])\s+([^(\s-][^\s-]*)\s+-\s*([\d])/,
-    "$1 ($2) - $3",
+    (full, br: string, token: string, d: string) => {
+      if (
+        /^(Д\.|Б\.|М\.|Угол|100|Планка|Ніша|Тум|Реал|Леон|\d)/.test(token)
+      ) {
+        return full;
+      }
+      return `${br} (${token}) - ${d}`;
+    },
   );
 }
 
@@ -354,7 +364,7 @@ function fixMissingDashForBareMaterial(line: string): string {
 function fixPlankaBareComponent(line: string): string {
   return line.replace(
     /^(\s*)Планка\s+(\S+)\s+-\s*([\d,.]+)\s*шт\.?\s*$/,
-    "$1🧩[Планка - нарізані деталі] (Планка $2) - $3 шт.",
+    "$1🧩[Планка - нарізані деталі] Планка $2 - $3 шт.",
   );
 }
 
@@ -503,7 +513,8 @@ export function formatDocumentContent(original: string): FormatterResult {
     apply(fixDashBeforeQty, "пробіл після дефіса перед числом додано");
     apply(fixAttributeSpaces, "пробіл після крапки в атрибуті прибрано");
     apply(fixAttributeCapitalization, "капіталізація в атрибуті виправлена");
-    apply(fixAttributeSpacing100dsp, '"100 ДСП" → "100ДСП"');
+    apply(fixAttributeSpacing100dsp, '"100ДСП" → "100 ДСП"');
+    apply(fixMcNeo, '"М Ч " → "М.Ч."');
     apply(fixBareProducts, "ДСП/ДВП → [ДСП]/[ДВП] (Звичайний)");
     apply(
       fixDefaultUomForSheetMaterials,
@@ -515,7 +526,7 @@ export function formatDocumentContent(original: string): FormatterResult {
     );
     apply(
       fixPlankaBareComponent,
-      "Планка NNN - qty → 🧩[Планка - нарізані деталі] (Планка NNN)",
+      "Планка NNN - qty → 🧩[Планка - нарізані деталі] Планка NNN",
     );
     // apply(
     //   fixConnectorFormat,

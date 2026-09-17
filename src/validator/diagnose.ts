@@ -162,8 +162,9 @@ export function appendLint(
   content: string,
   aliases: Map<string, string> = new Map(),
   furnitureCanons: string[] = [],
+  nameCanons: string[] = [],
 ): void {
-  const hits = lintSpec(content, aliases, furnitureCanons);
+  const hits = lintSpec(content, aliases, furnitureCanons, nameCanons);
   const zeroLines = new Set(
     issues
       .filter((i) => i.line && (i.message.startsWith("[ZERO]") || /нульов/i.test(i.message)))
@@ -245,7 +246,7 @@ export function diagnoseSpec(
     collectCatalogIssues(issues, working, knownNamesMd);
     {
       const cat = parseKnownCatalog(knownNamesMd);
-      appendLint(issues, working, cat.aliases, cat.furnitureCanons);
+      appendLint(issues, working, cat.aliases, cat.furnitureCanons, cat.nameCanons);
     }
     return finish(working, working, fileName, mode, issues);
   }
@@ -269,7 +270,7 @@ export function diagnoseSpec(
   collectCatalogIssues(issues, working, knownNamesMd);
   {
     const cat = parseKnownCatalog(knownNamesMd);
-    appendLint(issues, working, cat.aliases, cat.furnitureCanons);
+    appendLint(issues, working, cat.aliases, cat.furnitureCanons, cat.nameCanons);
   }
 
   const outName =

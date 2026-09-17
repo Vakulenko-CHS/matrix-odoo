@@ -9,6 +9,7 @@ import type {
   AttributeVal,
   ComponentEntry,
 } from "../../docToJson/types";
+import { convertFilmQty } from "../../../validator/filmUom";
 
 const UOM_MAP: Record<string, number> = {
   шт: 1,
@@ -16,9 +17,19 @@ const UOM_MAP: Record<string, number> = {
   m: 8,
   "m²": 10,
   г: 14,
+  g: 14,
   кг: 15,
   "m³": 30,
 };
+
+function bomQty(comp: { templateName: string; qty: number; uom: string }): {
+  qty: number;
+  uomId: number;
+  uom: string;
+} {
+  const film = convertFilmQty(comp.templateName, comp.qty, comp.uom);
+  return { qty: film.qty, uomId: UOM_MAP[film.uom] ?? 1, uom: film.uom };
+}
 
 // ─── Route cache ─────────────────────────────────────────────────────────────
 
@@ -716,11 +727,12 @@ export async function importTemplateBomGroup(
           continue;
         }
 
+        const q1 = bomQty(comp);
         const lineId1 = await create("mrp.bom.line", {
           bom_id: bomId,
           product_id: compResolved.variantId,
-          product_qty: comp.qty,
-          product_uom_id: UOM_MAP[comp.uom] ?? 1,
+          product_qty: q1.qty,
+          product_uom_id: q1.uomId,
           sequence: lineSeq++,
           operation_id: opIds[comp.operationIndex] ?? false,
           ...(entryPtavIds.length > 0
@@ -736,7 +748,7 @@ export async function importTemplateBomGroup(
         const label = fixedAttrs.length
           ? `${comp.templateName} (${fixedAttrs.map((a) => a.value).join(", ")})`
           : comp.templateName;
-        console.log(`    [+] ${label} × ${comp.qty} ${comp.uom}`);
+        console.log(`    [+] ${label} × ${q1.qty} ${q1.uom}`);
         continue;
       }
 
@@ -787,11 +799,12 @@ export async function importTemplateBomGroup(
 
         const allPtavIds = [...entryPtavIds, ...comboPtavIds];
 
+        const q2 = bomQty(comp);
         const lineId2 = await create("mrp.bom.line", {
           bom_id: bomId,
           product_id: compResolved.variantId,
-          product_qty: comp.qty,
-          product_uom_id: UOM_MAP[comp.uom] ?? 1,
+          product_qty: q2.qty,
+          product_uom_id: q2.uomId,
           sequence: lineSeq++,
           operation_id: opIds[comp.operationIndex] ?? false,
           ...(allPtavIds.length > 0

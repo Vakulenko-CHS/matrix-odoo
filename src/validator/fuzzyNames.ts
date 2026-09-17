@@ -126,24 +126,22 @@ export function uniqueHeadCanon(
  */
 export function exactFurnitureCanon(
   query: string,
-  aliases: Map<string, string>,
+  _aliases: Map<string, string>,
   toCanon: Map<string, string>,
 ): string | undefined {
   const q = normNameKey(query);
   if (!q) return undefined;
-  const fromAlias = aliases.get(q);
-  if (fromAlias) return fromAlias;
   const mapped = toCanon.get(q);
-  if (mapped && normNameKey(mapped) === q) return mapped;
+  if (mapped) return mapped;
 
   const keys = [...toCanon.keys()];
   const stripped = stripOrphanCodes(query, keys);
   const sq = normNameKey(stripped);
   if (sq && sq !== q) {
-    const viaStrip = aliases.get(sq) ?? toCanon.get(sq);
+    const viaStrip = toCanon.get(sq);
     if (viaStrip) return viaStrip;
     const word = firstSignificantWord(stripped);
-    const viaWord = word ? aliases.get(word) : undefined;
+    const viaWord = word ? toCanon.get(word) : undefined;
     if (viaWord) return viaWord;
     const head = uniqueHeadCanon(stripped, toCanon, false);
     if (head) return head;
@@ -151,7 +149,7 @@ export function exactFurnitureCanon(
 
   if (orphanCodesOf(query, keys).length > 0) {
     const word = firstSignificantWord(query);
-    const viaWord = word ? aliases.get(word) : undefined;
+    const viaWord = word ? toCanon.get(word) : undefined;
     if (viaWord) return viaWord;
     const head = uniqueHeadCanon(query, toCanon, false);
     if (head) return head;
@@ -186,16 +184,16 @@ export function furnitureSearchKeys(
   furnitureCanons: string[],
 ): Map<string, string> {
   const toCanon = new Map<string, string>();
+  const furn = new Set<string>();
   for (const c of furnitureCanons) {
     const k = normNameKey(c);
-    if (k) toCanon.set(k, c);
+    if (!k) continue;
+    toCanon.set(k, c);
+    furn.add(k);
   }
   for (const [alias, canon] of aliases) {
-    if (alias) toCanon.set(alias, canon);
-  }
-  for (const canon of aliases.values()) {
-    const k = normNameKey(canon);
-    if (k) toCanon.set(k, canon);
+    if (!alias || !furn.has(normNameKey(canon))) continue;
+    toCanon.set(alias, canon);
   }
   return toCanon;
 }

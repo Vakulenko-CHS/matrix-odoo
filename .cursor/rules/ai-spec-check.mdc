@@ -5,7 +5,7 @@ alwaysApply: true
 
 # AI spec check (read-only)
 
-When checking a furniture BOM markdown spec (цехи, `[Товар]`, qty/UOM), **do not** eyeball the whole file and invent a list. Run the shared checker. It uses the same pipeline as the web UI (`diagnoseSpec` → prep/format, attrs, chain, bom, catalog `right_names_odoo_base.md` + `right_names_furniture.md`, lint).
+When checking a furniture BOM markdown spec (цехи, `[Товар]`, qty/UOM), **do not** eyeball the whole file and invent a list. Run the shared checker. It uses the same pipeline as the web UI (`diagnoseSpec` → prep/format, attrs, chain, bom, catalog `right_names_odoo_base.md` + `right_names_furniture.md` + `right_names.md`, lint).
 
 ## Command
 

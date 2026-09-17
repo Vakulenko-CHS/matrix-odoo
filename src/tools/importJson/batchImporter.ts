@@ -4,9 +4,10 @@ import { ensureVariantFromAttrs, preSeedAttributeLines, clearVariantDisplayCache
 import { expandEntry } from './expander';
 import { track, resetSession, saveSession } from '../../state/tracker';
 import type { BomEntry } from '../docToJson/types';
+import { convertFilmQty } from '../../validator/filmUom';
 
 const UOM_MAP: Record<string, number> = {
-  'шт': 1, 'шт.': 1, 'm': 8, 'm²': 10, 'г': 14, 'кг': 15, 'm³': 30,
+  'шт': 1, 'шт.': 1, 'm': 8, 'm²': 10, 'г': 14, 'g': 14, 'кг': 15, 'm³': 30,
 };
 
 function uomStrToId(uom: string): number {
@@ -100,10 +101,11 @@ async function resolveEntry(entry: BomEntry): Promise<PreparedBom | null> {
       console.warn(`    [SKIP comp] "${comp.templateName}"`);
       continue;
     }
+    const film = convertFilmQty(comp.templateName, comp.qty, comp.uom);
     comps.push({
       variantId: compRes.variantId,
-      qty: comp.qty,
-      uomId: uomStrToId(comp.uom),
+      qty: film.qty,
+      uomId: uomStrToId(film.uom),
       sequence: i + 1,
       operationIndex: comp.operationIndex,
     });

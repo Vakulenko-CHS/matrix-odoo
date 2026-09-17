@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { lineHtmlCommentFlags } from "../tools/htmlComment";
-import { FURNITURE_NAMES_FILE } from "./namesFiles";
+import { CANON_NAMES_FILE, FURNITURE_NAMES_FILE } from "./namesFiles";
 import { componentHead, normNameKey } from "./nameKey";
 import {
   exactFurnitureCanon,
@@ -31,6 +31,8 @@ export interface KnownCatalog {
   aliases: Map<string, string>;
   /** Товар names from right_names_furniture.md */
   furnitureCanons: string[];
+  /** Товар names from right_names.md (target DB) */
+  nameCanons: string[];
 }
 
 interface FoamBlock {
@@ -45,7 +47,9 @@ export function parseKnownCatalog(content: string): KnownCatalog {
   const labels: string[] = [];
   const aliases = new Map<string, string>();
   const furnitureCanons: string[] = [];
+  const nameCanons: string[] = [];
   let inFurnitureCanonFile = false;
+  let inNameCanonFile = false;
 
   function addName(raw: string): void {
     const name = raw
@@ -61,11 +65,19 @@ export function parseKnownCatalog(content: string): KnownCatalog {
   let lastCanon = "";
   for (const rawLine of content.split(/\n/)) {
     const t = rawLine.trim();
-    if (/^#\s*Фурнітура — канон/.test(t)) inFurnitureCanonFile = true;
+    if (/^#\s*Фурнітура — канон/.test(t)) {
+      inFurnitureCanonFile = true;
+      inNameCanonFile = false;
+    }
+    if (/^#\s*Канон назв/.test(t)) {
+      inNameCanonFile = true;
+      inFurnitureCanonFile = false;
+    }
     if (t.startsWith("Товар:")) {
       lastCanon = t.slice("Товар:".length).trim().replace(/^"|"$/g, "");
       addName(lastCanon);
       if (inFurnitureCanonFile && lastCanon) furnitureCanons.push(lastCanon);
+      if (inNameCanonFile && lastCanon) nameCanons.push(lastCanon);
       continue;
     }
     const am = t.match(/^Аліаси:\s*(.*)$/u);
@@ -83,7 +95,7 @@ export function parseKnownCatalog(content: string): KnownCatalog {
   let m: RegExpExecArray | null;
   while ((m = re2.exec(content)) !== null) addName(m[1]);
 
-  return { set, labels, aliases, furnitureCanons };
+  return { set, labels, aliases, furnitureCanons, nameCanons };
 }
 
 export function parseKnownProducts(content: string): Set<string> {
@@ -189,6 +201,7 @@ export function checkDocumentContent(
   knownLabels: string[] = [...knownProducts],
   aliases: Map<string, string> = new Map(),
   furnitureCanons: string[] = [],
+  nameCanons: string[] = [],
 ): CheckResult {
   const lines = content.split("\n");
   const commented = lineHtmlCommentFlags(content);
@@ -196,6 +209,11 @@ export function checkDocumentContent(
   const warnings: CheckError[] = [];
   const knownTemplatePrefixes = extractTemplatePrefixes(knownLabels);
   const furnIndex = furnitureSearchKeys(aliases, furnitureCanons);
+  const knownSuffixes = new Set<string>();
+  for (const c of nameCanons) {
+    const m = c.match(/\]\s+(.+)$/);
+    if (m) knownSuffixes.add(normNameKey(m[1]));
+  }
 
   let inWorkshop = false;
   let hasWorkshops = false;
@@ -379,12 +397,12 @@ export function checkDocumentContent(
       });
     }
 
-    // Check "100 ДСП" with space
-    if (/\(.*100\s+ДСП.*\)/.test(line)) {
+    // Check "100ДСП" without space
+    if (/\(.*100ДСП.*\)/.test(line) || /\]\s+100ДСП\b/.test(line)) {
       errors.push({
         line: lineNum,
         severity: "error",
-        message: `Пробіл між "100" і "ДСП". Правильно: (100ДСП Механізм)`,
+        message: `Пробіл між "100" і "ДСП". Правильно: 100 ДСП`,
         original: trimmed,
       });
     }
@@ -417,9 +435,15 @@ export function checkDocumentContent(
       !aliasCanon && head && furnIndex.size > 0
         ? uniqueFuzzyCanon(fuzzyFurnitureCanons(head, furnIndex))
         : null;
+    const suffixTok = trimmed.match(
+      /\]\s+([^(%]+?)(?:\s*\(|\s+-\s*[\d]|\s*$)/,
+    )?.[1]?.trim();
+    const suffixIsModel =
+      Boolean(suffixTok) && knownSuffixes.has(normNameKey(suffixTok!));
     if (
       !aliasCanon &&
       !fuzzyFurn &&
+      !suffixIsModel &&
       /\[[^\]]+\]\s+[^(\s\-][^\s\-]*\s+-\s*[\d]/.test(trimmed)
     ) {
       errors.push({
@@ -563,9 +587,17 @@ export function checkDocument(
     path.dirname(referenceBasePath),
     FURNITURE_NAMES_FILE,
   );
-  const md = fs.existsSync(furniturePath)
-    ? `${odooMd}\n${fs.readFileSync(furniturePath, "utf-8")}`
-    : odooMd;
+  const canonPath = path.join(
+    path.dirname(referenceBasePath),
+    CANON_NAMES_FILE,
+  );
+  let md = odooMd;
+  if (fs.existsSync(furniturePath)) {
+    md = `${md}\n${fs.readFileSync(furniturePath, "utf-8")}`;
+  }
+  if (fs.existsSync(canonPath)) {
+    md = `${md}\n${fs.readFileSync(canonPath, "utf-8")}`;
+  }
   const catalog = parseKnownCatalog(md);
   return checkDocumentContent(
     content,
@@ -573,6 +605,7 @@ export function checkDocument(
     catalog.labels,
     catalog.aliases,
     catalog.furnitureCanons,
+    catalog.nameCanons,
   );
 }
 

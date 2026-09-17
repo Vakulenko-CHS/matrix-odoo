@@ -11,6 +11,7 @@ import {
   fuzzyFurnitureCanons,
   uniqueFuzzyCanon,
 } from "./fuzzyNames";
+import { rewriteCanonHead, suffixesByInner } from "./canonRewrite";
 
 export interface QuickFix {
   id: string;
@@ -59,6 +60,27 @@ function isProducedPart(head: string): boolean {
   );
 }
 
+function lineCanonHead(trimmed: string): string | null {
+  const t = trimmed
+    .replace(/<!--.*?-->/g, "")
+    .replace(/\s*\/\/.*$/, "")
+    .trim();
+  if (!t || t.startsWith("#") || t.startsWith("<<") || t.startsWith("//")) {
+    return null;
+  }
+  if (/^Ціна\s+/i.test(t)) return null;
+  if (/^(або|Або|і|---)$/.test(t)) return null;
+  const qtyHead = componentHead(t);
+  if (qtyHead) return qtyHead;
+  if (/^[🪵🧩🪤🧽]/.test(t) && t.includes("[")) return t;
+  if (/^\[[^\]]+\]/.test(t)) return t;
+  if (/^\(Послуга\)/.test(t)) return t.replace(COMP_QTY_TAIL_RE, "").trim() || t;
+  if (/^(Ламінат|Перевірка Якості)\b/i.test(t)) {
+    return t.replace(COMP_QTY_TAIL_RE, "").trim() || t;
+  }
+  return null;
+}
+
 function lineFurnitureHead(trimmed: string): string | null {
   const t = trimmed
     .replace(/<!--.*?-->/g, "")
@@ -83,6 +105,8 @@ const TYPOS: Array<{ re: RegExp; correct: string }> = [
   { re: /деровина/gi, correct: "деревина" },
   { re: /карказ/gi, correct: "Каркас" },
   { re: /компонети/gi, correct: "компоненти" },
+  { re: /напівфабрікат/gi, correct: "напівфабрикат" },
+  { re: /сборка/gi, correct: "збірка" },
   { re: /атримбут/gi, correct: "атрибут" },
   { re: /обємі/gi, correct: "об'ємі" },
   { re: /труегольн/gi, correct: "трикутн" },
@@ -161,6 +185,7 @@ export function lintSpec(
   content: string,
   aliases: Map<string, string> = new Map(),
   furnitureCanons: string[] = [],
+  nameCanons: string[] = [],
 ): LintHit[] {
   const lines = content.split("\n");
   const commented = lineHtmlCommentFlags(content);
@@ -170,6 +195,8 @@ export function lintSpec(
     aliases.size > 0 || furnitureCanons.length > 0
       ? furnitureSearchKeys(aliases, furnitureCanons)
       : null;
+  const suffixIndex = suffixesByInner(nameCanons);
+  const hasCanon = aliases.size > 0 && (nameCanons.length > 0 || suffixIndex.size > 0);
   let inShop9 = false;
   let shop9Line: number | null = null;
   const newFurn: string[] = [];
@@ -298,6 +325,34 @@ export function lintSpec(
         ) {
           furnitureHit = true;
           warnNewFurniture(head, n, t);
+        }
+      }
+    }
+
+    if (!furnitureHit && hasCanon) {
+      const canonHead = lineCanonHead(t);
+      if (canonHead) {
+        const next = rewriteCanonHead(canonHead, aliases, suffixIndex);
+        if (next) {
+          furnitureHit = true;
+          const qty = t.match(COMP_QTY_TAIL_RE)?.[0] ?? "";
+          const indent = line.match(/^\s*/)?.[0] ?? "";
+          hits.push({
+            kind: "error",
+            source: "lint",
+            line: n,
+            message: `Назва: «${canonHead}» → «${next}»`,
+            original: t,
+            fixes: [
+              {
+                id: `canon-${seq++}`,
+                label: `Замінити на «${next}»`,
+                action: "replace-line",
+                line: n,
+                replacement: `${indent}${next}${qty}`,
+              },
+            ],
+          });
         }
       }
     }

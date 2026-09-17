@@ -12,6 +12,7 @@ import { getOrCreateWorkcenter } from '../../bom/product';
 import { ensureVariantFromAttrs, preSeedAttributeLines } from './resolver';
 import { expandEntry } from './expander';
 import type { BomEntry } from '../docToJson/types';
+import { convertFilmQty } from '../../validator/filmUom';
 
 const UOM_MAP: Record<string, number> = {
   'шт': 1,
@@ -19,6 +20,7 @@ const UOM_MAP: Record<string, number> = {
   'm': 8,
   'm²': 10,
   'г': 14,
+  'g': 14,
   'кг': 15,
   'm³': 30,
 };
@@ -114,11 +116,12 @@ export async function importBomEntry(entry: BomEntry): Promise<'created' | 'exis
     }
 
     const operationId = opIds[comp.operationIndex] ?? false;
+    const film = convertFilmQty(comp.templateName, comp.qty, comp.uom);
     const lineId = await create('mrp.bom.line', {
       bom_id: bomId,
       product_id: compResolved.variantId,
-      product_qty: comp.qty,
-      product_uom_id: uomStrToId(comp.uom),
+      product_qty: film.qty,
+      product_uom_id: uomStrToId(film.uom),
       sequence: i + 1,
       operation_id: operationId,
     });
@@ -127,7 +130,7 @@ export async function importBomEntry(entry: BomEntry): Promise<'created' | 'exis
     const label = comp.attributes.length
       ? `${comp.templateName} (${comp.attributes.map(a => a.value).join(', ')})`
       : comp.templateName;
-    console.log(`    [+] ${label} × ${comp.qty} ${comp.uom} (${sec(t)})`);
+    console.log(`    [+] ${label} × ${film.qty} ${film.uom} (${sec(t)})`);
   }
 
   return 'created';

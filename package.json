@@ -29,7 +29,9 @@
     "fix-product-types": "ts-node src/commands/fixProductTypes.ts",
     "diagnose-mo": "ts-node src/tools/diagnose-mo.ts",
     "find-no-category": "ts-node src/tools/find-no-category.ts",
-    "sync-base": "ts-node src/tools/sync-base.ts"
+    "sync-base": "ts-node src/tools/sync-base.ts",
+    "dump-names": "ts-node src/tools/dump-odoo-names.ts",
+    "build-names": "ts-node src/tools/build-name-canon.ts"
   },
   "keywords": [],
   "author": "",

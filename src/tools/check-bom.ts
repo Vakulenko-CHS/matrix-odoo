@@ -4,7 +4,7 @@ import { SOFA_START_RE, stripSpecComment } from "./specLine";
 import { lineHtmlCommentFlags } from "./htmlComment";
 
 const EMOJI_RE = /^[🪵🧩🪤🧽]+/u;
-const BRACKET_START = /^\[.+\]\s*\(/u;
+const BRACKET_START = /^\[.+\](\s*\(|\s+\S)/u;
 const SECTION_RE = /^#+\s*(Цех\s*№[\d\-]+)/u;
 
 // Broad qty pattern: "- N unit?" OR "- unit" at end of line.
@@ -14,7 +14,7 @@ const ANY_QTY_RE = /[-]\s*(?:[\d.,]+\s*(кг|m³|m²|дм²|m|шт\.?)?|(кг|m�
 // Narrower pattern used to extract qty+unit values for zero/nounit checks
 const QTY_EXTRACT_RE = /[-]\s*([\d.,]*)\s*(кг|m³|m²|дм²|m|шт\.?)?\s*$/u;
 
-const VALID_UNITS = new Set(["кг", "m", "m²", "m³", "шт", "шт.", "дм²"]);
+const VALID_UNITS = new Set(["кг", "m", "m²", "m³", "шт", "шт.", "дм²", "г"]);
 
 // TODO: [CHECK] SPELLING_FIXES — авто-виправлення написання назв сировини/фурнітури.
 // Помилка в написанні = товар не знаходить свій keyword у RAW_MATERIAL_CATEGORY

@@ -124,5 +124,6 @@ export function checkSpecContent(
     catalog.labels,
     catalog.aliases,
     catalog.furnitureCanons,
+    catalog.nameCanons,
   );
 }

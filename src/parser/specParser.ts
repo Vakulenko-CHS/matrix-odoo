@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { BomDef, ComponentSpec, OperationSpec, UOM } from "../bom/types";
 import { lineHtmlCommentFlags } from "../tools/htmlComment";
+import { convertFilmQty } from "../validator/filmUom";
 
 interface WorkshopHeader {
   number: string;
@@ -182,13 +183,16 @@ function rawProductToBomDef(
     priceRate: price,
   };
 
-  const bomComponents: ComponentSpec[] = components.map((c) => ({
-    product: c.name,
-    variants: c.attributes.length > 0 ? c.attributes : undefined,
-    qty: c.qty,
-    uomId: parseUom(c.uomStr),
-    operationIndex: 0,
-  }));
+  const bomComponents: ComponentSpec[] = components.map((c) => {
+    const film = convertFilmQty(c.name, c.qty, c.uomStr);
+    return {
+      product: c.name,
+      variants: c.attributes.length > 0 ? c.attributes : undefined,
+      qty: film.qty,
+      uomId: parseUom(film.uom),
+      operationIndex: 0,
+    };
+  });
 
   return {
     product: product.name,

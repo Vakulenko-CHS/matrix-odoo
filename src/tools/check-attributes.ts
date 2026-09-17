@@ -126,7 +126,7 @@ function parseAttributeRules(content: string): Attribute[] {
 // ─── Step 2: Parse product line params ────────────────────────────────────
 
 const EMOJI_RE = /^[🪵🧩🪤🧽]+/u;
-const BRACKET_PREFIX_RE = /^\[.+\]\s*\(/u;
+const BRACKET_PREFIX_RE = /^\[.+\](\s*\(|\s+[^(%])/u;
 const SOFA_PREFIX_RE = SOFA_START_RE;
 
 function isProductLine(line: string): boolean {

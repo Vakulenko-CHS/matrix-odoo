@@ -174,16 +174,20 @@ function splitLineParts(
 
   if (bracketOpen !== -1 && bracketClose !== -1) {
     // Has brackets — prefix is everything through ']' (includes emoji)
-    const prefix = body.slice(0, bracketClose + 1).trim();
+    const prefixBare = body.slice(0, bracketClose + 1).trim();
     const remainder = body.slice(bracketClose + 1).trim();
-    const bracketName = prefix.match(/\[([^\]]+)\]/)?.[1]?.trim() ?? "";
+    const bracketName = prefixBare.match(/\[([^\]]+)\]/)?.[1]?.trim() ?? "";
     // Поролон: збираємо ST + dims з remainder (ігноруємо криві дужки)
     if (bracketName === "Поролон") {
       const rebuilt = rebuildPorolonAttrStr(remainder);
-      if (rebuilt) return { prefix, attrStr: rebuilt, qty, uom };
+      if (rebuilt) return { prefix: prefixBare, attrStr: rebuilt, qty, uom };
     }
-    // The attr string is the FIRST outer paren group after ']'
     const attrStr = extractFirstOuterParen(remainder);
+    const beforeParen = remainder.replace(/\(.*$/s, "").trim();
+    const prefix =
+      beforeParen && !beforeParen.startsWith("-")
+        ? `${prefixBare} ${beforeParen}`
+        : prefixBare;
     return { prefix, attrStr, qty, uom };
   } else {
     // No brackets — split at first '('
@@ -208,13 +212,30 @@ function splitLineParts(
 }
 
 // Returns the full template name including emoji and brackets
+function parseEmojiBracketPrefix(prefix: string): {
+  emoji: string;
+  bracketName: string;
+  suffix: string;
+} | null {
+  const m = prefix.match(
+    /^([\p{Emoji}\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}🪤🧩🪵🧽]*)\[([^\]]+)\](?:\s+(.+))?$/u,
+  );
+  if (!m) return null;
+  return {
+    emoji: m[1].trim(),
+    bracketName: m[2].trim(),
+    suffix: (m[3] ?? "").trim(),
+  };
+}
+
 function buildTemplateName(
   emoji: string,
   bracketName: string,
   isBracketed: boolean,
+  suffix = "",
 ): string {
-  if (isBracketed) return `${emoji}[${bracketName}]`;
-  return bracketName;
+  const base = isBracketed ? `${emoji}[${bracketName}]` : bracketName;
+  return suffix ? `${base} ${suffix}` : base;
 }
 
 // Only these two templates embed the model identifier into the bracket name to avoid
@@ -266,16 +287,15 @@ function tryParseProduct(
   // Check for (Послуга) prefix — service, treat as component not product
   if (trimmed.startsWith("(Послуга)")) return null;
 
-  // Bracketed product: emoji[Name]
-  const bracketMatch = prefix.match(
-    /^([\p{Emoji}\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}🪤🧩🪵🧽]*)\[([^\]]+)\]$/u,
-  );
+  // Bracketed product: emoji[Name] suffix?
+  const bracketMatch = parseEmojiBracketPrefix(prefix);
   if (bracketMatch) {
-    const emoji = bracketMatch[1].trim();
-    const bracketName = bracketMatch[2].trim();
+    const { emoji, bracketName, suffix } = bracketMatch;
     const attrValues = attrStr ? parseAttrString(attrStr) : [];
-    const { effectiveName, effectiveValues } = embedLiteralFirstAttr(bracketName, attrValues);
-    const templateName = buildTemplateName(emoji, effectiveName, true);
+    const { effectiveName, effectiveValues } = suffix
+      ? { effectiveName: bracketName, effectiveValues: attrValues }
+      : embedLiteralFirstAttr(bracketName, attrValues);
+    const templateName = buildTemplateName(emoji, effectiveName, true, suffix);
     const attributes = valuesToAttributes(effectiveValues, bracketName);
     const variantDisplayName = buildVariantDisplayName(templateName, effectiveValues);
 
@@ -341,16 +361,15 @@ function tryParseComponent(line: string): ParsedComponent | null {
   const { prefix, attrStr, qty, uom } = parts;
   if (qty <= 0) return null;
 
-  // Bracketed component: emoji[Name] (attrs) - qty uom
-  const bracketMatch = prefix.match(
-    /^([\p{Emoji}\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}🪤🧩🪵🧽]*)\[([^\]]+)\]$/u,
-  );
+  // Bracketed component: emoji[Name] suffix? (attrs) - qty uom
+  const bracketMatch = parseEmojiBracketPrefix(prefix);
   if (bracketMatch) {
-    const emoji = bracketMatch[1].trim();
-    const bracketName = bracketMatch[2].trim();
+    const { emoji, bracketName, suffix } = bracketMatch;
     const attrValues = attrStr ? parseAttrString(attrStr) : [];
-    const { effectiveName, effectiveValues } = embedLiteralFirstAttr(bracketName, attrValues);
-    const templateName = buildTemplateName(emoji, effectiveName, true);
+    const { effectiveName, effectiveValues } = suffix
+      ? { effectiveName: bracketName, effectiveValues: attrValues }
+      : embedLiteralFirstAttr(bracketName, attrValues);
+    const templateName = buildTemplateName(emoji, effectiveName, true, suffix);
     return {
       templateName,
       attributes: valuesToAttributes(effectiveValues, bracketName),
