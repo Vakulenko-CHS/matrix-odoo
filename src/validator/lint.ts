@@ -1,5 +1,10 @@
 import { lineHtmlCommentFlags } from "../tools/htmlComment";
-import { COMP_QTY_TAIL_RE, componentHead, normNameKey } from "./nameKey";
+import {
+  COMP_QTY_TAIL_RE,
+  componentHead,
+  displayName,
+  normNameKey,
+} from "./nameKey";
 import {
   exactFurnitureCanon,
   furnitureSearchKeys,
@@ -205,7 +210,7 @@ export function lintSpec(
         const indent = line.match(/^\s*/)?.[0] ?? "";
         const exact = exactFurnitureCanon(head, aliases, furnIndex);
         if (exact) {
-          if (normNameKey(exact) !== normNameKey(head)) {
+          if (displayName(exact) !== displayName(head)) {
             furnitureHit = true;
             hits.push({
               kind: "error",

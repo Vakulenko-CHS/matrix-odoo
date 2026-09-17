@@ -3,6 +3,11 @@ export function normNameKey(s: string): string {
   return s.replace(/\s+/g, " ").trim().toLowerCase();
 }
 
+/** Collapse spaces; keep case. Spec line must match canon spelling. */
+export function displayName(s: string): string {
+  return s.replace(/\s+/g, " ").trim();
+}
+
 /** Qty suffix on a component line. Allows glued dash: `(Накладная)-4 шт.` */
 export const COMP_QTY_TAIL_RE = /\s*-\s*[\d.,]+\s*\S+\s*$/u;
 
