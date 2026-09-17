@@ -6,7 +6,7 @@ import {
   type DiagnoseMode,
 } from "../validator/diagnose";
 
-const REFERENCE_PATH = path.resolve(process.cwd(), "right_names_odoo_base.md");
+import { readKnownNamesMd } from "../validator/knownNames";
 
 function usage(): never {
   console.error(
@@ -40,11 +40,11 @@ export function runAiCheck(argv: string[]): void {
   const files = argv.filter((a) => a !== "--as-is");
   if (files.length === 0) usage();
 
-  if (!fs.existsSync(REFERENCE_PATH)) {
-    console.error(`Не знайдено каталог назв: ${REFERENCE_PATH}`);
+  if (!fs.existsSync(path.resolve(process.cwd(), "right_names_odoo_base.md"))) {
+    console.error("Не знайдено каталог назв: right_names_odoo_base.md");
     process.exit(2);
   }
-  const knownNamesMd = fs.readFileSync(REFERENCE_PATH, "utf-8");
+  const knownNamesMd = readKnownNamesMd();
 
   let failed = false;
   for (const filePath of files) {

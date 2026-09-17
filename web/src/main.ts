@@ -1,4 +1,5 @@
-import knownNamesMd from "../../right_names_odoo_base.md?raw";
+import knownNamesOdooMd from "../../right_names_odoo_base.md?raw";
+import knownNamesFurnitureMd from "../../right_names_furniture.md?raw";
 import { applyFix, type QuickFix } from "./lint";
 import {
   attributeFlagsSignature,
@@ -18,6 +19,8 @@ import {
   type HtmlCommentRange,
 } from "../../src/tools/htmlComment";
 import "./styles.css";
+
+const knownNamesMd = `${knownNamesOdooMd}\n\n${knownNamesFurnitureMd}\n`;
 
 const SPLIT_KEY = "matrix-spec-raw-split";
 const DOCK_KEY = "matrix-spec-issues-dock";

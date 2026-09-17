@@ -1,6 +1,15 @@
 import * as fs from "fs";
 import * as path from "path";
 import { lineHtmlCommentFlags } from "../tools/htmlComment";
+import { FURNITURE_NAMES_FILE } from "./namesFiles";
+import { componentHead, normNameKey } from "./nameKey";
+import {
+  exactFurnitureCanon,
+  furnitureSearchKeys,
+  fuzzyFurnitureCanons,
+  similarLabels,
+  uniqueFuzzyCanon,
+} from "./fuzzyNames";
 
 export interface CheckError {
   line: number;
@@ -18,6 +27,10 @@ export interface CheckResult {
 export interface KnownCatalog {
   set: Set<string>;
   labels: string[];
+  /** alias key (normNameKey) → canon display name from `Аліаси:` */
+  aliases: Map<string, string>;
+  /** Товар names from right_names_furniture.md */
+  furnitureCanons: string[];
 }
 
 interface FoamBlock {
@@ -30,6 +43,9 @@ interface FoamBlock {
 export function parseKnownCatalog(content: string): KnownCatalog {
   const set = new Set<string>();
   const labels: string[] = [];
+  const aliases = new Map<string, string>();
+  const furnitureCanons: string[] = [];
+  let inFurnitureCanonFile = false;
 
   function addName(raw: string): void {
     const name = raw
@@ -42,39 +58,36 @@ export function parseKnownCatalog(content: string): KnownCatalog {
     labels.push(name);
   }
 
-  // Lines with explicit "Товар:" prefix
-  const re1 = /Товар:\s*"?([^"\n\r]+)"?/g;
-  let m: RegExpExecArray | null;
-  while ((m = re1.exec(content)) !== null) addName(m[1]);
+  let lastCanon = "";
+  for (const rawLine of content.split(/\n/)) {
+    const t = rawLine.trim();
+    if (/^#\s*Фурнітура — канон/.test(t)) inFurnitureCanonFile = true;
+    if (t.startsWith("Товар:")) {
+      lastCanon = t.slice("Товар:".length).trim().replace(/^"|"$/g, "");
+      addName(lastCanon);
+      if (inFurnitureCanonFile && lastCanon) furnitureCanons.push(lastCanon);
+      continue;
+    }
+    const am = t.match(/^Аліаси:\s*(.*)$/u);
+    if (am && lastCanon) {
+      for (const q of am[1].matchAll(/"([^"]+)"/g)) {
+        const alias = q[1].trim();
+        if (!alias) continue;
+        aliases.set(normNameKey(alias), lastCanon);
+      }
+    }
+  }
 
   // Standalone product lines without "Товар:" prefix: "🧩[Name]" or "[Name]"
   const re2 = /^[🪵🧩🪤🧽]*\[([^\]]+)\]\s*$/gmu;
+  let m: RegExpExecArray | null;
   while ((m = re2.exec(content)) !== null) addName(m[1]);
 
-  return { set, labels };
+  return { set, labels, aliases, furnitureCanons };
 }
 
 export function parseKnownProducts(content: string): Set<string> {
   return parseKnownCatalog(content).set;
-}
-
-function levenshtein(a: string, b: string): number {
-  const m = a.length;
-  const n = b.length;
-  if (m === 0) return n;
-  if (n === 0) return m;
-  const row = Array.from({ length: n + 1 }, (_, i) => i);
-  for (let i = 1; i <= m; i++) {
-    let prev = i - 1;
-    row[0] = i;
-    for (let j = 1; j <= n; j++) {
-      const tmp = row[j];
-      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + cost);
-      prev = tmp;
-    }
-  }
-  return row[n];
 }
 
 function extractTemplatePrefixes(labels: string[]): Set<string> {
@@ -87,14 +100,7 @@ function extractTemplatePrefixes(labels: string[]): Set<string> {
 }
 
 function similarKnownNames(needle: string, labels: string[], limit = 3): string[] {
-  const q = needle.toLowerCase();
-  const maxDist = Math.max(2, Math.min(5, Math.floor(q.length / 3)));
-  return labels
-    .map((label) => ({ label, d: levenshtein(q, label.toLowerCase()) }))
-    .filter((x) => x.d > 0 && x.d <= maxDist)
-    .sort((a, b) => a.d - b.d || a.label.length - b.label.length)
-    .slice(0, limit)
-    .map((x) => x.label);
+  return similarLabels(needle, labels, limit);
 }
 
 const KNOWN_UOMS = new Set([
@@ -181,12 +187,15 @@ export function checkDocumentContent(
   content: string,
   knownProducts: Set<string> = new Set(),
   knownLabels: string[] = [...knownProducts],
+  aliases: Map<string, string> = new Map(),
+  furnitureCanons: string[] = [],
 ): CheckResult {
   const lines = content.split("\n");
   const commented = lineHtmlCommentFlags(content);
   const errors: CheckError[] = [];
   const warnings: CheckError[] = [];
   const knownTemplatePrefixes = extractTemplatePrefixes(knownLabels);
+  const furnIndex = furnitureSearchKeys(aliases, furnitureCanons);
 
   let inWorkshop = false;
   let hasWorkshops = false;
@@ -399,7 +408,20 @@ export function checkDocumentContent(
     }
 
     // Check [Name] attr - qty without parens around attr (syntax violation)
-    if (/\[[^\]]+\]\s+[^(\s\-][^\s\-]*\s+-\s*[\d]/.test(trimmed)) {
+    // Skip when the whole component head is a furniture alias — lint will rename.
+    const head = componentHead(trimmed);
+    const aliasCanon = head
+      ? exactFurnitureCanon(head, aliases, furnIndex)
+      : undefined;
+    const fuzzyFurn =
+      !aliasCanon && head && furnIndex.size > 0
+        ? uniqueFuzzyCanon(fuzzyFurnitureCanons(head, furnIndex))
+        : null;
+    if (
+      !aliasCanon &&
+      !fuzzyFurn &&
+      /\[[^\]]+\]\s+[^(\s\-][^\s\-]*\s+-\s*[\d]/.test(trimmed)
+    ) {
       errors.push({
         line: lineNum,
         severity: "error",
@@ -418,12 +440,18 @@ export function checkDocumentContent(
         trimmed,
       )
     ) {
-      warnings.push({
-        line: lineNum,
-        severity: "warning",
-        message: `Можливо потрібні квадратні дужки: "${trimmed.split(" - ")[0].trim()}" — перевірте чи це компонент-специфікатор`,
-        original: trimmed,
-      });
+      const bareHead = head ?? trimmed.split(" - ")[0].trim();
+      const knownFull =
+        knownProducts.has(bareHead.toLowerCase()) ||
+        knownProducts.has(normNameKey(bareHead));
+      if (!knownFull && !aliasCanon && !fuzzyFurn) {
+        warnings.push({
+          line: lineNum,
+          severity: "warning",
+          message: `Можливо потрібні квадратні дужки: "${bareHead}" — перевірте чи це компонент-специфікатор`,
+          original: trimmed,
+        });
+      }
     }
 
     // Check UOM in component lines
@@ -530,8 +558,22 @@ export function checkDocument(
   if (!referenceBasePath || !fs.existsSync(referenceBasePath)) {
     return checkDocumentContent(content);
   }
-  const catalog = parseKnownCatalog(fs.readFileSync(referenceBasePath, "utf-8"));
-  return checkDocumentContent(content, catalog.set, catalog.labels);
+  const odooMd = fs.readFileSync(referenceBasePath, "utf-8");
+  const furniturePath = path.join(
+    path.dirname(referenceBasePath),
+    FURNITURE_NAMES_FILE,
+  );
+  const md = fs.existsSync(furniturePath)
+    ? `${odooMd}\n${fs.readFileSync(furniturePath, "utf-8")}`
+    : odooMd;
+  const catalog = parseKnownCatalog(md);
+  return checkDocumentContent(
+    content,
+    catalog.set,
+    catalog.labels,
+    catalog.aliases,
+    catalog.furnitureCanons,
+  );
 }
 
 export function formatCheckReport(

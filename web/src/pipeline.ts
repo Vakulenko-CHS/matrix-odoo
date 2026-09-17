@@ -13,6 +13,7 @@ import {
 } from "../../src/validator/specPipeline";
 import { inferFixes } from "../../src/validator/inferFixes";
 import { lintSpec, type QuickFix } from "./lint";
+import { parseKnownCatalog } from "../../src/validator/checker";
 
 export { attributeFlagsSignature, attributeListNeedsEmojiFix } from "../../src/tools/check-attributes";
 export type { QuickFix };
@@ -133,8 +134,13 @@ function collectToolIssues(
   }
 }
 
-function appendLint(issues: UiIssue[], content: string): void {
-  const hits = lintSpec(content);
+function appendLint(
+  issues: UiIssue[],
+  content: string,
+  aliases: Map<string, string> = new Map(),
+  furnitureCanons: string[] = [],
+): void {
+  const hits = lintSpec(content, aliases, furnitureCanons);
   const zeroLines = new Set(
     issues
       .filter((i) => i.line && (i.message.startsWith("[ZERO]") || /нульов/i.test(i.message)))
@@ -263,7 +269,10 @@ export function rewriteSpecAttributes(
   collectToolIssues(issues, tools.chain, working, false);
   collectToolIssues(issues, tools.bom, working, false);
   collectCatalogIssues(issues, working, knownNamesMd);
-  appendLint(issues, working);
+  {
+    const cat = parseKnownCatalog(knownNamesMd);
+    appendLint(issues, working, cat.aliases, cat.furnitureCanons);
+  }
 
   return finish(original, working, fileName, issues);
 }

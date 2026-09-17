@@ -118,5 +118,11 @@ export function checkSpecContent(
   knownNamesMd: string,
 ): CheckResult {
   const catalog = parseKnownCatalog(knownNamesMd);
-  return checkDocumentContent(content, catalog.set, catalog.labels);
+  return checkDocumentContent(
+    content,
+    catalog.set,
+    catalog.labels,
+    catalog.aliases,
+    catalog.furnitureCanons,
+  );
 }

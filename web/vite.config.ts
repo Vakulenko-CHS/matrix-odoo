@@ -28,6 +28,6 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: [],
+    include: ["fuzzball"],
   },
 });

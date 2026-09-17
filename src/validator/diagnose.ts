@@ -8,6 +8,7 @@ import {
 } from "./specPipeline";
 import { inferFixes } from "./inferFixes";
 import { lintSpec, type QuickFix } from "./lint";
+import { parseKnownCatalog } from "./checker";
 
 const AUTO_TODO_LINE =
   /^\s*<!--\s*TODO:\s*(\[(CHAIN-OUT|CHAIN-IN|BREAK|ZERO|EMPTY|NOUNIT)\]|нульова кількість|записати компоненти|відсутн)/i;
@@ -156,8 +157,13 @@ function collectCatalogIssues(
   }
 }
 
-export function appendLint(issues: DiagnoseIssue[], content: string): void {
-  const hits = lintSpec(content);
+export function appendLint(
+  issues: DiagnoseIssue[],
+  content: string,
+  aliases: Map<string, string> = new Map(),
+  furnitureCanons: string[] = [],
+): void {
+  const hits = lintSpec(content, aliases, furnitureCanons);
   const zeroLines = new Set(
     issues
       .filter((i) => i.line && (i.message.startsWith("[ZERO]") || /нульов/i.test(i.message)))
@@ -237,7 +243,10 @@ export function diagnoseSpec(
     collectToolIssues(issues, tools.chain, working, false);
     collectToolIssues(issues, tools.bom, working, false);
     collectCatalogIssues(issues, working, knownNamesMd);
-    appendLint(issues, working);
+    {
+      const cat = parseKnownCatalog(knownNamesMd);
+      appendLint(issues, working, cat.aliases, cat.furnitureCanons);
+    }
     return finish(working, working, fileName, mode, issues);
   }
 
@@ -258,7 +267,10 @@ export function diagnoseSpec(
   collectToolIssues(issues, tools.chain, working, true);
   collectToolIssues(issues, tools.bom, working, true);
   collectCatalogIssues(issues, working, knownNamesMd);
-  appendLint(issues, working);
+  {
+    const cat = parseKnownCatalog(knownNamesMd);
+    appendLint(issues, working, cat.aliases, cat.furnitureCanons);
+  }
 
   const outName =
     prepared.fileName !== "специфікація.md"

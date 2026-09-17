@@ -1,4 +1,11 @@
 import { lineHtmlCommentFlags } from "../tools/htmlComment";
+import { COMP_QTY_TAIL_RE, componentHead, normNameKey } from "./nameKey";
+import {
+  exactFurnitureCanon,
+  furnitureSearchKeys,
+  fuzzyFurnitureCanons,
+  uniqueFuzzyCanon,
+} from "./fuzzyNames";
 
 export interface QuickFix {
   id: string;
@@ -22,6 +29,47 @@ export interface QuickFix {
 
 const SKIP_NAME =
   /^(дерево|дсп|двп|фанера|тканина|синтепон|флізелін|поролон|войлок|скотч|плівка|картон|кромка|бонняль|Холлофайбер|крихта|крошка)$/i;
+
+const SKIP_FURN_LINE =
+  /^(дерево|дсп|двп|фанера|тканина|синтепон|флізелін|поролон|войлок|скотч|плівка|картон|кромка|бонняль|холлофайбер|крихта|крошка|ціна|або|і)\b/i;
+
+const SHOP9_HDR = /^#\s*Цех\s*№\s*9(?![\d-])/u;
+const WORKSHOP_HDR = /^#[^#].*№/;
+
+function skipFurnitureName(head: string): boolean {
+  const first =
+    head.replace(/[\[\]()]/g, " ").trim().split(/\s+/)[0] ?? "";
+  return SKIP_NAME.test(first);
+}
+
+/** Sofa outputs / cut parts — not shop-9 hardware. */
+function isProducedPart(head: string): boolean {
+  if (/%[А-Яа-яҐЄІЇA-Za-z]/.test(head)) return true;
+  const inner = (head.match(/\[([^\]]+)\]/)?.[1] ?? head).trim();
+  return (
+    /напівфабрикат|нарізан|наволочк/i.test(inner) ||
+    /^(подушка|чохол|накладка)\b/i.test(inner) ||
+    /^(диван|ліжко|угол)\b/i.test(inner)
+  );
+}
+
+function lineFurnitureHead(trimmed: string): string | null {
+  const t = trimmed
+    .replace(/<!--.*?-->/g, "")
+    .replace(/\s*\/\/.*$/, "")
+    .trim();
+  if (!t || t.startsWith("#") || t.startsWith("<<") || t.startsWith("//")) {
+    return null;
+  }
+  if (/^[🪵🧩🪤🧽]/.test(t)) return null;
+  if (SKIP_FURN_LINE.test(t)) return null;
+  const head = componentHead(t);
+  if (head) {
+    if (skipFurnitureName(head) || isProducedPart(head)) return null;
+    return head;
+  }
+  return t.length >= 3 && t.length <= 90 ? t : null;
+}
 
 const TYPOS: Array<{ re: RegExp; correct: string }> = [
   { re: /Цшна/gi, correct: "Ціна" },
@@ -103,16 +151,27 @@ export interface LintHit {
   fixes: QuickFix[];
 }
 
-export function lintSpec(content: string): LintHit[] {
+export function lintSpec(
+  content: string,
+  aliases: Map<string, string> = new Map(),
+  furnitureCanons: string[] = [],
+): LintHit[] {
   const lines = content.split("\n");
   const commented = lineHtmlCommentFlags(content);
   const hits: LintHit[] = [];
   let seq = 0;
+  const furnIndex =
+    aliases.size > 0 || furnitureCanons.length > 0
+      ? furnitureSearchKeys(aliases, furnitureCanons)
+      : null;
+  let inShop9 = false;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const t = line.trim();
     const n = i + 1;
+
+    if (WORKSHOP_HDR.test(t)) inShop9 = SHOP9_HDR.test(t);
 
     if (commented[i] || t.startsWith("<!--")) {
       if (/<!--\s*TODO/i.test(t)) {
@@ -135,7 +194,94 @@ export function lintSpec(content: string): LintHit[] {
       continue;
     }
 
-    for (const typo of TYPOS) {
+    let furnitureHit = false;
+    if (furnIndex && furnIndex.size > 0) {
+      const head = lineFurnitureHead(t);
+      const qtyHead = componentHead(t);
+      const allowFuzzy =
+        Boolean(qtyHead) || (/^\[[^\]]+\]/.test(t) && !t.includes("("));
+      if (head && (qtyHead || allowFuzzy || furnIndex.has(normNameKey(head)))) {
+        const qty = t.match(COMP_QTY_TAIL_RE)?.[0] ?? "";
+        const indent = line.match(/^\s*/)?.[0] ?? "";
+        const exact = exactFurnitureCanon(head, aliases, furnIndex);
+        if (exact) {
+          if (normNameKey(exact) !== normNameKey(head)) {
+            furnitureHit = true;
+            hits.push({
+              kind: "error",
+              source: "lint",
+              line: n,
+              message: `Фурнітура: «${head}» → «${exact}»`,
+              original: t,
+              fixes: [
+                {
+                  id: `furn-${seq++}`,
+                  label: `Замінити на «${exact}»`,
+                  action: "replace-line",
+                  line: n,
+                  replacement: `${indent}${exact}${qty}`,
+                },
+              ],
+            });
+          } else {
+            furnitureHit = true;
+          }
+        } else if (allowFuzzy) {
+          const ranked = fuzzyFurnitureCanons(head, furnIndex);
+          const unique = uniqueFuzzyCanon(ranked);
+          const suggest = unique ? [unique] : ranked.slice(0, 3);
+          if (suggest.length > 0) {
+            furnitureHit = true;
+            const top = suggest
+              .map((h) => `«${h.canon}» ${h.score}`)
+              .join(", ");
+            hits.push({
+              kind: "warning",
+              source: "lint",
+              line: n,
+              message: unique
+                ? `Фурнітура ≈ «${unique.canon}» (fuzzball ${unique.score})`
+                : `Фурнітура ≈ ${top}`,
+              original: t,
+              fixes: suggest.map((h) => ({
+                id: `furn-fuzz-${seq++}`,
+                label: `Замінити на «${h.canon}»`,
+                action: "replace-line" as const,
+                line: n,
+                replacement: `${indent}${h.canon}${qty}`,
+              })),
+            });
+          } else if (inShop9 && qtyHead && !skipFurnitureName(head)) {
+            furnitureHit = true;
+            hits.push({
+              kind: "warning",
+              source: "lint",
+              line: n,
+              message: `Фурнітура «${head}» немає в каноні назв`,
+              original: t,
+              fixes: [],
+            });
+          }
+        } else if (
+          inShop9 &&
+          qtyHead &&
+          !exact &&
+          !skipFurnitureName(head)
+        ) {
+          furnitureHit = true;
+          hits.push({
+            kind: "warning",
+            source: "lint",
+            line: n,
+            message: `Фурнітура «${head}» немає в каноні назв`,
+            original: t,
+            fixes: [],
+          });
+        }
+      }
+    }
+
+    if (!furnitureHit) for (const typo of TYPOS) {
       typo.re.lastIndex = 0;
       if (!typo.re.test(line)) continue;
       typo.re.lastIndex = 0;
@@ -306,7 +452,6 @@ export function lintSpec(content: string): LintHit[] {
   // Output line (emoji+bracket, no qty suffix) inside a workshop that has zero
   // component lines before the next output / price / separator.
   // If the raw line already carries <!-- Купляється --> the block is intentional.
-  const WORKSHOP_HDR = /^#[^#].*№/;
   const OUTPUT_RE = /^[🪵🧩🪤🧽]+\[/u;
   const COMP_QTY_RE = /-\s*[\d,.][\d,.]*\s*\S+\s*$/;
   const PRICE_HDR = /^Ціна\s+[\d.]+\s*грн/i;
