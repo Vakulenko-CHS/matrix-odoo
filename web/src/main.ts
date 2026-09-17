@@ -953,16 +953,44 @@ function makeFixButton(
   btn.type = "button";
   btn.textContent = fix.label;
   if (fix.action === "goto-line") btn.classList.add("is-goto");
+  if (fix.action === "copy") btn.classList.add("is-copy");
   btn.addEventListener("click", (event) => {
     onClick?.(event);
-    runFix(fix);
+    void runFix(fix, btn);
   });
   return btn;
 }
 
-function runFix(fix: QuickFix): void {
+async function copyPlain(text: string): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    document.body.append(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+  }
+}
+
+async function runFix(fix: QuickFix, btn?: HTMLButtonElement): Promise<void> {
   if (fix.action === "goto-line") {
     jumpToLine(fix.line);
+    return;
+  }
+  if (fix.action === "copy") {
+    await copyPlain(fix.replacement ?? "");
+    if (btn) {
+      const prev = btn.textContent ?? "";
+      btn.textContent = "Скопійовано";
+      setTimeout(() => {
+        btn.textContent = prev;
+      }, 1200);
+    }
     return;
   }
   const prev = editor.value;

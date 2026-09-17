@@ -21,7 +21,8 @@ export interface QuickFix {
     | "merge-next"
     | "replace-all"
     | "insert-after"
-    | "goto-line";
+    | "goto-line"
+    | "copy";
   line: number;
   extraLines?: number;
   replacement?: string;
@@ -170,13 +171,42 @@ export function lintSpec(
       ? furnitureSearchKeys(aliases, furnitureCanons)
       : null;
   let inShop9 = false;
+  let shop9Line: number | null = null;
+  const newFurn: string[] = [];
+  let newFurnLine: number | null = null;
+
+  function copyFix(label: string, text: string, line: number): QuickFix {
+    return {
+      id: `furn-copy-${seq++}`,
+      label,
+      action: "copy",
+      line,
+      replacement: text,
+    };
+  }
+
+  function warnNewFurniture(head: string, line: number, original: string): void {
+    hits.push({
+      kind: "warning",
+      source: "lint",
+      line,
+      message: `Нова фурнітура: «${head}»`,
+      original,
+      fixes: [copyFix("Скопіювати", head, line)],
+    });
+    if (!newFurn.includes(head)) newFurn.push(head);
+    if (newFurnLine == null) newFurnLine = line;
+  }
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const t = line.trim();
     const n = i + 1;
 
-    if (WORKSHOP_HDR.test(t)) inShop9 = SHOP9_HDR.test(t);
+    if (WORKSHOP_HDR.test(t)) {
+      inShop9 = SHOP9_HDR.test(t);
+      if (inShop9) shop9Line = n;
+    }
 
     if (commented[i] || t.startsWith("<!--")) {
       if (/<!--\s*TODO/i.test(t)) {
@@ -258,14 +288,7 @@ export function lintSpec(
             });
           } else if (inShop9 && qtyHead && !skipFurnitureName(head)) {
             furnitureHit = true;
-            hits.push({
-              kind: "warning",
-              source: "lint",
-              line: n,
-              message: `Фурнітура «${head}» немає в каноні назв`,
-              original: t,
-              fixes: [],
-            });
+            warnNewFurniture(head, n, t);
           }
         } else if (
           inShop9 &&
@@ -274,14 +297,7 @@ export function lintSpec(
           !skipFurnitureName(head)
         ) {
           furnitureHit = true;
-          hits.push({
-            kind: "warning",
-            source: "lint",
-            line: n,
-            message: `Фурнітура «${head}» немає в каноні назв`,
-            original: t,
-            fixes: [],
-          });
+          warnNewFurniture(head, n, t);
         }
       }
     }
@@ -378,6 +394,20 @@ export function lintSpec(
         ],
       });
     }
+  }
+
+  if (newFurn.length > 0) {
+    const loc = shop9Line ?? newFurnLine ?? 1;
+    hits.push({
+      kind: "warning",
+      source: "lint",
+      line: loc,
+      message: `У документі є нові елементи фурнітури (${newFurn.length})`,
+      original: newFurn.join("\n"),
+      fixes: [
+        copyFix("Скопіювати всі", newFurn.join("\n"), loc),
+      ],
+    });
   }
 
   for (let i = 0; i < lines.length; i++) {
@@ -525,7 +555,7 @@ export function lintSpec(
 }
 
 export function applyFix(content: string, fix: QuickFix): string {
-  if (fix.action === "goto-line") return content;
+  if (fix.action === "goto-line" || fix.action === "copy") return content;
   const lines = content.split("\n");
   const idx = fix.line - 1;
   if (idx < 0 || idx >= lines.length) return content;
