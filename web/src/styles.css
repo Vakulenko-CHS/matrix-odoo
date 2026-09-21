@@ -845,6 +845,8 @@ textarea {
   z-index: 2;
   flex: 0 0 auto;
   display: flex;
+  flex-direction: column;
+  gap: 6px;
   padding: 8px 10px;
   border-top: 1px solid var(--graphite);
   background: color-mix(in srgb, var(--sheet) 88%, var(--ply-dark));
@@ -860,6 +862,20 @@ textarea {
   font-size: 12px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.issues-apply-bar button[hidden] {
+  display: none;
+}
+
+.issues-apply-bar button.is-sheet {
+  background: #fff;
+  color: var(--graphite);
+  border-color: var(--graphite);
+}
+
+.issues-apply-bar button.is-sheet:hover:not(:disabled) {
+  background: var(--sheet);
 }
 
 .issues li {

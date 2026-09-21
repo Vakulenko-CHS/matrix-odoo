@@ -91,6 +91,7 @@ const countsEl = document.querySelector<HTMLElement>("#counts")!;
 const issuesEl = document.querySelector<HTMLOListElement>("#issues")!;
 const issuesShownEl = document.querySelector<HTMLElement>("#issues-shown")!;
 const issuesApplyBar = document.querySelector<HTMLElement>("#issues-apply-bar")!;
+const btnCopyNewNames = document.querySelector<HTMLButtonElement>("#btn-copy-new-names")!;
 const btnApplyUnique = document.querySelector<HTMLButtonElement>("#btn-apply-unique")!;
 const fileHint = document.querySelector<HTMLElement>("#file-hint")!;
 const fileInput = document.querySelector<HTMLInputElement>("#file-input")!;
@@ -193,7 +194,7 @@ function kindRank(kind: UiIssue["kind"]): number {
 function lineKindMap(issues: UiIssue[]): Map<number, UiIssue["kind"]> {
   const map = new Map<number, UiIssue["kind"]>();
   for (const issue of issues) {
-    if (!issue.line || !shownKinds.has(issue.kind)) continue;
+    if (!issue.line || !shownKinds.has(issue.kind) || isNewNamesIssue(issue)) continue;
     const prev = map.get(issue.line);
     if (!prev || kindRank(issue.kind) < kindRank(prev)) {
       map.set(issue.line, issue.kind);
@@ -205,7 +206,7 @@ function lineKindMap(issues: UiIssue[]): Map<number, UiIssue["kind"]> {
 function lineFixMap(issues: UiIssue[]): Map<number, QuickFix[]> {
   const map = new Map<number, QuickFix[]>();
   for (const issue of issues) {
-    if (!issue.line || !issue.fixes?.length || !shownKinds.has(issue.kind)) continue;
+    if (!issue.line || !issue.fixes?.length || !shownKinds.has(issue.kind) || isNewNamesIssue(issue)) continue;
     const cur = map.get(issue.line) ?? [];
     for (const fix of issue.fixes) {
       if (!cur.some((f) => f.id === fix.id && f.label === fix.label)) {
@@ -389,7 +390,15 @@ function setStamp(status: SheetStatus, customHint?: string): void {
 }
 
 function setCounts(result: ValidationResult | null): void {
-  const c = result?.counts ?? { blocking: 0, errors: 0, auto: 0, warnings: 0 };
+  const listed = result ? listedIssues(result.issues) : [];
+  const c = result
+    ? {
+        blocking: listed.filter((i) => i.kind === "blocking").length,
+        errors: listed.filter((i) => i.kind === "error").length,
+        auto: listed.filter((i) => i.kind === "auto").length,
+        warnings: listed.filter((i) => i.kind === "warning").length,
+      }
+    : { blocking: 0, errors: 0, auto: 0, warnings: 0 };
   countsEl.querySelector('[data-k="blocking"]')!.textContent = `${c.blocking} блокують`;
   countsEl.querySelector('[data-k="errors"]')!.textContent = `${c.errors} помилок`;
   countsEl.querySelector('[data-k="auto"]')!.textContent = `${c.auto} авто`;
@@ -521,7 +530,7 @@ function highlightIssuesForLine(n: number | null, focusId?: string): void {
   shop.highlightLine(n);
   if (!n || !last) return;
   const matches = last.issues.filter(
-    (i) => i.line === n && shownKinds.has(i.kind),
+    (i) => i.line === n && shownKinds.has(i.kind) && !isNewNamesIssue(i),
   );
   let best: HTMLElement | null = null;
   let bestRank = 99;
@@ -651,6 +660,18 @@ function setIssuesShown(result: ValidationResult, visible: number): void {
         : `у списку ${visible}`;
 }
 
+function isNewNamesIssue(issue: UiIssue): boolean {
+  return issue.source === "lint" && /^Нові моделі \(Pattern B\)/.test(issue.message);
+}
+
+function listedIssues(issues: UiIssue[]): UiIssue[] {
+  return issues.filter((i) => !isNewNamesIssue(i));
+}
+
+function newNamesIssueOf(issues: UiIssue[]): UiIssue | undefined {
+  return issues.find(isNewNamesIssue);
+}
+
 function isMutatingFix(fix: QuickFix): boolean {
   return fix.action !== "goto-line" && fix.action !== "copy";
 }
@@ -671,22 +692,44 @@ function uniqueMutatingFixes(issues: UiIssue[]): QuickFix[] {
   return out;
 }
 
-function syncApplyUniqueBar(issues: UiIssue[]): void {
-  const unique = uniqueMutatingFixes(issues);
-  if (unique.length === 0) {
-    issuesApplyBar.hidden = true;
-    return;
+function syncApplyUniqueBar(listed: UiIssue[], catalog?: UiIssue): void {
+  const names = (catalog?.original ?? "").split("\n").filter(Boolean);
+  const unique = uniqueMutatingFixes(listed);
+  const hasNames = names.length > 0;
+  const hasUnique = unique.length > 0;
+  issuesApplyBar.hidden = !hasNames && !hasUnique;
+  btnCopyNewNames.hidden = !hasNames;
+  btnApplyUnique.hidden = !hasUnique;
+  if (hasNames) {
+    btnCopyNewNames.textContent =
+      names.length === 1 ? "Скопіювати нову назву" : `Скопіювати ${names.length} нових назв`;
+    btnCopyNewNames.title = names.join("\n");
+  } else {
+    btnCopyNewNames.title = "";
   }
-  issuesApplyBar.hidden = false;
-  btnApplyUnique.textContent =
-    unique.length === 1
-      ? "Застосувати однозначне"
-      : `Застосувати ${unique.length} однозначних`;
+  if (hasUnique) {
+    btnApplyUnique.textContent =
+      unique.length === 1
+        ? "Застосувати однозначне"
+        : `Застосувати ${unique.length} однозначних`;
+  }
+}
+
+async function copyNewNames(): Promise<void> {
+  const catalog = last ? newNamesIssueOf(last.issues) : undefined;
+  const text = catalog?.original?.trim();
+  if (!text) return;
+  await copyPlain(text);
+  const prev = btnCopyNewNames.textContent ?? "";
+  btnCopyNewNames.textContent = "Скопійовано";
+  setTimeout(() => {
+    btnCopyNewNames.textContent = prev;
+  }, 1200);
 }
 
 function applyAllUniqueFixes(): void {
   if (!last) return;
-  const visible = last.issues.filter((i) => shownKinds.has(i.kind));
+  const visible = listedIssues(last.issues).filter((i) => shownKinds.has(i.kind));
   const unique = uniqueMutatingFixes(visible);
   if (!unique.length) return;
 
@@ -707,15 +750,17 @@ function applyAllUniqueFixes(): void {
 
 function renderIssues(result: ValidationResult): void {
   issuesEl.replaceChildren();
-  const visible = result.issues.filter((i) => shownKinds.has(i.kind));
-  setIssuesShown(result, visible.length);
+  const catalog = newNamesIssueOf(result.issues);
+  const board = listedIssues(result.issues);
+  const visible = board.filter((i) => shownKinds.has(i.kind));
+  setIssuesShown({ ...result, issues: board }, visible.length);
 
-  if (result.issues.length === 0) {
+  if (board.length === 0) {
     const li = document.createElement("li");
     li.className = "issues-empty";
     li.textContent = "Помилок немає. Можна зберігати файл і відправляти.";
     issuesEl.append(li);
-    syncApplyUniqueBar([]);
+    syncApplyUniqueBar([], catalog);
     return;
   }
 
@@ -724,7 +769,7 @@ function renderIssues(result: ValidationResult): void {
     li.className = "issues-empty";
     li.textContent = "Ці типи вимкнені в лічильниках. Увімкни потрібні — або «авто», якщо хочеш журнал правок.";
     issuesEl.append(li);
-    syncApplyUniqueBar([]);
+    syncApplyUniqueBar([], catalog);
     return;
   }
 
@@ -771,7 +816,7 @@ function renderIssues(result: ValidationResult): void {
     li.addEventListener("click", () => jumpTo(issue, undefined, issue.id));
     issuesEl.append(li);
   }
-  syncApplyUniqueBar(sorted);
+  syncApplyUniqueBar(sorted, catalog);
 }
 
 function jumpToLine(line: number): void {
@@ -1437,6 +1482,10 @@ btnRecheckSpec.addEventListener("click", () => void runFromSpec());
 btnRewriteAttrs.addEventListener("click", () => runRewriteAttrs());
 btnCopy.addEventListener("click", () => void copyText());
 btnDownload.addEventListener("click", download);
+btnCopyNewNames.addEventListener("click", (event) => {
+  event.stopPropagation();
+  void copyNewNames();
+});
 btnApplyUnique.addEventListener("click", (event) => {
   event.stopPropagation();
   applyAllUniqueFixes();
