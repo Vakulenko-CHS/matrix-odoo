@@ -1,4 +1,8 @@
 import type { QuickFix } from "./lint";
+import {
+  applyAttrsToLine,
+  replaceParamsInner,
+} from "../tools/check-attributes";
 
 function inferChainOutFixes(
   message: string,
@@ -73,6 +77,50 @@ function lastWorkshopBodyLine(content: string, headerLine: number): number {
   return last + 1;
 }
 
+function inferAttrLineFixes(
+  message: string,
+  line: number | null,
+  content: string,
+): QuickFix[] {
+  if (!line) return [];
+  const original = content.split("\n")[line - 1];
+  if (!original) return [];
+
+  if (message.startsWith("[ATTR-CHAIN]")) {
+    const from = message.match(/ряд\.\s*(\d+)/u);
+    const prodLine = from ? Number(from[1]) : 0;
+    const producer = prodLine ? content.split("\n")[prodLine - 1] : "";
+    const attrs = [...(producer?.match(/%[^%]+❌?%/gu) ?? [])];
+    if (!attrs.length) return [];
+    const next = applyAttrsToLine(original, attrs);
+    if (next === original) return [];
+    return [
+      {
+        id: `attr-chain-${line}`,
+        label: `Додати атрибути з ряд. ${prodLine}`,
+        action: "replace-line",
+        line,
+        replacement: next,
+      },
+    ];
+  }
+
+  const arrow = message.match(/→\s*"([^"]+)"/u);
+  if (!arrow) return [];
+  const next = replaceParamsInner(original, arrow[1]);
+  if (next === original) return [];
+  const kind = message.startsWith("[FIX]") ? "fix" : "cascade";
+  return [
+    {
+      id: `attr-${kind}-${line}`,
+      label: `Замінити на «${arrow[1]}»`,
+      action: "replace-line",
+      line,
+      replacement: next,
+    },
+  ];
+}
+
 export function inferFixes(
   message: string,
   line: number | null,
@@ -80,6 +128,13 @@ export function inferFixes(
 ): QuickFix[] {
   if (message.startsWith("[CHAIN-OUT]")) {
     return inferChainOutFixes(message, line, content);
+  }
+  if (
+    message.startsWith("[ATTR-CHAIN]") ||
+    message.startsWith("[FIX]") ||
+    message.startsWith("[CASCADE]")
+  ) {
+    return inferAttrLineFixes(message, line, content);
   }
   if (!line) return [];
   if (message.startsWith("[ZERO]") || /нульов/i.test(message)) {

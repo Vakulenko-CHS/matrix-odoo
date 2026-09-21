@@ -133,12 +133,18 @@ export function collectToolIssues(
     return;
   }
   for (const msg of pass.issues) {
+    const line = resolveLine(content, msg);
+    const original = line ? content.split("\n")[line - 1] : undefined;
     if (isBlockingIssue(msg)) {
-      pushIssue(issues, "blocking", pass.source, msg, content);
+      pushIssue(issues, "blocking", pass.source, msg, content, original, line);
     } else if (isAutoIssue(msg)) {
-      if (applyAutos) pushIssue(issues, "auto", pass.source, msg, content);
+      if (applyAutos) {
+        pushIssue(issues, "auto", pass.source, msg, content, original, line);
+      } else {
+        pushIssue(issues, "warning", pass.source, msg, content, original, line);
+      }
     } else {
-      pushIssue(issues, "warning", pass.source, msg, content);
+      pushIssue(issues, "warning", pass.source, msg, content, original, line);
     }
   }
 }
@@ -261,12 +267,12 @@ export function diagnoseSpec(
 
   const tools = runSpecTools(stripAutoTodoLines(prepared.content), prepared.fileName, {
     applyTodos: false,
-    applyContent: true,
+    applyContent: false,
   });
-  const working = stripAutoTodoLines(tools.content);
-  collectToolIssues(issues, tools.attr, working, true);
-  collectToolIssues(issues, tools.chain, working, true);
-  collectToolIssues(issues, tools.bom, working, true);
+  const working = stripAutoTodoLines(prepared.content);
+  collectToolIssues(issues, tools.attr, working, false);
+  collectToolIssues(issues, tools.chain, working, false);
+  collectToolIssues(issues, tools.bom, working, false);
   collectCatalogIssues(issues, working, knownNamesMd);
   {
     const cat = parseKnownCatalog(knownNamesMd);

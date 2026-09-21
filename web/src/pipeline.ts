@@ -128,6 +128,7 @@ function collectToolIssues(
       pushIssue(issues, "blocking", pass.source, msg, content);
     } else if (isAutoIssue(msg)) {
       if (applyAutos) pushIssue(issues, "auto", pass.source, msg, content);
+      else pushIssue(issues, "warning", pass.source, msg, content);
     } else {
       pushIssue(issues, "warning", pass.source, msg, content);
     }

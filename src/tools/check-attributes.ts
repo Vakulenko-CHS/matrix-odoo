@@ -190,27 +190,121 @@ function parseParams(line: string): ParsedParams | null {
   return { productId, attributes };
 }
 
-/**
- * Rebuild the line with new params content, preserving prefix, suffix, and comments.
- */
+const HAS_QTY_RE =
+  /[-]\s*[\d.,]*\s*(?:шт|кг|m|m²|m³)|[-]\s*[\d.,]+\s*$/u;
+const QTY_TAIL_RE = /(\s+-\s*[\d.,]+\s*\S+)\s*$/u;
+
+function splitComment(line: string): { head: string; comment: string } {
+  const commentIdx = line.indexOf("//");
+  if (commentIdx < 0) return { head: line.trim(), comment: "" };
+  return {
+    head: line.slice(0, commentIdx).trim(),
+    comment: " " + line.slice(commentIdx).trim(),
+  };
+}
+
+/** Insert or replace `(…)` params. Works when the line has no parens yet. */
+export function replaceParamsInner(
+  originalLine: string,
+  newParamsContent: string,
+): string {
+  const { head, comment } = splitComment(originalLine);
+  const bounds = findParamBounds(head);
+  if (bounds) {
+    return (
+      head.slice(0, bounds.open + 1) +
+      newParamsContent +
+      head.slice(bounds.close) +
+      comment
+    );
+  }
+  const qty = head.match(QTY_TAIL_RE);
+  if (qty && qty.index != null) {
+    return `${head.slice(0, qty.index)} (${newParamsContent})${qty[1]}${comment}`;
+  }
+  return `${head} (${newParamsContent})${comment}`;
+}
+
 function rebuildLine(originalLine: string, newParamsContent: string): string {
-  const commentIdx = originalLine.indexOf("//");
-  const lineBeforeComment =
-    commentIdx >= 0
-      ? originalLine.slice(0, commentIdx).trim()
-      : originalLine.trim();
-  const comment =
-    commentIdx >= 0 ? " " + originalLine.slice(commentIdx).trim() : "";
+  return replaceParamsInner(originalLine, newParamsContent);
+}
 
-  const bounds = findParamBounds(lineBeforeComment);
-  if (!bounds) return originalLine;
+function productType(line: string): string {
+  const s = stripLineComment(line.trim());
+  const bracketEnd = s.indexOf("]");
+  if (bracketEnd < 0) return "";
+  return s.slice(0, bracketEnd + 1).trim();
+}
 
-  const rebuilt =
-    lineBeforeComment.slice(0, bounds.open + 1) +
-    newParamsContent +
-    lineBeforeComment.slice(bounds.close);
+/** Model / product id. Pattern A `(Model, %Attr%)` or Pattern B `] Model (%Attr%)`. */
+function productId(line: string): string {
+  const noQty = stripLineComment(line.trim()).replace(
+    /\s*-\s*[\d.,]+\s*\S+\s*$/u,
+    "",
+  ).trim();
+  const after = noQty.match(/\]\s+(.+)$/);
+  if (after) {
+    const rest = after[1].trim();
+    if (rest.startsWith("(")) {
+      const inner = rest.slice(1);
+      const sepIdx = inner.search(/[,%]/);
+      const content =
+        sepIdx >= 0
+          ? inner.slice(0, sepIdx).trim()
+          : inner.replace(/\).*/, "").trim();
+      if (content.startsWith("%")) return "";
+      return content;
+    }
+    const paren = rest.indexOf("(");
+    const model = (paren < 0 ? rest : rest.slice(0, paren)).trim();
+    if (model && !model.startsWith("%")) return model;
+  }
+  const parenOpen = noQty.indexOf("(");
+  if (parenOpen < 0) return "";
+  const inner = noQty.slice(parenOpen + 1);
+  const sepIdx = inner.search(/[,%]/);
+  const content =
+    sepIdx >= 0
+      ? inner.slice(0, sepIdx).trim()
+      : inner.replace(/\).*/, "").trim();
+  if (content.startsWith("%")) return "";
+  return content;
+}
 
-  return rebuilt + comment;
+function productKey(line: string): string | null {
+  const t = productType(line);
+  const id = productId(line);
+  if (!t || !id) return null;
+  return `${t}::${id}`;
+}
+
+function paramsInner(line: string): string {
+  const clean = stripLineComment(line.trim());
+  const bounds = findParamBounds(clean);
+  if (!bounds) return "";
+  return clean.slice(bounds.open + 1, bounds.close).replace(/\s+/g, " ").trim();
+}
+
+function attrTokens(inner: string): string[] {
+  if (!inner) return [];
+  return inner
+    .split(",")
+    .map((t) => t.trim())
+    .filter((t) => t.startsWith("%"));
+}
+
+/** Copy `%Attr%` tokens onto a consumer line, keep Pattern A model in parens. */
+export function applyAttrsToLine(line: string, attrs: string[]): string {
+  const inner = paramsInner(line);
+  const tokens = inner
+    ? inner.split(",").map((t) => t.trim()).filter(Boolean)
+    : [];
+  const modelInParens =
+    tokens[0] && !tokens[0].startsWith("%") ? tokens[0] : "";
+  const newInner = modelInParens
+    ? [modelInParens, ...attrs].join(", ")
+    : attrs.join(", ");
+  return replaceParamsInner(line, newInner);
 }
 
 // ─── Step 3: Workshop number extraction ───────────────────────────────────
@@ -327,9 +421,7 @@ function verify(
     }
 
     // Is it an input line (has "- N шт." or "- шт." or "- N кг" etc.)?
-    const hasQty = /[-]\s*[\d.,]*\s*(?:шт|кг|m|m²|m³)|[-]\s*[\d.,]+\s*$/u.test(
-      cleanLine,
-    );
+    const hasQty = HAS_QTY_RE.test(cleanLine);
     if (hasQty) continue; // skip inputs — handled via cascading
 
     // It's an output line
@@ -373,7 +465,7 @@ function verify(
       `  [FIX] ${currentWorkshop}: "${oldParamsContent}" → "${newParamsContent}"`,
     );
     issues.push(
-      `[FIX] Цех №${currentWorkshop}: "${oldParamsContent}" → "${newParamsContent}"`,
+      `[FIX] рядок ${i + 1}: Цех №${currentWorkshop}: "${oldParamsContent}" → "${newParamsContent}"`,
     );
 
     // Build rename info for cascading inputs
@@ -409,9 +501,7 @@ function cascadeInputUpdates(
     }
 
     const cleanLine = stripLineComment(trimmed);
-    const hasQty = /[-]\s*[\d.,]*\s*(?:шт|кг|m|m²|m³)|[-]\s*[\d.,]+\s*$/u.test(
-      cleanLine,
-    );
+    const hasQty = HAS_QTY_RE.test(cleanLine);
     if (!hasQty) continue; // only inputs
 
     for (const rename of renames) {
@@ -442,6 +532,67 @@ function cascadeInputUpdates(
   }
 
   return { changes: inputChanges, issues };
+}
+
+type Produced = { lineIdx: number; attrs: string[] };
+
+/** Copy attrs from nearest producer above onto consumers of the same type+id. */
+function syncConsumerAttrs(
+  fileLines: string[],
+  skip: Set<number>,
+): { changes: LineChange[]; issues: string[] } {
+  const produced: Produced[] = [];
+  const producedKeys: string[] = [];
+  const changes: LineChange[] = [];
+  const issues: string[] = [];
+
+  for (let i = 0; i < fileLines.length; i++) {
+    const raw = fileLines[i];
+    const trimmed = raw.trim();
+    if (!isProductLine(trimmed)) continue;
+    const clean = stripLineComment(trimmed);
+    const key = productKey(clean);
+    if (!key) continue;
+    if (!HAS_QTY_RE.test(clean)) {
+      produced.push({ lineIdx: i, attrs: attrTokens(paramsInner(clean)) });
+      producedKeys.push(key);
+    }
+  }
+
+  for (let i = 0; i < fileLines.length; i++) {
+    if (skip.has(i)) continue;
+    const raw = fileLines[i];
+    const trimmed = raw.trim();
+    if (!isProductLine(trimmed)) continue;
+    const clean = stripLineComment(trimmed);
+    if (!HAS_QTY_RE.test(clean)) continue;
+    const key = productKey(clean);
+    if (!key) continue;
+
+    let src: Produced | null = null;
+    for (let p = 0; p < produced.length; p++) {
+      if (producedKeys[p] !== key) continue;
+      if (produced[p].lineIdx >= i) continue;
+      if (!src || produced[p].lineIdx > src.lineIdx) src = produced[p];
+    }
+    if (!src || src.attrs.length === 0) continue;
+
+    const have = attrTokens(paramsInner(clean));
+    if (have.length > 0) continue;
+    if (src.attrs.length === 0) continue;
+
+    const newLine = applyAttrsToLine(raw, src.attrs);
+    if (newLine === raw) continue;
+
+    const msg =
+      `[ATTR-CHAIN] рядок ${i + 1}: немає атрибутів, у виробництві ` +
+      `ряд. ${src.lineIdx + 1}: ${src.attrs.join(", ")}`;
+    console.log(`  ${msg}`);
+    issues.push(msg);
+    changes.push({ lineIdx: i, oldLine: raw, newLine });
+  }
+
+  return { changes, issues };
 }
 
 // ─── Apply all changes ────────────────────────────────────────────────────
@@ -508,20 +659,32 @@ export function runAttributeCheck(
     changedOutputIdxs,
   );
   workingLines = applyChanges(workingLines, inputChanges);
+  const skipped = new Set([
+    ...changedOutputIdxs,
+    ...inputChanges.map((c) => c.lineIdx),
+  ]);
+  const { changes: chainChanges, issues: chainIssues } = syncConsumerAttrs(
+    fileLines,
+    skipped,
+  );
+  workingLines = applyChanges(workingLines, chainChanges);
 
   const totalChanges =
-    listNorm.fixes.length + outputChanges.length + inputChanges.length;
+    listNorm.fixes.length +
+    outputChanges.length +
+    inputChanges.length +
+    chainChanges.length;
   if (totalChanges === 0) {
     console.log("  ✅ Атрибути в порядку, змін немає.");
   } else {
     console.log(
-      `  Змін список: ${listNorm.fixes.length}, output: ${outputChanges.length}, input (каскад): ${inputChanges.length}`,
+      `  Змін список: ${listNorm.fixes.length}, output: ${outputChanges.length}, input (каскад): ${inputChanges.length}, ланцюг: ${chainChanges.length}`,
     );
   }
 
   return {
     content: workingLines.join("\n"),
-    issues: [...listNorm.fixes, ...attrIssues, ...cascadeIssues],
+    issues: [...listNorm.fixes, ...attrIssues, ...cascadeIssues, ...chainIssues],
   };
 }
 
