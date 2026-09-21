@@ -81,6 +81,29 @@ function lineCanonHead(trimmed: string): string | null {
   return null;
 }
 
+/** Keep `- N uom`, `// @Attr=…`, and `<!-- -->` after a head rewrite. */
+function lineFixTail(trimmed: string): { qty: string; trail: string } {
+  let body = trimmed;
+  let trail = "";
+  const html = body.match(/(\s*<!--[\s\S]*-->)\s*$/);
+  if (html) {
+    trail = html[1];
+    body = body.slice(0, -html[0].length).trimEnd();
+  }
+  const slash = body.match(/(\s*\/\/.*)$/);
+  if (slash) {
+    trail = `${slash[1]}${trail}`;
+    body = body.slice(0, -slash[0].length).trimEnd();
+  }
+  const qty = body.match(COMP_QTY_TAIL_RE)?.[0] ?? "";
+  return { qty, trail };
+}
+
+function rebuiltFixLine(indent: string, head: string, trimmed: string): string {
+  const { qty, trail } = lineFixTail(trimmed);
+  return `${indent}${head}${qty}${trail}`;
+}
+
 function lineFurnitureHead(trimmed: string): string | null {
   const t = trimmed
     .replace(/<!--.*?-->/g, "")
@@ -277,7 +300,6 @@ export function lintSpec(
       const allowFuzzy =
         Boolean(qtyHead) || (/^\[[^\]]+\]/.test(t) && !t.includes("("));
       if (head && (qtyHead || allowFuzzy || furnIndex.has(normNameKey(head)))) {
-        const qty = t.match(COMP_QTY_TAIL_RE)?.[0] ?? "";
         const indent = line.match(/^\s*/)?.[0] ?? "";
         const exact = exactFurnitureCanon(head, aliases, furnIndex);
         if (exact) {
@@ -295,7 +317,7 @@ export function lintSpec(
                   label: `Замінити на «${exact}»`,
                   action: "replace-line",
                   line: n,
-                  replacement: `${indent}${exact}${qty}`,
+                  replacement: rebuiltFixLine(indent, exact, t),
                 },
               ],
             });
@@ -324,7 +346,7 @@ export function lintSpec(
                 label: `Замінити на «${h.canon}»`,
                 action: "replace-line" as const,
                 line: n,
-                replacement: `${indent}${h.canon}${qty}`,
+                replacement: rebuiltFixLine(indent, h.canon, t),
               })),
             });
           } else if (inShop9 && qtyHead && !skipFurnitureName(head)) {
@@ -349,7 +371,6 @@ export function lintSpec(
         const next = rewriteCanonHead(canonHead, aliases, suffixIndex);
         if (next) {
           furnitureHit = true;
-          const qty = t.match(COMP_QTY_TAIL_RE)?.[0] ?? "";
           const indent = line.match(/^\s*/)?.[0] ?? "";
           hits.push({
             kind: "error",
@@ -363,7 +384,7 @@ export function lintSpec(
                 label: `Замінити на «${next}»`,
                 action: "replace-line",
                 line: n,
-                replacement: `${indent}${next}${qty}`,
+                replacement: rebuiltFixLine(indent, next, t),
               },
             ],
           });
