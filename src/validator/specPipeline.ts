@@ -44,6 +44,19 @@ export function isAutoIssue(message: string): boolean {
   return AUTO_PREFIXES.some((p) => message.startsWith(p));
 }
 
+export function applyAttributeCheck(
+  content: string,
+  fileName: string,
+): SpecToolPass {
+  try {
+    const result = runAttributeCheck(content, fileName);
+    return { source: "attrs", content: result.content, issues: result.issues };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { source: "attrs", content, issues: [], error: message };
+  }
+}
+
 export function prepareSpecContent(raw: string): PrepareSpecResult {
   const prepared = toNoValidContent(raw);
   const formatted = formatDocumentContent(prepared.content);
@@ -75,19 +88,7 @@ export function runSpecTools(
           applyContent: applyTodosOrOptions.applyContent ?? true,
         };
 
-  let attr: SpecToolPass;
-  try {
-    const result = runAttributeCheck(content, fileName);
-    attr = { source: "attrs", content: result.content, issues: result.issues };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    attr = {
-      source: "attrs",
-      content,
-      issues: [],
-      error: message,
-    };
-  }
+  const attr = applyAttributeCheck(content, fileName);
 
   const chainInput = options.applyContent ? attr.content : content;
   const chainResult = runChainCheck(chainInput, fileName, options.applyTodos);

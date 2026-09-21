@@ -23,6 +23,16 @@ const ATTR_LIST_ITEM_RE = /"([^"]+)",?\s*(✅|❌)?\uFE0F?/gu;
 const ATTR_LIST_LINE_RE =
   /^(\s*"[^"]+")(,?)(\s*)((?:✅|❌)\uFE0F?)?(\s*)$/u;
 
+/** Same «## Інструкції» block in every spec. Source of truth — do not parse from the file. */
+export const ATTR_WORKSHOP_MAP: Record<string, readonly string[]> = {
+  "%Тканина%": ["7", "8", "9-1", "9"],
+  "%Диван Пружинний Блок%": ["5", "6", "9"],
+  "%Диван Наповнювач Подушек%": ["9-1", "9"],
+  "%Диван Розмір Бильця%": ["1", "2-1", "4-1", "5", "6", "7", "8", "9"],
+  "%Колір Ламінату%": ["3-2", "4-2", "6", "9"],
+  "%Дно Каркасу%": ["2-2", "4-2", "6", "9"],
+};
+
 function matchAttrListSection(content: string): RegExpMatchArray | null {
   return content.match(ATTR_LIST_SECTION_RE);
 }
@@ -88,36 +98,33 @@ function parseAttributeRules(content: string): Attribute[] {
   let order = 0;
   while ((m = itemRe.exec(listBlock)) !== null) {
     order++;
+    const paramName = `%${m[1]}%`;
     attrs.push({
-      paramName: `%${m[1]}%`,
+      paramName,
       order,
       // Missing mark = inactive (❌)
       active: m[2] === "✅",
-      workshops: [],
+      workshops: [...(ATTR_WORKSHOP_MAP[paramName] ?? [])],
     });
   }
 
-  // 1b. Parse "Інструкції" section for workshop effects
+  // Extra attrs (not in the hardcoded map): fill workshops from «Інструкції» if present.
   const instrMatch = content.match(
     /## Інструкції[^\n]*\n([\s\S]*?)(?=\n# |\n## |$)/,
   );
-  if (!instrMatch) throw new Error('Не знайдено "## Інструкції" у файлі');
+  if (!instrMatch) return attrs;
 
   const instrBlock = instrMatch[1];
   const workshopRe = /Впливає на цехи:\s*\(([^)]+)\)/u;
-
-  // Split by numbered entries
   const entries = instrBlock.split(/(?=^\d+\.\s+%)/mu).filter((e) => e.trim());
   for (const entry of entries) {
     const nameMatch = /^\d+\.\s+%([^%]+)%/u.exec(entry);
     if (!nameMatch) continue;
     const paramName = `%${nameMatch[1]}%`;
-
-    const wMatch = workshopRe.exec(entry);
-    const workshops = wMatch ? wMatch[1].split(",").map((w) => w.trim()) : [];
-
     const attr = attrs.find((a) => a.paramName === paramName);
-    if (attr) attr.workshops = workshops;
+    if (!attr || attr.workshops.length > 0) continue;
+    const wMatch = workshopRe.exec(entry);
+    attr.workshops = wMatch ? wMatch[1].split(",").map((w) => w.trim()) : [];
   }
 
   return attrs;
@@ -350,6 +357,24 @@ function requiredAttrsFor(
   return required;
 }
 
+function tokenKey(token: string): string {
+  return token.replace(/❌%$/, "%");
+}
+
+function requiredTokensFor(
+  workshopNum: string,
+  outputLine: string,
+  allAttrs: Attribute[],
+): string[] {
+  const required = requiredAttrsFor(workshopNum, outputLine, allAttrs);
+  const isWorkshop9 = workshopNum === "9";
+  return isWorkshop9
+    ? required.filter((a) => a.active).map((a) => a.paramName)
+    : required.map((a) =>
+        a.active ? a.paramName : a.paramName.replace(/%$/, "❌%"),
+      );
+}
+
 // ─── Step 5: Main verification and fix ────────────────────────────────────
 
 interface LineChange {
@@ -427,48 +452,50 @@ function verify(
     // It's an output line
     bomStarted = true;
 
+    const reqTokens = requiredTokensFor(currentWorkshop, cleanLine, allAttrs);
     const parsed = parseParams(cleanLine);
-    if (!parsed) continue;
 
-    // Determine required attributes (both active and inactive that affect this workshop)
-    const required = requiredAttrsFor(currentWorkshop, cleanLine, allAttrs);
+    if (!parsed) {
+      if (reqTokens.length === 0) continue;
+      const newParamsContent = reqTokens.join(", ");
+      const newLine = rebuildLine(raw, newParamsContent);
+      if (newLine === raw) continue;
+      outputChanges.push({ lineIdx: i, oldLine: raw, newLine });
+      const msg =
+        `[FIX] рядок ${i + 1}: Цех №${currentWorkshop}: немає атрибутів ` +
+        `→ "${newParamsContent}"`;
+      console.log(`  ${msg}`);
+      issues.push(msg);
+      renames.push({
+        baseKey: buildBaseKey(cleanLine),
+        oldParams: "",
+        newParams: newParamsContent,
+      });
+      continue;
+    }
 
-    // Цех №9 (final assembly): only active attrs, skip inactive
-    // All other workshops (incl. 9-1): active → %Name%, inactive → ❌
-    const isWorkshop9 = currentWorkshop === "9";
-    const reqTokens = isWorkshop9
-      ? required.filter((a) => a.active).map((a) => a.paramName)
-      : required.map((a) =>
-          a.active ? a.paramName : a.paramName.replace(/%$/, "❌%"),
-        );
-
-    // Build new params
     const newParamsContent = parsed.productId
       ? [parsed.productId, ...reqTokens].join(", ")
       : reqTokens.join(", ");
 
-    // Build old params content
     const bounds = findParamBounds(cleanLine);
     if (!bounds) continue;
     const oldParamsContent = cleanLine.slice(bounds.open + 1, bounds.close);
-
-    // Compare (normalize spaces)
     const oldNorm = oldParamsContent.replace(/\s+/g, " ").trim();
     const newNorm = newParamsContent.replace(/\s+/g, " ").trim();
-
     if (oldNorm === newNorm) continue;
 
-    // Record output change
+    const have = new Set(parsed.attributes.map(tokenKey));
+    const missing = reqTokens.filter((t) => !have.has(tokenKey(t)));
+    const msg = missing.length
+      ? `[FIX] рядок ${i + 1}: Цех №${currentWorkshop}: немає ${missing.join(", ")} → "${newParamsContent}"`
+      : `[FIX] рядок ${i + 1}: Цех №${currentWorkshop}: "${oldParamsContent}" → "${newParamsContent}"`;
+
     const newLine = rebuildLine(raw, newParamsContent);
     outputChanges.push({ lineIdx: i, oldLine: raw, newLine });
-    console.log(
-      `  [FIX] ${currentWorkshop}: "${oldParamsContent}" → "${newParamsContent}"`,
-    );
-    issues.push(
-      `[FIX] рядок ${i + 1}: Цех №${currentWorkshop}: "${oldParamsContent}" → "${newParamsContent}"`,
-    );
+    console.log(`  ${msg}`);
+    issues.push(msg);
 
-    // Build rename info for cascading inputs
     renames.push({
       baseKey: buildBaseKey(cleanLine),
       oldParams: oldParamsContent,
@@ -510,7 +537,19 @@ function cascadeInputUpdates(
 
       // Verify old params match
       const bounds = findParamBounds(cleanLine);
-      if (!bounds) continue;
+      if (!bounds) {
+        if (rename.oldParams.replace(/\s+/g, " ").trim() !== "") continue;
+        const newLine = rebuildLine(raw, rename.newParams);
+        if (newLine === raw) continue;
+        console.log(
+          `  [CASCADE] рядок ${i + 1}: немає атрибутів → "${rename.newParams}"`,
+        );
+        issues.push(
+          `[CASCADE] рядок ${i + 1}: немає атрибутів → "${rename.newParams}"`,
+        );
+        inputChanges.push({ lineIdx: i, oldLine: raw, newLine });
+        break;
+      }
       const currentParams = cleanLine.slice(bounds.open + 1, bounds.close);
       const currentNorm = currentParams.replace(/\s+/g, " ").trim();
       const oldNorm = rename.oldParams.replace(/\s+/g, " ").trim();
@@ -664,7 +703,7 @@ export function runAttributeCheck(
     ...inputChanges.map((c) => c.lineIdx),
   ]);
   const { changes: chainChanges, issues: chainIssues } = syncConsumerAttrs(
-    fileLines,
+    workingLines,
     skipped,
   );
   workingLines = applyChanges(workingLines, chainChanges);

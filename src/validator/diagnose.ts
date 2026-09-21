@@ -1,4 +1,5 @@
 import {
+  applyAttributeCheck,
   checkSpecContent,
   isAutoIssue,
   isBlockingIssue,
@@ -266,12 +267,15 @@ export function diagnoseSpec(
     pushIssue(issues, "auto", "format", change, prepared.content);
   }
 
-  const tools = runSpecTools(stripAutoTodoLines(prepared.content), prepared.fileName, {
+  let working = stripAutoTodoLines(prepared.content);
+  const attrPass = applyAttributeCheck(working, prepared.fileName);
+  working = stripAutoTodoLines(attrPass.content);
+  collectToolIssues(issues, attrPass, working, true);
+
+  const tools = runSpecTools(working, prepared.fileName, {
     applyTodos: false,
     applyContent: false,
   });
-  const working = stripAutoTodoLines(prepared.content);
-  collectToolIssues(issues, tools.attr, working, false);
   collectToolIssues(issues, tools.chain, working, false);
   collectToolIssues(issues, tools.bom, working, false);
   collectCatalogIssues(issues, working, knownNamesMd);
