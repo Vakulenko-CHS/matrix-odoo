@@ -39,9 +39,28 @@ function fixTokens(s: string): string {
     .replace(/^Д\.\s+/, "Д.");
 }
 
-const ALWAYS_SUFFIX_INNER = new Set(["накладка"]);
+/** Inners that are per-model templates (Pattern B). First literal attr → suffix. */
+const PATTERN_B_INNERS = new Set([
+  "накладка",
+  "наволочка",
+  "подушка",
+  "бильце - нарізані деталі",
+  "каркас - нарізані деталі",
+  "ламінат - нарізані деталі",
+  "планка - нарізані деталі",
+  "поролон - нарізані компоненти",
+  "поролон - нарізані компонети",
+  "чохол - нарізані матеріали",
+  "бильце - напівфабрикат",
+  "каркас - напівфабрикат",
+  "планка - напівфабрикат",
+  "чохол - напівфабрикат",
+  "каркас + поролон - напівфабрикат 2",
+  "бильце - нарізана деревина",
+  "каркас - нарізана деревина",
+]);
 
-function parseBracket(head: string): {
+export function parseCanonBracket(head: string): {
   emoji: string;
   inner: string;
   after: string;
@@ -51,10 +70,36 @@ function parseBracket(head: string): {
   return { emoji: m[1], inner: m[2], after: m[3].trim() };
 }
 
+/** True if `[inner] Model` is Pattern B — even when Model is not in right_names. */
+export function isPatternBInner(
+  inner: string,
+  suffixIndex: Map<string, Set<string>> = new Map(),
+): boolean {
+  const k = normNameKey(fixTokens(inner));
+  if (PATTERN_B_INNERS.has(k)) return true;
+  const set = suffixIndex.get(k);
+  return Boolean(set && set.size > 0);
+}
+
+/** Model suffix if already Pattern B form; null if still in parens or not Pattern B. */
+export function patternBModelSuffix(
+  head: string,
+  suffixIndex: Map<string, Set<string>> = new Map(),
+): string | null {
+  const p = parseCanonBracket(head);
+  if (!p || !isPatternBInner(p.inner, suffixIndex)) return null;
+  let after = p.after;
+  if (!after || after.startsWith("(") || after.startsWith("%")) return null;
+  const paren = after.indexOf("(");
+  if (paren >= 0) after = after.slice(0, paren).trim();
+  if (!after || after.startsWith("%")) return null;
+  return after;
+}
+
 export function suffixesByInner(nameCanons: string[]): Map<string, Set<string>> {
   const map = new Map<string, Set<string>>();
   for (const raw of nameCanons) {
-    const p = parseBracket(raw);
+    const p = parseCanonBracket(raw);
     if (!p || !p.after) continue;
     const key = normNameKey(p.inner);
     let set = map.get(key);
@@ -120,7 +165,7 @@ export function rewriteCanonHead(
   const fromAlias = aliases.get(q);
   if (fromAlias && displayName(fromAlias) !== src) return fromAlias;
 
-  const p = parseBracket(src);
+  const p = parseCanonBracket(src);
   if (!p) {
     const tokened = fixTokens(src);
     return tokened !== src ? tokened : null;
@@ -140,10 +185,7 @@ export function rewriteCanonHead(
     const attrs = splitTopAttrs(after.slice(1, -1));
     const first = attrs[0] ? fixTokens(attrs[0]) : "";
     if (first && !first.startsWith("%")) {
-      const allowed = suffixIndex.get(normNameKey(inner));
-      const force =
-        ALWAYS_SUFFIX_INNER.has(normNameKey(inner)) && !first.startsWith("%");
-      if (force || (allowed && allowed.has(normNameKey(first)))) {
+      if (isPatternBInner(inner, suffixIndex)) {
         const rest = attrs.slice(1);
         after = rest.length > 0 ? `${first} (${rest.join(", ")})` : first;
       } else {

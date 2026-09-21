@@ -11,7 +11,7 @@ import {
   fuzzyFurnitureCanons,
   uniqueFuzzyCanon,
 } from "./fuzzyNames";
-import { rewriteCanonHead, suffixesByInner } from "./canonRewrite";
+import { rewriteCanonHead, suffixesByInner, patternBModelSuffix } from "./canonRewrite";
 
 export interface QuickFix {
   id: string;
@@ -201,6 +201,8 @@ export function lintSpec(
   let shop9Line: number | null = null;
   const newFurn: string[] = [];
   let newFurnLine: number | null = null;
+  const newModels: string[] = [];
+  let newModelLine: number | null = null;
 
   function copyFix(label: string, text: string, line: number): QuickFix {
     return {
@@ -223,6 +225,18 @@ export function lintSpec(
     });
     if (!newFurn.includes(head)) newFurn.push(head);
     if (newFurnLine == null) newFurnLine = line;
+  }
+
+  function noteNewPatternB(head: string, line: number): void {
+    const model = patternBModelSuffix(head, suffixIndex);
+    if (!model) return;
+    const innerKey = head.match(/\[([^\]]+)\]/)?.[1] ?? "";
+    const allowed = suffixIndex.get(normNameKey(innerKey));
+    if (allowed?.has(normNameKey(model))) return;
+    const p = head.match(/^([🪵🧩🪤🧽]*\[[^\]]+\])/u);
+    const full = p ? `${p[1]} ${model}` : head;
+    if (!newModels.includes(full)) newModels.push(full);
+    if (newModelLine == null) newModelLine = line;
   }
 
   for (let i = 0; i < lines.length; i++) {
@@ -353,6 +367,9 @@ export function lintSpec(
               },
             ],
           });
+          noteNewPatternB(next, n);
+        } else {
+          noteNewPatternB(canonHead, n);
         }
       }
     }
@@ -449,6 +466,18 @@ export function lintSpec(
         ],
       });
     }
+  }
+
+  if (newModels.length > 0) {
+    const loc = newModelLine ?? 1;
+    hits.push({
+      kind: "warning",
+      source: "lint",
+      line: loc,
+      message: `Нові моделі (Pattern B), немає в right_names (${newModels.length})`,
+      original: newModels.join("\n"),
+      fixes: [copyFix("Скопіювати всі", newModels.join("\n"), loc)],
+    });
   }
 
   if (newFurn.length > 0) {

@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { lineHtmlCommentFlags } from "../tools/htmlComment";
+import { isPatternBInner } from "./canonRewrite";
 
 // Авто-виправлення типових помилок форматування сирих документів.
 // Не змінює смислову структуру — тільки текстові артефакти.
@@ -189,7 +190,9 @@ function fixMissingAttrParens(line: string): string {
   return line.replace(
     /(\[[^\]]+\])\s+([^(\s-][^\s-]*)\s+-\s*([\d])/,
     (full, br: string, token: string, d: string) => {
+      const inner = br.slice(1, -1);
       if (
+        isPatternBInner(inner) ||
         /^(Д\.|Б\.|М\.|Угол|100|Планка|Ніша|Тум|Реал|Леон|Полка|Бар|\d)/.test(token)
       ) {
         return full;

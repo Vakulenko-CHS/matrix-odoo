@@ -10,6 +10,7 @@ import {
   similarLabels,
   uniqueFuzzyCanon,
 } from "./fuzzyNames";
+import { isPatternBInner, suffixesByInner } from "./canonRewrite";
 
 export interface CheckError {
   line: number;
@@ -209,6 +210,7 @@ export function checkDocumentContent(
   const warnings: CheckError[] = [];
   const knownTemplatePrefixes = extractTemplatePrefixes(knownLabels);
   const furnIndex = furnitureSearchKeys(aliases, furnitureCanons);
+  const suffixIndex = suffixesByInner(nameCanons);
   const knownSuffixes = new Set<string>();
   for (const c of nameCanons) {
     const m = c.match(/\]\s+(.+)$/);
@@ -438,8 +440,11 @@ export function checkDocumentContent(
     const suffixTok = trimmed.match(
       /\]\s+([^(%]+?)(?:\s*\(|\s+-\s*[\d]|\s*$)/,
     )?.[1]?.trim();
+    const bracketInner = trimmed.match(/\[([^\]]+)\]/)?.[1];
     const suffixIsModel =
-      Boolean(suffixTok) && knownSuffixes.has(normNameKey(suffixTok!));
+      Boolean(suffixTok) &&
+      (knownSuffixes.has(normNameKey(suffixTok!)) ||
+        (Boolean(bracketInner) && isPatternBInner(bracketInner!, suffixIndex)));
     if (
       !aliasCanon &&
       !fuzzyFurn &&

@@ -5,6 +5,7 @@ import {
   OperationEntry,
 } from "./types";
 import { lineHtmlCommentFlags } from "../htmlComment";
+import { isPatternBInner } from "../../validator/canonRewrite";
 
 const DEFAULT_ATTR_NAMES = ["Модель", "Тканина", "Наповнювач"];
 
@@ -238,8 +239,7 @@ function buildTemplateName(
   return suffix ? `${base} ${suffix}` : base;
 }
 
-// Only these two templates embed the model identifier into the bracket name to avoid
-// variant explosion (Тканина × model × size = thousands of variants in one template).
+// Pattern B: first literal attr is the model suffix (not inside brackets).
 const EMBED_MODEL_TEMPLATES = new Set([
   'Чохол - нарізані матеріали',
   'Чохол - напівфабрикат',
@@ -249,18 +249,27 @@ const EMBED_MODEL_TEMPLATES = new Set([
 function embedLiteralFirstAttr(
   bracketName: string,
   attrValues: string[],
-): { effectiveName: string; effectiveValues: string[] } {
+): {
+  effectiveName: string;
+  effectiveValues: string[];
+  embedSuffix: string;
+} {
   if (
-    EMBED_MODEL_TEMPLATES.has(bracketName) &&
+    (EMBED_MODEL_TEMPLATES.has(bracketName) || isPatternBInner(bracketName)) &&
     attrValues.length > 0 &&
-    !attrValues[0].includes('%')
+    !attrValues[0].includes("%")
   ) {
     return {
-      effectiveName: `${bracketName} ${attrValues[0]}`,
+      effectiveName: bracketName,
       effectiveValues: attrValues.slice(1),
+      embedSuffix: attrValues[0],
     };
   }
-  return { effectiveName: bracketName, effectiveValues: attrValues };
+  return {
+    effectiveName: bracketName,
+    effectiveValues: attrValues,
+    embedSuffix: "",
+  };
 }
 
 function buildVariantDisplayName(
@@ -293,10 +302,16 @@ function tryParseProduct(
   if (bracketMatch) {
     const { emoji, bracketName, suffix } = bracketMatch;
     const attrValues = attrStr ? parseAttrString(attrStr) : [];
-    const { effectiveName, effectiveValues } = suffix
-      ? { effectiveName: bracketName, effectiveValues: attrValues }
+    const embedded = suffix
+      ? { effectiveName: bracketName, effectiveValues: attrValues, embedSuffix: "" }
       : embedLiteralFirstAttr(bracketName, attrValues);
-    const templateName = buildTemplateName(emoji, effectiveName, true, suffix);
+    const { effectiveName, effectiveValues, embedSuffix } = embedded;
+    const templateName = buildTemplateName(
+      emoji,
+      effectiveName,
+      true,
+      suffix || embedSuffix,
+    );
     const attributes = valuesToAttributes(effectiveValues, bracketName);
     const variantDisplayName = buildVariantDisplayName(templateName, effectiveValues);
 
@@ -367,10 +382,16 @@ function tryParseComponent(line: string): ParsedComponent | null {
   if (bracketMatch) {
     const { emoji, bracketName, suffix } = bracketMatch;
     const attrValues = attrStr ? parseAttrString(attrStr) : [];
-    const { effectiveName, effectiveValues } = suffix
-      ? { effectiveName: bracketName, effectiveValues: attrValues }
+    const embedded = suffix
+      ? { effectiveName: bracketName, effectiveValues: attrValues, embedSuffix: "" }
       : embedLiteralFirstAttr(bracketName, attrValues);
-    const templateName = buildTemplateName(emoji, effectiveName, true, suffix);
+    const { effectiveName, effectiveValues, embedSuffix } = embedded;
+    const templateName = buildTemplateName(
+      emoji,
+      effectiveName,
+      true,
+      suffix || embedSuffix,
+    );
     return {
       templateName,
       attributes: valuesToAttributes(effectiveValues, bracketName),
