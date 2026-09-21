@@ -781,8 +781,18 @@ textarea {
 }
 
 .issues-dock .counts,
-.issues-dock .issues {
+.issues-dock .issues,
+.issues-pane {
   background: var(--sheet);
+}
+
+.issues-pane {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--graphite);
+  position: relative;
 }
 
 .issues-dock .counts {
@@ -826,8 +836,30 @@ textarea {
   padding: 0;
   overflow: auto;
   flex: 1;
-  border: 1px solid var(--graphite);
   min-height: 0;
+}
+
+.issues-apply-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  flex: 0 0 auto;
+  display: flex;
+  padding: 8px 10px;
+  border-top: 1px solid var(--graphite);
+  background: color-mix(in srgb, var(--sheet) 88%, var(--ply-dark));
+  box-shadow: 0 -6px 10px rgba(42, 38, 34, 0.08);
+}
+
+.issues-apply-bar[hidden] {
+  display: none;
+}
+
+.issues-apply-bar button {
+  width: 100%;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .issues li {

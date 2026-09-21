@@ -90,6 +90,8 @@ const stampHint = document.querySelector<HTMLElement>("#stamp-hint")!;
 const countsEl = document.querySelector<HTMLElement>("#counts")!;
 const issuesEl = document.querySelector<HTMLOListElement>("#issues")!;
 const issuesShownEl = document.querySelector<HTMLElement>("#issues-shown")!;
+const issuesApplyBar = document.querySelector<HTMLElement>("#issues-apply-bar")!;
+const btnApplyUnique = document.querySelector<HTMLButtonElement>("#btn-apply-unique")!;
 const fileHint = document.querySelector<HTMLElement>("#file-hint")!;
 const fileInput = document.querySelector<HTMLInputElement>("#file-input")!;
 const btnCheck = document.querySelector<HTMLButtonElement>("#btn-check")!;
@@ -649,6 +651,60 @@ function setIssuesShown(result: ValidationResult, visible: number): void {
         : `у списку ${visible}`;
 }
 
+function isMutatingFix(fix: QuickFix): boolean {
+  return fix.action !== "goto-line" && fix.action !== "copy";
+}
+
+function uniqueMutatingFixes(issues: UiIssue[]): QuickFix[] {
+  const out: QuickFix[] = [];
+  const seen = new Set<string>();
+  for (const issue of issues) {
+    const fixes = issue.fixes ?? [];
+    if (fixes.length !== 1) continue;
+    const fix = fixes[0];
+    if (!isMutatingFix(fix)) continue;
+    const key = `${fix.action}:${fix.line}:${fix.find ?? ""}:${fix.replacement ?? ""}:${fix.extraLines ?? ""}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(fix);
+  }
+  return out;
+}
+
+function syncApplyUniqueBar(issues: UiIssue[]): void {
+  const unique = uniqueMutatingFixes(issues);
+  if (unique.length === 0) {
+    issuesApplyBar.hidden = true;
+    return;
+  }
+  issuesApplyBar.hidden = false;
+  btnApplyUnique.textContent =
+    unique.length === 1
+      ? "Застосувати однозначне"
+      : `Застосувати ${unique.length} однозначних`;
+}
+
+function applyAllUniqueFixes(): void {
+  if (!last) return;
+  const visible = last.issues.filter((i) => shownKinds.has(i.kind));
+  const unique = uniqueMutatingFixes(visible);
+  if (!unique.length) return;
+
+  const lineBased = unique
+    .filter((f) => f.action !== "replace-all")
+    .sort((a, b) => b.line - a.line);
+  const global = unique.filter((f) => f.action === "replace-all");
+
+  let next = editor.value;
+  for (const fix of [...lineBased, ...global]) {
+    next = applyFix(next, fix);
+  }
+  if (next === editor.value) return;
+  setSpec(next);
+  enableExport();
+  runLintNow();
+}
+
 function renderIssues(result: ValidationResult): void {
   issuesEl.replaceChildren();
   const visible = result.issues.filter((i) => shownKinds.has(i.kind));
@@ -659,6 +715,7 @@ function renderIssues(result: ValidationResult): void {
     li.className = "issues-empty";
     li.textContent = "Помилок немає. Можна зберігати файл і відправляти.";
     issuesEl.append(li);
+    syncApplyUniqueBar([]);
     return;
   }
 
@@ -667,6 +724,7 @@ function renderIssues(result: ValidationResult): void {
     li.className = "issues-empty";
     li.textContent = "Ці типи вимкнені в лічильниках. Увімкни потрібні — або «авто», якщо хочеш журнал правок.";
     issuesEl.append(li);
+    syncApplyUniqueBar([]);
     return;
   }
 
@@ -713,6 +771,7 @@ function renderIssues(result: ValidationResult): void {
     li.addEventListener("click", () => jumpTo(issue, undefined, issue.id));
     issuesEl.append(li);
   }
+  syncApplyUniqueBar(sorted);
 }
 
 function jumpToLine(line: number): void {
@@ -1378,6 +1437,10 @@ btnRecheckSpec.addEventListener("click", () => void runFromSpec());
 btnRewriteAttrs.addEventListener("click", () => runRewriteAttrs());
 btnCopy.addEventListener("click", () => void copyText());
 btnDownload.addEventListener("click", download);
+btnApplyUnique.addEventListener("click", (event) => {
+  event.stopPropagation();
+  applyAllUniqueFixes();
+});
 editor.addEventListener("copy", () => markSpecCopied());
 document.addEventListener("keydown", (e) => {
   if (!(e.ctrlKey || e.metaKey)) return;

@@ -171,9 +171,19 @@
               <span data-k="auto" role="button" tabindex="0" title="Машина вже виправила сама. За замовчуванням сховані. Клік — показати або сховати в списку.">0 авто</span>
               <span data-k="warnings" role="button" tabindex="0" title="Можна лишити: нова назва товару, матеріалу чи шаблону — глянь, чи написання правильне. Імпорт може пройти, ризик — крива назва в базі. Штамп не ламає. Клік — сховати або показати в списку.">0 увага</span>
             </div>
-            <ol class="issues" id="issues">
-              <li class="issues-empty">Ще немає перевірки. Встав сирий текст зліва і натисни «Перевірити».</li>
-            </ol>
+            <div class="issues-pane">
+              <ol class="issues" id="issues">
+                <li class="issues-empty">Ще немає перевірки. Встав сирий текст зліва і натисни «Перевірити».</li>
+              </ol>
+              <div class="issues-apply-bar" id="issues-apply-bar" hidden>
+                <button
+                  type="button"
+                  id="btn-apply-unique"
+                  class="primary"
+                  title="Помилки з одним варіантом виправлення — застосувати всі одразу."
+                >Застосувати однозначні</button>
+              </div>
+            </div>
           </aside>
         </div>
         </div>
