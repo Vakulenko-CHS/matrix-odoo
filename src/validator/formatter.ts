@@ -190,7 +190,7 @@ function fixMissingAttrParens(line: string): string {
     /(\[[^\]]+\])\s+([^(\s-][^\s-]*)\s+-\s*([\d])/,
     (full, br: string, token: string, d: string) => {
       if (
-        /^(Д\.|Б\.|М\.|Угол|100|Планка|Ніша|Тум|Реал|Леон|\d)/.test(token)
+        /^(Д\.|Б\.|М\.|Угол|100|Планка|Ніша|Тум|Реал|Леон|Полка|Бар|\d)/.test(token)
       ) {
         return full;
       }

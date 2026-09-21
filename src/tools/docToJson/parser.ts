@@ -21,7 +21,7 @@ const BRACKET_ATTR_NAMES: Record<string, string[]> = {
   Синтепон: ["Синтепон"],
   Тканина: ["Тканина"],
   Флізелін: ["Флізелін"],
-  Накладка: ["Накладка"],
+  Накладка: ["Колір Ламінату"],
 };
 
 // Maps the FIRST WORD of a plain (non-bracketed) product name to its attribute names
@@ -243,6 +243,7 @@ function buildTemplateName(
 const EMBED_MODEL_TEMPLATES = new Set([
   'Чохол - нарізані матеріали',
   'Чохол - напівфабрикат',
+  'Накладка',
 ]);
 
 function embedLiteralFirstAttr(

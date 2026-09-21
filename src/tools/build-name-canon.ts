@@ -40,7 +40,6 @@ const KEEP_BARE = new Set([
   "[Флізелін]",
   "[Тканина]",
   "[Боннель]",
-  "🪤[Накладка]",
 ]);
 
 const DELETE_EXACT = new Set([
@@ -77,6 +76,30 @@ const FURNITURE_OLD = new Set([
 const COVER_INNERS = [
   "Чохол - напівфабрикат",
   "Чохол - нарізані матеріали",
+];
+
+/** Pattern B: generic 🪤[Накладка] (attrs) → per-model templates. */
+const OVERLAY_CAT = "Цех / №3-2 [Накладка нарізка деталей]";
+const OVERLAY_MODELS: Array<{ model: string; aliases?: string[] }> = [
+  { model: "Бар Елегант", aliases: ["бар Елегант"] },
+  { model: "Д.Елегант БН" },
+  { model: "Д.Елегант НН" },
+  { model: "Д.Елегант ПБ" },
+  { model: "Д.Елегант ПН" },
+  { model: "Д.Еллі" },
+  { model: "Д.Ельдорадо" },
+  { model: "Д.Ельдорадо-1" },
+  { model: "Д.Леон-Люкс", aliases: ["Д. Леон-Люкс"] },
+  { model: "Д.Леон-Т" },
+  { model: "Д.Сітті" },
+  { model: "Полка Елегант", aliases: ["полка Елегант"] },
+  { model: "Реал-2Т" },
+  { model: "Реал-Т" },
+  { model: "Угол Елегант БН" },
+  { model: "Угол Елегант НН" },
+  { model: "Угол Елегант ПН" },
+  { model: "Угол Смарт-1 ПН" },
+  { model: "Угол Смарт-2 НН" },
 ];
 
 function q(s: string): string {
@@ -213,8 +236,9 @@ function main(): void {
     if (p.inner && !p.suffix && !KEEP_BARE.has(r.name)) {
       const g = byInner.get(p.inner);
       const isCoverGeneric = COVER_INNERS.includes(p.inner);
+      const isOverlayGeneric = p.inner === "Накладка";
       const hasNamed = Boolean(g && g.named.length > 0);
-      if (hasNamed || isCoverGeneric) {
+      if (hasNamed || isCoverGeneric || isOverlayGeneric) {
         archive.push({
           id: r.id,
           name: r.name,
@@ -285,6 +309,26 @@ function main(): void {
     });
   }
 
+  for (const item of OVERLAY_MODELS) {
+    const name = `🪤[Накладка] ${item.model}`;
+    const aliases = [
+      `🪤[Накладка] (${item.model})`,
+      `[Накладка] (${item.model})`,
+      ...(item.aliases ?? []).flatMap((a) => [
+        `🪤[Накладка] (${a})`,
+        `[Накладка] (${a})`,
+        `🪤[Накладка] ${a}`,
+      ]),
+    ];
+    canons.push({
+      category: OVERLAY_CAT,
+      name,
+      uom: "Одиниці",
+      aliases: uniq(aliases),
+      note: "атрибут лише %Колір Ламінату%; універсал 🪤[Накладка] — архів",
+    });
+  }
+
   const extraLaminate: CanonItem = {
     category: "Сировина / Дерево",
     name: "🧩[Ламінат кольоровий - лист]",
@@ -342,6 +386,9 @@ function main(): void {
     "- Справжні атрибути в дужках: `🧩[Ламінат кольоровий - лист] (1006x198, %Колір Ламінату%) - 2 шт.`.",
   );
   out.push("- Чохол 7–8: `🪤[Чохол - напівфабрикат] Д.Моллі` (модель не в `[ ]`).");
+  out.push(
+    "- Накладка 3-2: `🪤[Накладка] Д.Еллі (%Колір Ламінату%)` — окремий шаблон на модель, не універсал з attrs.",
+  );
   out.push("- `компонети` → `компоненти`. `сборка` → `збірка`. `Бильце` — однина.");
   out.push("- `М Ч Нео` → `М.Ч.Нео`. `100ДСП` → `100 ДСП`.");
   out.push("- `[Боннель]` лишаємо. `[ДВП]` і `[ДВП дно]` лишаємо.");

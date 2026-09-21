@@ -33,8 +33,13 @@ function fixTokens(s: string): string {
     .replace(/компонети/g, "компоненти")
     .replace(/М Ч /g, "М.Ч.")
     .replace(/100ДСП/g, "100 ДСП")
-    .replace(/(\d+)[хХ×](\d+)/g, "$1x$2");
+    .replace(/(\d+)[хХ×](\d+)/g, "$1x$2")
+    .replace(/^полка /i, "Полка ")
+    .replace(/^бар /i, "Бар ")
+    .replace(/^Д\.\s+/, "Д.");
 }
+
+const ALWAYS_SUFFIX_INNER = new Set(["накладка"]);
 
 function parseBracket(head: string): {
   emoji: string;
@@ -136,7 +141,9 @@ export function rewriteCanonHead(
     const first = attrs[0] ? fixTokens(attrs[0]) : "";
     if (first && !first.startsWith("%")) {
       const allowed = suffixIndex.get(normNameKey(inner));
-      if (allowed && allowed.has(normNameKey(first))) {
+      const force =
+        ALWAYS_SUFFIX_INNER.has(normNameKey(inner)) && !first.startsWith("%");
+      if (force || (allowed && allowed.has(normNameKey(first)))) {
         const rest = attrs.slice(1);
         after = rest.length > 0 ? `${first} (${rest.join(", ")})` : first;
       } else {
