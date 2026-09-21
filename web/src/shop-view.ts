@@ -7,6 +7,7 @@ import {
   type ShopWorkshop,
 } from "./shop-graph";
 import type { UiIssue } from "./pipeline";
+import { scrollChildIntoView } from "./scroll";
 
 export interface ShopHandle {
   render(text: string, issues: UiIssue[]): UiIssue[];
@@ -548,8 +549,8 @@ export function mountShop(
       }
     }
 
-    if (activeLine || activeEdgeKey) {
-      focus?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    if ((activeLine || activeEdgeKey) && focus) {
+      scrollChildIntoView(board, focus, "nearest");
     }
 
     if (opts.onActiveLegend) {

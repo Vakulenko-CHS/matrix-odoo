@@ -12,6 +12,7 @@ import {
   type UiIssue,
   type ValidationResult,
 } from "./pipeline";
+import { scrollChildIntoView } from "./scroll";
 import { mountShop } from "./shop-view";
 import { SPEC_TEMPLATE } from "./spec-template";
 import {
@@ -505,7 +506,7 @@ function observeLineMarks(): void {
   for (const mark of backdrop.children) hlRo.observe(mark);
 }
 
-function highlightIssuesForLine(n: number | null): void {
+function highlightIssuesForLine(n: number | null, focusId?: string): void {
   activeLine = n;
   for (const el of backdrop.querySelectorAll(".hl.active")) el.classList.remove("active");
   for (const el of gutter.querySelectorAll(".gutter-line.active")) el.classList.remove("active");
@@ -519,14 +520,22 @@ function highlightIssuesForLine(n: number | null): void {
   const matches = last.issues.filter(
     (i) => i.line === n && shownKinds.has(i.kind),
   );
-  let first: Element | null = null;
+  let best: HTMLElement | null = null;
+  let bestRank = 99;
+  let focus: HTMLElement | null = null;
   for (const issue of matches) {
     const li = issuesEl.querySelector(`[data-id="${CSS.escape(issue.id)}"]`);
     if (!(li instanceof HTMLElement)) continue;
     li.classList.add("active");
-    first ??= li;
+    const rank = kindRank(issue.kind);
+    if (rank < bestRank) {
+      best = li;
+      bestRank = rank;
+    }
+    if (focusId && issue.id === focusId) focus = li;
   }
-  first?.scrollIntoView({ block: "nearest" });
+  const target = focus ?? best;
+  if (target) scrollChildIntoView(issuesEl, target, "nearest");
 }
 
 function renderDecorations(text: string): void {
@@ -697,7 +706,7 @@ function renderIssues(result: ValidationResult): void {
       }
       li.append(row);
     }
-    li.addEventListener("click", () => jumpTo(issue));
+    li.addEventListener("click", () => jumpTo(issue, undefined, issue.id));
     issuesEl.append(li);
   }
 }
@@ -712,8 +721,8 @@ function jumpToLine(line: number): void {
   });
 }
 
-function jumpTo(issue: UiIssue, range?: { from: number; to: number }): void {
-  highlightIssuesForLine(issue.line);
+function jumpTo(issue: UiIssue, range?: { from: number; to: number }, focusId?: string): void {
+  highlightIssuesForLine(issue.line, focusId);
   if (!issue.line) return;
 
   const lines = editor.value.split("\n");
@@ -726,8 +735,10 @@ function jumpTo(issue: UiIssue, range?: { from: number; to: number }): void {
   editor.setSelectionRange(from, to);
 
   const hl = document.getElementById(`HL${issue.line}`);
-  hl?.scrollIntoView({ block: "center" });
-  editor.scrollTop = backdrop.scrollTop;
+  if (hl instanceof HTMLElement) {
+    scrollChildIntoView(backdrop, hl, "center");
+    editor.scrollTop = backdrop.scrollTop;
+  }
   syncScroll();
 }
 
