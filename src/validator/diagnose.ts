@@ -8,6 +8,7 @@ import {
 } from "./specPipeline";
 import { inferFixes } from "./inferFixes";
 import { lintSpec, type QuickFix } from "./lint";
+import { formatCharDiff, issueFixDiffs } from "./lineDiff";
 import { parseKnownCatalog } from "./checker";
 
 const AUTO_TODO_LINE =
@@ -318,6 +319,9 @@ export function formatDiagnoseReport(
       if (issue.original) lines.push(`  | ${issue.original}`);
       for (const fix of issue.fixes ?? []) {
         if (fix.label) lines.push(`  [btn] ${fix.label}`);
+      }
+      for (const diff of issueFixDiffs(result.content, issue)) {
+        lines.push(`  ~ ${formatCharDiff(diff.before, diff.after)}`);
       }
     }
     lines.push("");

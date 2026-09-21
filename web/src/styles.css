@@ -874,6 +874,29 @@ textarea {
   white-space: pre-wrap;
 }
 
+.issue-diff {
+  margin: 6px 0 0;
+  font-family: var(--spec);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--graphite);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.issue-diff del {
+  color: var(--grease);
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  background: rgba(180, 35, 24, 0.14);
+}
+
+.issue-diff ins {
+  color: var(--oxide);
+  text-decoration: none;
+  background: rgba(31, 107, 74, 0.16);
+}
+
 .kind-blocking,
 .kind-error { color: var(--grease); }
 .kind-warning { color: var(--ochre); }
@@ -1126,7 +1149,8 @@ body[data-chrome="off"] .issues-dock .counts {
 }
 
 body[data-chrome="off"] .issues-dock .pane-lead,
-body[data-chrome="off"] .issue-orig {
+body[data-chrome="off"] .issue-orig,
+body[data-chrome="off"] .issue-diff {
   display: none;
 }
 

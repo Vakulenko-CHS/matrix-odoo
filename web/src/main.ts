@@ -2,6 +2,7 @@ import knownNamesOdooMd from "../../right_names_odoo_base.md?raw";
 import knownNamesFurnitureMd from "../../right_names_furniture.md?raw";
 import knownNamesCanonMd from "../../right_names.md?raw";
 import { applyFix, type QuickFix } from "./lint";
+import { issueFixDiffs, type DiffSpan } from "../../src/validator/lineDiff";
 import {
   attributeFlagsSignature,
   attributeListNeedsEmojiFix,
@@ -705,6 +706,9 @@ function renderIssues(result: ValidationResult): void {
         row.append(makeFixButton(fix, (event) => event.stopPropagation()));
       }
       li.append(row);
+      for (const diff of issueFixDiffs(result.content, issue)) {
+        li.append(renderIssueDiff(diff.spans, diff.fix.label));
+      }
     }
     li.addEventListener("click", () => jumpTo(issue, undefined, issue.id));
     issuesEl.append(li);
@@ -971,6 +975,22 @@ function makeFixButton(
     void runFix(fix, btn);
   });
   return btn;
+}
+
+function renderIssueDiff(spans: DiffSpan[], label: string): HTMLParagraphElement {
+  const el = document.createElement("p");
+  el.className = "issue-diff";
+  el.title = label;
+  for (const span of spans) {
+    if (span.kind === "eq") {
+      el.append(span.text);
+      continue;
+    }
+    const mark = document.createElement(span.kind === "del" ? "del" : "ins");
+    mark.textContent = span.text;
+    el.append(mark);
+  }
+  return el;
 }
 
 async function copyPlain(text: string): Promise<void> {
