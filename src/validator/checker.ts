@@ -11,6 +11,7 @@ import {
   uniqueFuzzyCanon,
 } from "./fuzzyNames";
 import { isPatternBInner, suffixesByInner } from "./canonRewrite";
+import { matchUnbraced, unwrapNameBraces } from "../parser/nameBrace";
 
 export interface CheckError {
   line: number;
@@ -437,9 +438,10 @@ export function checkDocumentContent(
       !aliasCanon && head && furnIndex.size > 0
         ? uniqueFuzzyCanon(fuzzyFurnitureCanons(head, furnIndex))
         : null;
-    const suffixTok = trimmed.match(
+    const suffixTokRaw = trimmed.match(
       /\]\s+([^(%]+?)(?:\s*\(|\s+-\s*[\d]|\s*$)/,
     )?.[1]?.trim();
+    const suffixTok = suffixTokRaw ? unwrapNameBraces(suffixTokRaw).trim() : undefined;
     const bracketInner = trimmed.match(/\[([^\]]+)\]/)?.[1];
     const suffixIsModel =
       Boolean(suffixTok) &&
@@ -484,7 +486,7 @@ export function checkDocumentContent(
     }
 
     // Check UOM in component lines
-    const compQtyMatch = line.match(/-\s*([\d,.]+)\s*([^\s]+)\s*$/);
+    const compQtyMatch = matchUnbraced(line, /-\s*([\d,.]+)\s*([^\s]+)\s*$/);
     if (compQtyMatch) {
       const qtyStr = compQtyMatch[1];
       const uomStr = compQtyMatch[2];

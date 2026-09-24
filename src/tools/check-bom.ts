@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { SOFA_START_RE, stripSpecComment } from "./specLine";
 import { lineHtmlCommentFlags } from "./htmlComment";
+import { matchUnbraced, testUnbraced } from "../parser/nameBrace";
 
 const EMOJI_RE = /^[🪵🧩🪤🧽]+/u;
 const BRACKET_START = /^\[.+\](\s*\(|\s+\S)/u;
@@ -36,7 +37,7 @@ function stripComment(line: string): string {
 }
 
 function isOutputLine(t: string): boolean {
-  if (ANY_QTY_RE.test(t)) return false; // has qty → it's a component
+  if (testUnbraced(t, ANY_QTY_RE)) return false; // has qty → it's a component
   return (
     (EMOJI_RE.test(t) && t.includes("[")) ||
     BRACKET_START.test(t) ||
@@ -207,10 +208,10 @@ export function runBomCheck(
     }
 
     // Component / material line with quantity
-    if (ANY_QTY_RE.test(t) && blockOutputLine >= 0) {
+    if (testUnbraced(t, ANY_QTY_RE) && blockOutputLine >= 0) {
       blockHasInputs = true;
 
-      const m = QTY_EXTRACT_RE.exec(t);
+      const m = matchUnbraced(t, QTY_EXTRACT_RE);
       if (m) {
         const qtyStr = m[1];
         const unit = m[2];

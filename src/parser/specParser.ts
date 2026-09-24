@@ -3,6 +3,7 @@ import * as path from "path";
 import { BomDef, ComponentSpec, OperationSpec, UOM } from "../bom/types";
 import { lineHtmlCommentFlags } from "../tools/htmlComment";
 import { convertFilmQty } from "../validator/filmUom";
+import { splitQtyTail, unwrapNameBraces } from "./nameBrace";
 
 interface WorkshopHeader {
   number: string;
@@ -52,21 +53,6 @@ function parseQty(qtyStr: string): number {
   return parseFloat(qtyStr.replace(",", ".")) || 0;
 }
 
-// Regex для рядка з emoji-продуктом або звичайним продуктом
-// Відловлює: 🪤🧽[Назва] (Атр1, Атр2) - qty uom
-const PRODUCT_RE =
-  /^([\s\S]*?)(?:([\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}🪤🧩🪵🧽]+))?\[([^\]]+)\]\s*(?:\(([^)]+)\))?\s*(?:-\s*([\d,.]+)\s*(.+?))?\s*$/u;
-
-// Рядок без дужок: "Диван (Атр1, Атр2)"
-const PLAIN_PRODUCT_RE =
-  /^[\s]*([A-Za-zА-ЯҐЄІЇа-яґєії0-9 -]+?)\s*\(([^)]+)\)\s*(?:-\s*([\d,.]+)\s*(.+?))?\s*$/;
-
-// Компонент (відступ + назва - кількість UOM)
-const COMPONENT_BRACKET_RE =
-  /^(\s{2,})([\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}🪤🧩🪵🧽]*)\[([^\]]+)\]\s*(?:\(([^)]+)\))?\s*-\s*([\d,.]+)\s*(.+?)\s*$/u;
-const COMPONENT_PLAIN_RE =
-  /^(\s{2,})([^[\n#\/\-].+?)\s*-\s*([\d,.]+)\s*(.+?)\s*$/;
-
 function parseWorkshopHeader(line: string): WorkshopHeader | null {
   const m = line.match(
     /^#+\s*Цех\s+№([\w-]+)\s+(.+?)\s+-\s+(\S+)\s+[""](.+?)[""]\s*$/,
@@ -91,25 +77,31 @@ function tryParseProduct(line: string): RawProduct | null {
   )
     return null;
 
-  // Спробуємо з дужками []
-  const m = trimmed.match(PRODUCT_RE);
-  if (m && m[3]) {
+  const { body, qtyStr, uom } = splitQtyTail(trimmed);
+  const qty = qtyStr != null ? parseQty(qtyStr) : undefined;
+  const uomStr = qtyStr != null ? uom : undefined;
+
+  const m = body.match(
+    /^(?:([\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}🪤🧩🪵🧽]+))?\[([^\]]+)\](?:\s+\{[^}]+\})?\s*(?:\(([^)]+)\))?\s*$/u,
+  );
+  if (m && m[2]) {
     return {
-      emoji: (m[2] || "").trim(),
-      name: m[3].trim(),
-      attributes: m[4]
-        ? m[4]
+      emoji: (m[1] || "").trim(),
+      name: m[2].trim(),
+      attributes: m[3]
+        ? m[3]
             .split(",")
             .map((s) => s.trim())
             .filter(Boolean)
         : [],
-      qty: m[5] ? parseQty(m[5]) : undefined,
-      uomStr: m[6]?.trim(),
+      qty,
+      uomStr,
     };
   }
 
-  // Без дужок: "Диван (Атр1, Атр2)"
-  const pm = trimmed.match(PLAIN_PRODUCT_RE);
+  const pm = body.match(
+    /^[\s]*([A-Za-zА-ЯҐЄІЇа-яґєії0-9 -]+?)\s*\(([^)]+)\)\s*$/,
+  );
   if (pm) {
     return {
       emoji: "",
@@ -118,8 +110,8 @@ function tryParseProduct(line: string): RawProduct | null {
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean),
-      qty: pm[3] ? parseQty(pm[3]) : undefined,
-      uomStr: pm[4]?.trim(),
+      qty,
+      uomStr,
     };
   }
 
@@ -127,11 +119,15 @@ function tryParseProduct(line: string): RawProduct | null {
 }
 
 function tryParseComponent(line: string): RawComponent | null {
-  // З дужками: "    🧩[Каркас] (100ДСП) - 1 шт."
-  const bm = line.match(COMPONENT_BRACKET_RE);
+  const { body, qtyStr, uom } = splitQtyTail(line);
+  if (qtyStr == null) return null;
+  const qty = parseQty(qtyStr);
+  if (qty <= 0) return null;
+
+  const bm = body.match(
+    /^(\s{2,})([\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}🪤🧩🪵🧽]*)\[([^\]]+)\](?:\s+\{[^}]+\})?\s*(?:\(([^)]+)\))?\s*$/u,
+  );
   if (bm && bm[3]) {
-    const qty = parseQty(bm[5]);
-    if (qty <= 0) return null;
     return {
       emoji: (bm[2] || "").trim(),
       name: bm[3].trim(),
@@ -142,14 +138,13 @@ function tryParseComponent(line: string): RawComponent | null {
             .filter(Boolean)
         : [],
       qty,
-      uomStr: bm[6].trim(),
+      uomStr: uom,
     };
   }
 
-  // Без дужок: "    Дерево - 0.024 m³"
-  const pm = line.match(COMPONENT_PLAIN_RE);
+  const pm = body.match(/^(\s{2,})([^[\n#\/].+?)\s*$/);
   if (pm) {
-    const name = pm[2].trim();
+    const name = unwrapNameBraces(pm[2].trim());
     if (
       !name ||
       name.startsWith("Ціна") ||
@@ -157,14 +152,12 @@ function tryParseComponent(line: string): RawComponent | null {
       name === "---"
     )
       return null;
-    const qty = parseQty(pm[3]);
-    if (qty <= 0) return null;
     return {
       emoji: "",
       name,
       attributes: [],
       qty,
-      uomStr: pm[4].trim(),
+      uomStr: uom,
     };
   }
 

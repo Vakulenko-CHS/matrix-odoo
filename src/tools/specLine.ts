@@ -1,3 +1,5 @@
+import { matchUnbraced } from "../parser/nameBrace";
+
 /** Finished sofa/corner/bed line, no leading emoji. */
 export const SOFA_START_RE = /^(Диван|Ліжко|Угол)\s+/u;
 
@@ -13,6 +15,7 @@ export function stripSpecComment(line: string): string {
   const slash = s.indexOf("//");
   if (slash < 0) return s.trim();
   const head = s.slice(0, slash).trim();
-  const qty = s.slice(slash).match(QTY_TAIL_RE);
+  const after = s.slice(slash);
+  const qty = matchUnbraced(after, QTY_TAIL_RE);
   return qty ? `${head} ${qty[0]}`.trim() : head;
 }

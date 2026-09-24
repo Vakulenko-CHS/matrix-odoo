@@ -4,7 +4,9 @@ import {
   componentHead,
   displayName,
   normNameKey,
+  stripQtyTail,
 } from "./nameKey";
+import { hyphenNameSuffix, matchUnbraced, testUnbraced } from "../parser/nameBrace";
 import {
   exactFurnitureCanon,
   furnitureSearchKeys,
@@ -74,9 +76,9 @@ function lineCanonHead(trimmed: string): string | null {
   if (qtyHead) return qtyHead;
   if (/^[🪵🧩🪤🧽]/.test(t) && t.includes("[")) return t;
   if (/^\[[^\]]+\]/.test(t)) return t;
-  if (/^\(Послуга\)/.test(t)) return t.replace(COMP_QTY_TAIL_RE, "").trim() || t;
+  if (/^\(Послуга\)/.test(t)) return stripQtyTail(t).trim() || t;
   if (/^(Ламінат|Перевірка Якості)\b/i.test(t)) {
-    return t.replace(COMP_QTY_TAIL_RE, "").trim() || t;
+    return stripQtyTail(t).trim() || t;
   }
   return null;
 }
@@ -95,7 +97,8 @@ function lineFixTail(trimmed: string): { qty: string; trail: string } {
     trail = `${slash[1]}${trail}`;
     body = body.slice(0, -slash[0].length).trimEnd();
   }
-  const qty = body.match(COMP_QTY_TAIL_RE)?.[0] ?? "";
+  const qtyM = matchUnbraced(body, COMP_QTY_TAIL_RE);
+  const qty = qtyM && qtyM.index !== undefined ? body.slice(qtyM.index) : "";
   return { qty, trail };
 }
 
@@ -291,6 +294,28 @@ export function lintSpec(
         });
       }
       continue;
+    }
+
+    const hyphenSuffix = hyphenNameSuffix(t);
+    if (hyphenSuffix) {
+      const indent = line.match(/^\s*/)?.[0] ?? "";
+      const wrapped = t.replace(`] ${hyphenSuffix}`, `] {${hyphenSuffix}}`);
+      hits.push({
+        kind: "warning",
+        source: "lint",
+        line: n,
+        message: `Суфікс «${hyphenSuffix}» містить «-» — обгорни в {…}, інакше це читається як UOM`,
+        original: t,
+        fixes: [
+          {
+            id: `brace-${seq++}`,
+            label: `Огорнути «${hyphenSuffix}» у {…}`,
+            action: "replace-line",
+            line: n,
+            replacement: `${indent}${wrapped}`,
+          },
+        ],
+      });
     }
 
     let furnitureHit = false;
@@ -641,7 +666,7 @@ export function lintSpec(
     if (PRICE_HDR.test(t)) { flushBom(); continue; }
 
     // Output line: starts with emoji+bracket, no qty at end
-    if (OUTPUT_RE.test(t) && !COMP_QTY_RE.test(t)) {
+    if (OUTPUT_RE.test(t) && !testUnbraced(t, COMP_QTY_RE)) {
       flushBom();
       outLine = i + 1;
       outText = t.replace(/<!--.*?-->/g, "").trim();
@@ -651,7 +676,7 @@ export function lintSpec(
     }
 
     // Component line with qty
-    if (COMP_QTY_RE.test(t) && outLine >= 0) hasComp = true;
+    if (testUnbraced(t, COMP_QTY_RE) && outLine >= 0) hasComp = true;
   }
   flushBom();
   // ────────────────────────────────────────────────────────────────────────────

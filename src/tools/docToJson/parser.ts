@@ -6,6 +6,7 @@ import {
 } from "./types";
 import { lineHtmlCommentFlags } from "../htmlComment";
 import { isPatternBInner } from "../../validator/canonRewrite";
+import { splitQtyTail, unwrapNameBraces } from "../../parser/nameBrace";
 
 const DEFAULT_ATTR_NAMES = ["Модель", "Тканина", "Наповнювач"];
 
@@ -157,17 +158,11 @@ function rebuildPorolonAttrStr(remainder: string): string {
 function splitLineParts(
   line: string,
 ): { prefix: string; attrStr: string; qty: number | null; uom: string } | null {
-  // Strip qty+uom from the end: " - qty uom"
-  const qtyMatch = line.match(/\s+-\s+([\d,.]+)\s+([\S]+)\s*$/);
-  let qty: number | null = null;
-  let uom = "";
-  let body = line;
-
-  if (qtyMatch) {
-    qty = parseFloat(qtyMatch[1].replace(",", "."));
-    uom = qtyMatch[2].trim().replace(/\.$/, "");
-    body = line.slice(0, line.length - qtyMatch[0].length);
-  }
+  const split = splitQtyTail(line);
+  const qty =
+    split.qtyStr != null ? parseFloat(split.qtyStr.replace(",", ".")) : null;
+  const uom = split.uom;
+  const body = split.body;
 
   // body is now: "emoji[Name] (attrs)", "emoji[Name]", or "Name (attrs)"
   const bracketOpen = body.indexOf("[");
@@ -225,7 +220,7 @@ function parseEmojiBracketPrefix(prefix: string): {
   return {
     emoji: m[1].trim(),
     bracketName: m[2].trim(),
-    suffix: (m[3] ?? "").trim(),
+    suffix: unwrapNameBraces((m[3] ?? "").trim()),
   };
 }
 

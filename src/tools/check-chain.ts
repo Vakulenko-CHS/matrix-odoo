@@ -2,6 +2,11 @@ import * as fs from "fs";
 import * as path from "path";
 import { SOFA_START_RE, stripSpecComment } from "./specLine";
 import { findHtmlComments, lineHtmlCommentFlags } from "./htmlComment";
+import {
+  matchUnbraced,
+  testUnbraced,
+  unwrapNameBraces,
+} from "../parser/nameBrace";
 
 interface BomBlock {
   output: string;
@@ -273,11 +278,14 @@ function stripLineComment(line: string): string {
 }
 
 function hasQty(line: string): boolean {
-  return QTY_RE.test(stripLineComment(line));
+  return testUnbraced(stripLineComment(line), QTY_RE);
 }
 
 function stripQty(line: string): string {
-  return stripLineComment(line).replace(QTY_SUFFIX, "").trim();
+  const t = stripLineComment(line);
+  const m = matchUnbraced(t, QTY_SUFFIX);
+  if (!m || m.index === undefined) return t.trim();
+  return t.slice(0, m.index).trim();
 }
 
 function isProductLine(line: string): boolean {
@@ -480,10 +488,21 @@ function buildKnownOutputs(): Set<string> {
  * "🪤[Накладка] (%Attr%)"          → "" (only attribute, no id)
  */
 function getProductId(output: string): string {
-  const noQty = output.replace(/\s*-\s*[\d.,]+\s*\S+\s*$/u, "").trim();
+  const qtyM = matchUnbraced(output, /\s*-\s*[\d.,]+\s*\S+\s*$/u);
+  const noQty =
+    qtyM && qtyM.index !== undefined
+      ? output.slice(0, qtyM.index).trim()
+      : output.trim();
   const after = noQty.match(/\]\s+(.+)$/);
   if (after) {
     const rest = after[1].trim();
+    if (rest.startsWith("{")) {
+      const close = rest.indexOf("}");
+      if (close > 0) {
+        const model = unwrapNameBraces(rest.slice(0, close + 1)).trim();
+        if (model && !model.startsWith("%")) return model;
+      }
+    }
     if (rest.startsWith("(")) {
       const inner = rest.slice(1);
       const sepIdx = inner.search(/[,%]/);
@@ -495,7 +514,9 @@ function getProductId(output: string): string {
       return content;
     }
     const paren = rest.indexOf("(");
-    const model = (paren < 0 ? rest : rest.slice(0, paren)).trim();
+    const model = unwrapNameBraces(
+      (paren < 0 ? rest : rest.slice(0, paren)).trim(),
+    ).trim();
     if (model && !model.startsWith("%")) return model;
   }
   const parenOpen = noQty.indexOf("(");
@@ -803,7 +824,7 @@ function detectBrokenChains(
     if (!s) return null;
     // Raw-material lines (кг/m²/…) are treated as "output" by parseDocument
     // because they don't end in "шт." — skip them, they're not semi-finished.
-    if (RAW_MATERIAL_UNIT_RE.test(s)) return null;
+    if (testUnbraced(s, RAW_MATERIAL_UNIT_RE)) return null;
     const bracketType = getProductType(s);
     if (!bracketType) return null; // no bracket → sofa or service line
     const firstArg = getProductId(s);
@@ -1025,7 +1046,6 @@ function verify(
             !sourceBom &&
             isCommentedOutInFile(fileLines, normPrevOut)
           ) {
-            // Source was already commented out by a previous run
             sourceHasZero = true;
           } else if (!sourceBom) {
             sourceMissingInFile = true;

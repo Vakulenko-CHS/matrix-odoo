@@ -1,6 +1,11 @@
 import type { IssueKind, QuickFix, UiIssue } from "./pipeline";
 import { lineHtmlCommentFlags } from "../../src/tools/htmlComment";
 import { SOFA_START_RE, stripSpecComment } from "../../src/tools/specLine";
+import {
+  matchUnbraced,
+  testUnbraced,
+  unwrapNameBraces,
+} from "../../src/parser/nameBrace";
 
 export type ShopNodeKind = "output" | "input" | "material";
 export type ShopEdgeStatus = "ok" | "break" | "orphan" | "mismatch";
@@ -106,7 +111,33 @@ function getTypeKey(s: string): string {
   return `[${inner}]`;
 }
 
+function stripQtyMasked(s: string): string {
+  const t = stripComment(s);
+  const m = matchUnbraced(t, QTY_RE);
+  if (!m || m.index === undefined) return t.replace(/\s+/g, " ").trim();
+  return t.slice(0, m.index).replace(/\s+/g, " ").trim();
+}
+
 function getProductId(s: string): string {
+  const t = stripQtyMasked(s);
+  const after = t.match(/\]\s+(.+)$/);
+  if (after) {
+    const rest = after[1].trim();
+    if (rest.startsWith("{")) {
+      const close = rest.indexOf("}");
+      if (close > 0) {
+        const model = unwrapNameBraces(rest.slice(0, close + 1)).trim();
+        if (model && !model.startsWith("%")) return model;
+      }
+    }
+    if (!rest.startsWith("(")) {
+      const paren = rest.indexOf("(");
+      const model = unwrapNameBraces(
+        (paren < 0 ? rest : rest.slice(0, paren)).trim(),
+      ).trim();
+      if (model && !model.startsWith("%")) return model;
+    }
+  }
   const start = s.indexOf("(");
   if (start < 0) return "";
   let depth = 0;
@@ -132,7 +163,7 @@ function normalizeKeyPart(s: string): string {
 }
 
 function getVariantKey(s: string, typeKey: string): string {
-  const base = stripComment(s).replace(QTY_RE, "").replace(/\s+/g, " ").trim();
+  const base = stripQtyMasked(s);
   return `${normalizeKeyPart(typeKey)}::${normalizeKeyPart(base)}`;
 }
 
@@ -164,7 +195,7 @@ function isBracketProduct(t: string): boolean {
 }
 
 function qtyOf(t: string): string | undefined {
-  const m = t.match(QTY_RE);
+  const m = matchUnbraced(t, QTY_RE);
   if (!m) return undefined;
   const n = m[1] || "0";
   let unit = m[2] ?? "";
@@ -340,7 +371,7 @@ export function buildShopGraph(text: string, issues: UiIssue[] = []): ShopGraph 
     }
 
     const kind: ShopNodeKind =
-      isBracketProduct(t) && !RAW_UNIT_RE.test(t) ? "input" : "material";
+      isBracketProduct(t) && !testUnbraced(t, RAW_UNIT_RE) ? "input" : "material";
     const node = makeNode(`n${seq++}`, kind, current.key, n, t, qty);
     if (kind === "input") bom.inputs.push(node);
     else bom.materials.push(node);
@@ -406,7 +437,7 @@ export function buildShopGraph(text: string, issues: UiIssue[] = []): ShopGraph 
           issues: [],
         });
         if (mismatch) {
-          const fromBase = from.raw.replace(QTY_RE, "").trim();
+          const fromBase = stripQtyMasked(from.raw);
           const qtyPart = input.qty ? ` - ${input.qty}` : "";
           const consumerLine = `${fromBase}${qtyPart}`;
           const producerLine = replaceProductId(

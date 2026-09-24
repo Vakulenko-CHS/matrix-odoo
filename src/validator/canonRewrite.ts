@@ -1,4 +1,5 @@
 import { displayName, normNameKey } from "./nameKey";
+import { unwrapNameBraces } from "../parser/nameBrace";
 
 export interface CanonRewrite {
   from: string;
@@ -93,7 +94,7 @@ export function patternBModelSuffix(
   const paren = after.indexOf("(");
   if (paren >= 0) after = after.slice(0, paren).trim();
   if (!after || after.startsWith("%")) return null;
-  return after;
+  return unwrapNameBraces(after).trim() || null;
 }
 
 export function suffixesByInner(nameCanons: string[]): Map<string, Set<string>> {

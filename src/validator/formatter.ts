@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { lineHtmlCommentFlags } from "../tools/htmlComment";
 import { isPatternBInner } from "./canonRewrite";
+import { matchUnbraced, testUnbraced } from "../parser/nameBrace";
 
 // Авто-виправлення типових помилок форматування сирих документів.
 // Не змінює смислову структуру — тільки текстові артефакти.
@@ -257,12 +258,12 @@ function normalizePorolonLine(line: string): string {
   if (!/\[Поролон\]|^Поролон[\s(]/u.test(trimmed)) return line;
   if (!/\bST-\d+/i.test(trimmed)) return line;
 
-  const qtyMatch = trimmed.match(
-    /\s*-\s*([\d,.]+)\s*([а-яА-ЯҐЄІЇa-zA-Z²³][а-яА-ЯҐЄІЇa-zA-Z0-9.²³]*)\s*$/u,
-  );
-  if (!qtyMatch) return line;
+  const qtyRe =
+    /\s*-\s*([\d,.]+)\s*([а-яА-ЯҐЄІЇa-zA-Z²³][а-яА-ЯҐЄІЇa-zA-Z0-9.²³]*)\s*$/u;
+  const qtyMatch = matchUnbraced(trimmed, qtyRe);
+  if (!qtyMatch || qtyMatch.index === undefined) return line;
 
-  const body = trimmed.slice(0, trimmed.length - qtyMatch[0].length);
+  const body = trimmed.slice(0, qtyMatch.index);
   const codeRaw = body.match(/\b(ST-\d+)\b/i)?.[1];
   const dimsRaw = body.match(/(\d+(?:[xхX×]\d+){2,})/)?.[1];
   if (!codeRaw || !dimsRaw) return line;
@@ -282,15 +283,18 @@ function uomKey(raw: string): string {
 
 // Нормалізація одиниць: "1.60 kg" → "1.60 кг", "2.7m²" → "2.7 m²", "2,3 m" → "2.3 m"
 function fixUom(line: string): string {
-  return line.replace(
-    /(-\s*)([\d,.]+)(\s*)([а-яА-ЯҐЄІЇa-zA-Z][а-яА-ЯҐЄІЇa-zA-Z0-9²³]*\.?)\s*$/u,
-    (_match, dash, qty, _space, uom) => {
-      const qtyNorm = String(qty).replace(",", ".");
-      const key = uomKey(uom);
-      const normalized = UOM_NORMALIZE[key] ?? UOM_NORMALIZE[uom] ?? uom;
-      return `${dash}${qtyNorm} ${normalized}`;
-    },
-  );
+  const re =
+    /(-\s*)([\d,.]+)(\s*)([а-яА-ЯҐЄІЇa-zA-Z][а-яА-ЯҐЄІЇa-zA-Z0-9²³]*\.?)\s*$/u;
+  const m = matchUnbraced(line, re);
+  if (!m || m.index === undefined) return line;
+  const dash = m[1];
+  const qty = m[2];
+  const uom = m[4];
+  const qtyNorm = String(qty).replace(",", ".");
+  const key = uomKey(uom);
+  const normalized = UOM_NORMALIZE[key] ?? UOM_NORMALIZE[uom] ?? uom;
+  const next = `${dash}${qtyNorm} ${normalized}`;
+  return line.slice(0, m.index) + next + line.slice(m.index + m[0].length);
 }
 
 // "Войлок 1.60 - 2 m" → "[Войлок] (1.60) - 2 m"
@@ -767,7 +771,7 @@ function classifyWorkshopLine(line: string): WorkshopLineKind | "blank" {
   if (/^Ціна(\s|$)/i.test(t)) return "price";
   if (/^(або)$/i.test(t)) return "abo";
   if (/^<!--/.test(t)) return "comment";
-  if (ANY_QTY_END_RE.test(t)) return "content";
+  if (testUnbraced(t, ANY_QTY_END_RE)) return "content";
   if (
     (EMOJI_START_RE.test(t) && t.includes("[")) ||
     /^\[.+\]\s*\(/u.test(t) ||
