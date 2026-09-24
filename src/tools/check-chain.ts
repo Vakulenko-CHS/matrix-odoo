@@ -701,6 +701,10 @@ function detectProductIdMismatches(
         const suffix = longer.slice(shorter.length + 1);
         if (/^[А-ЯҐЄІЇ]{1,4}$/.test(suffix)) continue;
 
+        // `або` variants: both names are produced and both consumed.
+        // Cross-pairing "Б.Нео" × "Б.Нео Зменшені 10См" is not a broken chain.
+        if (outputIds.includes(inId) && inputIds.includes(outId)) continue;
+
         const key = `${type}::${outId}::${inId}`;
         if (reported.has(key)) continue;
         reported.add(key);
@@ -1002,6 +1006,7 @@ function verify(
         // Find source BOM and check zero consumption
         let sourceHasZero = false;
         let sourceBomToComment: BomBlock | null = null;
+        let sourceMissingInFile = false;
 
         for (let prevSi = 0; prevSi < si; prevSi++) {
           const prevStep = chain.steps[prevSi];
@@ -1022,9 +1027,13 @@ function verify(
           ) {
             // Source was already commented out by a previous run
             sourceHasZero = true;
+          } else if (!sourceBom) {
+            sourceMissingInFile = true;
           }
           break;
         }
+
+        if (sourceMissingInFile) continue;
 
         if (sourceHasZero) {
           // Comment out the source BOM lines (output + materials) if not already done

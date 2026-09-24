@@ -253,9 +253,22 @@ function tidyBody(body: string): string {
   return lines.join("\n");
 }
 
+function stripYamlFrontmatter(text: string): { text: string; stripped: boolean } {
+  if (!text.startsWith("---")) return { text, stripped: false };
+  const m = text.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n*/);
+  if (!m) return { text, stripped: false };
+  return { text: text.slice(m[0].length), stripped: true };
+}
+
 export function toNoValidContent(raw: string): ToNoValidResult {
   const changes: string[] = [];
   let text = raw.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n");
+
+  const yaml = stripYamlFrontmatter(text);
+  if (yaml.stripped) {
+    text = yaml.text;
+    changes.push("прибрано YAML HackMD");
+  }
 
   const syntax = stripSyntaxPreamble(text);
   if (syntax.stripped) {

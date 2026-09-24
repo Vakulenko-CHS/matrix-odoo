@@ -50,6 +50,18 @@ async function main() {
       break;
     }
 
+    case "pull-hackmd": {
+      const { runPullHackmd } = await import("./tools/pull-hackmd");
+      await runPullHackmd(args);
+      break;
+    }
+
+    case "batch-format": {
+      const { runBatchFormat } = await import("./commands/batchFormat");
+      await runBatchFormat(args);
+      break;
+    }
+
     case "add-fabric": {
       const { runAddFabric } = await import("./commands/addFabric");
       await runAddFabric(args[0]);
@@ -72,6 +84,8 @@ async function main() {
   npm run validate-all [папка]   — валідація всіх .md у папці
   npm run web                    — сторінка перевірки специфікації
   npm run ai-check -- "<файл.md>" — звіт помилок у stdout, файли не чіпає
+  npm run pull-hackmd -- urls.txt [папка] — дамп публічних HackMD у markdown
+  npm run batch-format -- <папка>  — веб-перевірка, 1 кнопка авто, multi → звіт
 
   Жива база (потрібен ODOO_API_KEY в .env):
   npm run import "<файл>"

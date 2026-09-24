@@ -64,19 +64,34 @@ function lineFromText(text: string): number | null {
 }
 
 function lineFromSnippet(content: string, message: string): number | null {
-  const quotes = [...message.matchAll(/"([^"]{6,})"/g)].map((m) => m[1]);
   const lines = content.split("\n");
-  const workshop = message.match(/Цех\s*№[\w-]+/i);
+  const workshop = message.match(/Цех\s*№[\w.-]+/i);
   let from = 0;
+  let workshopLine: number | null = null;
   if (workshop) {
     const header = lines.findIndex((l) => l.includes(workshop[0]));
-    if (header >= 0) from = header;
+    if (header >= 0) {
+      from = header;
+      workshopLine = header + 1;
+    }
   }
+
+  const quotes = [...message.matchAll(/"([^"]{2,})"/g)]
+    .map((m) => m[1])
+    .filter((q) => !/Готова продукція/i.test(q))
+    .sort((a, b) => b.length - a.length);
   for (const q of quotes) {
     const idx = lines.findIndex((l, i) => i >= from && l.includes(q));
     if (idx >= 0) return idx + 1;
   }
-  return null;
+
+  const bracket = message.match(/[🪵🧩🪤🧽]\[[^\]]+\]/u);
+  if (bracket) {
+    const idx = lines.findIndex((l, i) => i >= from && l.includes(bracket[0]));
+    if (idx >= 0) return idx + 1;
+  }
+
+  return workshopLine;
 }
 
 function resolveLine(content: string, message: string): number | null {
