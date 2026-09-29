@@ -12,7 +12,7 @@ import {
   type DiagnoseResult,
 } from "../validator/diagnose";
 import { readKnownNamesMd } from "../validator/knownNames";
-import { applyFix, type QuickFix } from "../validator/lint";
+import { applyFix, isBulkUniqueFix, type QuickFix } from "../validator/lint";
 import { writeOds } from "../tools/writeOds";
 
 const MAX_PASSES = 80;
@@ -77,11 +77,9 @@ export function actionableFixes(fixes?: QuickFix[]): QuickFix[] {
   );
 }
 
-/** replace-all is never auto: find can be a prefix of replacement, or a catalog alias that strips «-3»/«-Т». */
+/** replace-all / assembly renames never auto — see isBulkUniqueFix. */
 function isSafeAutoFix(fix: QuickFix): boolean {
-  if (fix.action === "goto-line" || fix.action === "copy") return false;
-  if (fix.action === "replace-all") return false;
-  return true;
+  return isBulkUniqueFix(fix);
 }
 
 function autoFixes(issue: DiagnoseIssue): QuickFix[] {
@@ -176,7 +174,7 @@ function writeUnresolved(dir: string, results: FileFormatResult[]): string | nul
       for (const issue of r.multi) lines.push(formatIssue(issue), "");
     }
     if (r.leftover.length) {
-      lines.push("### без однозначного фіксу / skipped replace-all");
+      lines.push("### без однозначного фіксу / skipped assembly+replace-all");
       for (const issue of r.leftover) lines.push(formatIssue(issue), "");
     }
     lines.push("");

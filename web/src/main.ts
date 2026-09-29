@@ -1,7 +1,7 @@
 import knownNamesOdooMd from "../../right_names_odoo_base.md?raw";
 import knownNamesFurnitureMd from "../../right_names_furniture.md?raw";
 import knownNamesCanonMd from "../../right_names.md?raw";
-import { applyFix, type QuickFix } from "./lint";
+import { applyFix, isBulkUniqueFix, type QuickFix } from "./lint";
 import { issueFixDiffs, type DiffSpan } from "../../src/validator/lineDiff";
 import {
   attributeFlagsSignature,
@@ -672,10 +672,6 @@ function newNamesIssueOf(issues: UiIssue[]): UiIssue | undefined {
   return issues.find(isNewNamesIssue);
 }
 
-function isMutatingFix(fix: QuickFix): boolean {
-  return fix.action !== "goto-line" && fix.action !== "copy";
-}
-
 function uniqueMutatingFixes(issues: UiIssue[]): QuickFix[] {
   const out: QuickFix[] = [];
   const seen = new Set<string>();
@@ -683,7 +679,7 @@ function uniqueMutatingFixes(issues: UiIssue[]): QuickFix[] {
     const fixes = issue.fixes ?? [];
     if (fixes.length !== 1) continue;
     const fix = fixes[0];
-    if (!isMutatingFix(fix)) continue;
+    if (!isBulkUniqueFix(fix)) continue;
     const key = `${fix.action}:${fix.line}:${fix.find ?? ""}:${fix.replacement ?? ""}:${fix.extraLines ?? ""}`;
     if (seen.has(key)) continue;
     seen.add(key);

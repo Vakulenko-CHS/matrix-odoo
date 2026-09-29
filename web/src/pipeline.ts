@@ -14,6 +14,10 @@ import {
 import { inferFixes } from "../../src/validator/inferFixes";
 import { lintSpec, type QuickFix } from "./lint";
 import { parseKnownCatalog } from "../../src/validator/checker";
+import {
+  chainBracketFromMessage,
+  lineMentionsChainSubject,
+} from "../../src/validator/docProduct";
 
 export { attributeFlagsSignature, attributeListNeedsEmojiFix } from "../../src/tools/check-attributes";
 export type { QuickFix };
@@ -72,16 +76,29 @@ function lineFromText(text: string): number | null {
 }
 
 function lineFromSnippet(content: string, message: string): number | null {
-  const quotes = [...message.matchAll(/"([^"]{6,})"/g)].map((m) => m[1]);
+  const quoteMatches = [...message.matchAll(/"([^"]{2,})"/g)]
+    .map((m) => m[1])
+    .filter((q) => !/Готова продукція/i.test(q));
+  const isChain = /^\[CHAIN-/i.test(message);
+  const bracketType = isChain ? chainBracketFromMessage(message) : null;
+  const quotes = isChain
+    ? quoteMatches
+    : [...quoteMatches].sort((a, b) => b.length - a.length);
   const lines = content.split("\n");
-  const workshop = message.match(/Цех\s*№[\w-]+/i);
+  const workshop = message.match(/Цех\s*№[\w.-]+/i);
   let from = 0;
   if (workshop) {
     const header = lines.findIndex((l) => l.includes(workshop[0]));
     if (header >= 0) from = header;
   }
   for (const q of quotes) {
-    const idx = lines.findIndex((l, i) => i >= from && l.includes(q));
+    const idx = lines.findIndex(
+      (l, i) =>
+        i >= from &&
+        (isChain
+          ? lineMentionsChainSubject(l, q, bracketType)
+          : l.includes(q)),
+    );
     if (idx >= 0) return idx + 1;
   }
   return null;

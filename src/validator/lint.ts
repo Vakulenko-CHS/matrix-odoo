@@ -14,6 +14,11 @@ import {
   uniqueFuzzyCanon,
 } from "./fuzzyNames";
 import { rewriteCanonHead, suffixesByInner, patternBModelSuffix } from "./canonRewrite";
+import {
+  extractDocProductNames,
+  finishedGoodName,
+  renameCorruptsDocProduct,
+} from "./docProduct";
 
 export interface QuickFix {
   id: string;
@@ -34,6 +39,22 @@ export interface QuickFix {
   focusLine?: number;
   /** Select first occurrence of this text on the focus line. */
   selectText?: string;
+  /**
+   * false → skip «Застосувати N однозначних» / batch auto.
+   * Still shown as a per-issue button. Default true.
+   * Use for risky file-wide identity renames (CHAIN ids).
+   * Pattern B / х→x / furniture / typos / attrs stay bulk-safe.
+   */
+  bulkApply?: boolean;
+}
+
+/** Eligible for bulk «однозначних» / batch-format auto. */
+export function isBulkUniqueFix(fix: QuickFix): boolean {
+  if (fix.action === "goto-line" || fix.action === "copy") return false;
+  if (fix.bulkApply === false) return false;
+  // File-wide identity swaps are never bulk — too easy to corrupt model names.
+  if (fix.action === "replace-all") return false;
+  return true;
 }
 
 const SKIP_NAME =
@@ -225,6 +246,8 @@ export function lintSpec(
   const hasCanon = aliases.size > 0 && (nameCanons.length > 0 || suffixIndex.size > 0);
   let inShop9 = false;
   let shop9Line: number | null = null;
+  let inWorkshop = false;
+  const docProduct = extractDocProductNames(content);
   const newFurn: string[] = [];
   let newFurnLine: number | null = null;
   const newModels: string[] = [];
@@ -271,6 +294,7 @@ export function lintSpec(
     const n = i + 1;
 
     if (WORKSHOP_HDR.test(t)) {
+      inWorkshop = true;
       inShop9 = SHOP9_HDR.test(t);
       if (inShop9) shop9Line = n;
     }
@@ -294,6 +318,35 @@ export function lintSpec(
         });
       }
       continue;
+    }
+
+    // Finished good in a workshop must match file-title product name.
+    if (inWorkshop && docProduct) {
+      const namePart = finishedGoodName(t);
+      if (namePart && namePart !== docProduct.full) {
+        const parenIdx = t.indexOf("(");
+        const attrsPart = parenIdx >= 0 ? t.slice(parenIdx) : "";
+        const indent = line.match(/^\s*/)?.[0] ?? "";
+        const fixed = attrsPart
+          ? `${indent}${docProduct.full} ${attrsPart}`
+          : `${indent}${docProduct.full}`;
+        hits.push({
+          kind: "error",
+          source: "lint",
+          line: n,
+          message: `Назва готового виробу: «${namePart}» ≠ заголовок «${docProduct.full}»`,
+          original: t,
+          fixes: [
+            {
+              id: `doc-title-${seq++}`,
+              label: `Замінити на «${docProduct.full}»`,
+              action: "replace-line",
+              line: n,
+              replacement: fixed,
+            },
+          ],
+        });
+      }
     }
 
     const hyphenSuffix = hyphenNameSuffix(t);
@@ -584,6 +637,7 @@ export function lintSpec(
   });
 
   const allKeys = [...counts.keys()];
+  const doc = extractDocProductNames(content);
   for (const [key, info] of counts) {
     if (info.lines.length !== 1) continue;
     if (!/напівфабрикат|нарізан|каркас|бильц|планка|чохол|накладк/i.test(key)) {
@@ -592,7 +646,8 @@ export function lintSpec(
     const near = allKeys
       .filter((other) => similar(key, other))
       .slice(0, 4)
-      .map((other) => counts.get(other)!.raw);
+      .map((other) => counts.get(other)!.raw)
+      .filter((n) => !doc || !renameCorruptsDocProduct(info.raw, n, doc));
     if (near.length === 0) continue;
     const line = info.lines[0];
     const original = lines[line - 1] ?? "";
@@ -605,10 +660,11 @@ export function lintSpec(
       fixes: near.map((n) => ({
         id: `fuzzy-${seq++}`,
         label: `Замінити на «${n}»`,
-        action: "replace-all",
+        action: "replace-all" as const,
         line,
         find: info.raw,
         replacement: n,
+        bulkApply: false,
       })),
     });
   }
@@ -684,6 +740,35 @@ export function lintSpec(
   return hits;
 }
 
+/**
+ * Apply Pattern B + token canon rewrites (х→x, М.Ч., …) to content.
+ * Used by validate/raw check — writes into working spec as `auto` format fixes.
+ */
+export function applyCanonRewrites(
+  content: string,
+  aliases: Map<string, string> = new Map(),
+  nameCanons: string[] = [],
+): { content: string; changes: string[] } {
+  const suffixIndex = suffixesByInner(nameCanons);
+  const lines = content.split("\n");
+  const commented = lineHtmlCommentFlags(content);
+  const changes: string[] = [];
+  const out = lines.map((line, i) => {
+    if (commented[i]) return line;
+    const t = line.trim();
+    const head = lineCanonHead(t);
+    if (!head) return line;
+    const next = rewriteCanonHead(head, aliases, suffixIndex);
+    if (!next || displayName(next) === displayName(head)) return line;
+    const indent = line.match(/^\s*/)?.[0] ?? "";
+    const fixed = rebuiltFixLine(indent, next, t);
+    if (fixed === line) return line;
+    changes.push(`Рядок ${i + 1}: Назва «${head}» → «${next}»`);
+    return fixed;
+  });
+  return { content: out.join("\n"), changes };
+}
+
 export function applyFix(content: string, fix: QuickFix): string {
   if (fix.action === "goto-line" || fix.action === "copy") return content;
   const lines = content.split("\n");
@@ -705,6 +790,10 @@ export function applyFix(content: string, fix: QuickFix): string {
     return lines.join("\n");
   }
   if (fix.action === "replace-all" && fix.find && fix.replacement) {
+    const doc = extractDocProductNames(content);
+    if (doc && renameCorruptsDocProduct(fix.find, fix.replacement, doc)) {
+      return content;
+    }
     return content.split(fix.find).join(fix.replacement);
   }
   if (fix.action === "insert-after" && fix.replacement !== undefined) {

@@ -8,9 +8,13 @@ import {
   type SpecToolPass,
 } from "./specPipeline";
 import { inferFixes } from "./inferFixes";
-import { lintSpec, type QuickFix } from "./lint";
+import { applyCanonRewrites, lintSpec, type QuickFix } from "./lint";
 import { formatCharDiff, issueFixDiffs } from "./lineDiff";
 import { parseKnownCatalog } from "./checker";
+import {
+  chainBracketFromMessage,
+  lineMentionsChainSubject,
+} from "./docProduct";
 
 const AUTO_TODO_LINE =
   /^\s*<!--\s*TODO:\s*(\[(CHAIN-OUT|CHAIN-IN|BREAK|ZERO|EMPTY|NOUNIT)\]|нульова кількість|записати компоненти|відсутн)/i;
@@ -76,12 +80,23 @@ function lineFromSnippet(content: string, message: string): number | null {
     }
   }
 
-  const quotes = [...message.matchAll(/"([^"]{2,})"/g)]
+  const quoteMatches = [...message.matchAll(/"([^"]{2,})"/g)]
     .map((m) => m[1])
-    .filter((q) => !/Готова продукція/i.test(q))
-    .sort((a, b) => b.length - a.length);
+    .filter((q) => !/Готова продукція/i.test(q));
+  const isChain = /^\[CHAIN-/i.test(message);
+  const bracketType = isChain ? chainBracketFromMessage(message) : null;
+  // CHAIN-*: first quoted id is the subject — prefer it over longer consumers.
+  const quotes = isChain
+    ? quoteMatches
+    : [...quoteMatches].sort((a, b) => b.length - a.length);
   for (const q of quotes) {
-    const idx = lines.findIndex((l, i) => i >= from && l.includes(q));
+    const idx = lines.findIndex(
+      (l, i) =>
+        i >= from &&
+        (isChain
+          ? lineMentionsChainSubject(l, q, bracketType)
+          : l.includes(q)),
+    );
     if (idx >= 0) return idx + 1;
   }
 
@@ -283,6 +298,14 @@ export function diagnoseSpec(
   }
 
   let working = stripAutoTodoLines(prepared.content);
+
+  const cat = parseKnownCatalog(knownNamesMd);
+  const canon = applyCanonRewrites(working, cat.aliases, cat.nameCanons);
+  working = canon.content;
+  for (const change of canon.changes) {
+    pushIssue(issues, "auto", "format", change, working);
+  }
+
   const attrPass = applyAttributeCheck(working, prepared.fileName);
   working = stripAutoTodoLines(attrPass.content);
   collectToolIssues(issues, attrPass, working, true);
@@ -294,10 +317,7 @@ export function diagnoseSpec(
   collectToolIssues(issues, tools.chain, working, false);
   collectToolIssues(issues, tools.bom, working, false);
   collectCatalogIssues(issues, working, knownNamesMd);
-  {
-    const cat = parseKnownCatalog(knownNamesMd);
-    appendLint(issues, working, cat.aliases, cat.furnitureCanons, cat.nameCanons);
-  }
+  appendLint(issues, working, cat.aliases, cat.furnitureCanons, cat.nameCanons);
 
   const outName =
     prepared.fileName !== "специфікація.md"

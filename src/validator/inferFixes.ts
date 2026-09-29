@@ -3,6 +3,11 @@ import {
   applyAttrsToLine,
   replaceParamsInner,
 } from "../tools/check-attributes";
+import {
+  extractDocProductNames,
+  isExactDocProductId,
+  renameCorruptsDocProduct,
+} from "./docProduct";
 
 function inferChainOutFixes(
   message: string,
@@ -10,37 +15,7 @@ function inferChainOutFixes(
   content: string,
 ): QuickFix[] {
   const fixes: QuickFix[] = [];
-  const docLines = content.split("\n");
-
-  const docTitle =
-    docLines.find((l) => {
-      const t = l.trim();
-      return (
-        t &&
-        !t.startsWith("#") &&
-        !t.startsWith("//") &&
-        !t.startsWith("<!--") &&
-        !t.startsWith("<<")
-      );
-    })?.trim() ?? "";
-
-  const SOFA_ANY = /^(диван|ліжко|угол)\s+/iu;
-  for (let i = 0; i < docLines.length; i++) {
-    const t = docLines[i].trim();
-    if (!SOFA_ANY.test(t)) continue;
-    const parenIdx = t.indexOf("(");
-    const namePart = (parenIdx >= 0 ? t.slice(0, parenIdx) : t).trim();
-    const attrsPart = parenIdx >= 0 ? t.slice(parenIdx) : "";
-    if (!docTitle || namePart === docTitle) continue;
-    const fixedLine = attrsPart ? `${docTitle} ${attrsPart}` : docTitle;
-    fixes.push({
-      id: `chain-title-${i}`,
-      label: `Замінити «${namePart}» → «${docTitle}»`,
-      action: "replace-line",
-      line: i + 1,
-      replacement: fixedLine,
-    });
-  }
+  const doc = extractDocProductNames(content);
 
   const outIdMatch = message.match(/\[CHAIN-OUT\][^"]*"([^"]+)"/u);
   const consumedBlock = message.match(/споживається як:\s*(.+)$/u)?.[1];
@@ -50,14 +25,30 @@ function inferChainOutFixes(
       .map((m) => m[1])
       .filter((id) => id !== outId);
     for (let ci = 0; ci < Math.min(consumedIds.length, 2); ci++) {
-      const wrongId = consumedIds[ci];
+      let find = consumedIds[ci];
+      let replacement = outId;
+
+      // Prefer rename toward document product name — never strip model id from title.
+      if (doc) {
+        const findIsDoc = isExactDocProductId(find, doc);
+        const replIsDoc = isExactDocProductId(replacement, doc);
+        if (findIsDoc && !replIsDoc) {
+          find = outId;
+          replacement = consumedIds[ci];
+        }
+        if (renameCorruptsDocProduct(find, replacement, doc)) continue;
+      }
+
+      if (find === replacement) continue;
+
       fixes.push({
         id: `chain-rename-${ci}`,
-        label: `Замінити «${wrongId}» → «${outId}» (скрізь у файлі)`,
+        label: `Замінити «${find}» → «${replacement}» (скрізь у файлі)`,
         action: "replace-all",
         line: line ?? 1,
-        find: wrongId,
-        replacement: outId,
+        find,
+        replacement,
+        bulkApply: false,
       });
     }
   }
@@ -209,14 +200,23 @@ export function inferFixes(
   const product = message.match(/Товар "([^"]+)"/);
   if (similar && product && line) {
     const names = [...similar[1].matchAll(/«([^»]+)»/g)].map((m) => m[1]);
-    return names.map((n, i) => ({
-      id: `known-${line}-${i}`,
-      label: `Замінити на «${n}»`,
-      action: "replace-all" as const,
-      line,
-      find: product[1],
-      replacement: n,
-    }));
+    const doc = extractDocProductNames(content);
+    return names
+      .filter((n) => {
+        if (!doc) return true;
+        // Never suggest renaming the document product away to a catalog neighbor.
+        if (!isExactDocProductId(product[1], doc)) return true;
+        return isExactDocProductId(n, doc);
+      })
+      .map((n, i) => ({
+        id: `known-${line}-${i}`,
+        label: `Замінити на «${n}»`,
+        action: "replace-all" as const,
+        line,
+        find: product[1],
+        replacement: n,
+        bulkApply: false,
+      }));
   }
   if (message.startsWith("[EMPTY]")) {
     return [];

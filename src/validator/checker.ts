@@ -12,6 +12,7 @@ import {
 } from "./fuzzyNames";
 import { isPatternBInner, suffixesByInner } from "./canonRewrite";
 import { matchUnbraced, unwrapNameBraces } from "../parser/nameBrace";
+import { injectDocProductNames } from "./docProduct";
 
 export interface CheckError {
   line: number;
@@ -205,6 +206,13 @@ export function checkDocumentContent(
   furnitureCanons: string[] = [],
   nameCanons: string[] = [],
 ): CheckResult {
+  const withDoc = injectDocProductNames(
+    { set: knownProducts, labels: knownLabels },
+    content,
+  );
+  knownProducts = withDoc.set;
+  knownLabels = withDoc.labels;
+
   const lines = content.split("\n");
   const commented = lineHtmlCommentFlags(content);
   const errors: CheckError[] = [];
