@@ -6,7 +6,6 @@
  */
 import * as fs from "fs";
 import * as path from "path";
-import { authenticate, executeKw } from "../api/odoo";
 import { loadCanonSpecs } from "./migrateNames/parseSpec";
 import {
   LiveCategory,
@@ -14,62 +13,13 @@ import {
   buildMigratePlan,
   renderPlanMarkdown,
 } from "./migrateNames/plan";
-
-const PAGE = 500;
-const PAUSE_MS = 250;
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((r) => setTimeout(r, ms));
-}
-
-function isRetryable(err: unknown): boolean {
-  const msg = err instanceof Error ? err.message : String(err);
-  return /429|Too many|rate limit|ECONNRESET|ETIMEDOUT/i.test(msg);
-}
-
-async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
-  let last: unknown;
-  for (let i = 0; i < 6; i++) {
-    try {
-      return await fn();
-    } catch (err) {
-      last = err;
-      if (!isRetryable(err) || i === 5) throw err;
-      const wait = 1000 * 2 ** i;
-      process.stderr.write(`[migrate-names] retry ${i + 1} in ${wait}ms\n`);
-      await sleep(wait);
-    }
-  }
-  throw last;
-}
-
-async function searchReadPaged<T>(
-  model: string,
-  fields: string[],
-  domain: unknown[] = [],
-  activeTest = true,
-): Promise<T[]> {
-  const out: T[] = [];
-  let offset = 0;
-  for (;;) {
-    const batch = await withRetry(() =>
-      executeKw<T[]>(model, "search_read", [domain], {
-        fields,
-        limit: PAGE,
-        offset,
-        context: { lang: "uk_UA", active_test: activeTest },
-      }),
-    );
-    out.push(...batch);
-    process.stderr.write(
-      `[migrate-names] ${model} +${batch.length} (total ${out.length})\n`,
-    );
-    if (batch.length < PAGE) break;
-    offset += PAGE;
-    await sleep(PAUSE_MS);
-  }
-  return out;
-}
+import {
+  buildDetailedMigratePlan,
+  renderDetailedPlanMarkdown,
+} from "./migrateNames/detailedPlan";
+import { buildJournalFromDetailed, orderHealthCheck } from "./migrateNames/buildJournal";
+import { saveJournal } from "./migrateNames/journal";
+import { searchReadPaged, sleep } from "./odooPaged";
 
 interface TmplRow {
   id: number;
@@ -96,6 +46,16 @@ interface AttrLineRow {
 interface BomRow {
   id: number;
   product_tmpl_id: [number, string] | false;
+}
+
+interface BomLineRow {
+  id: number;
+  product_id: [number, string] | false;
+}
+
+interface VariantRow {
+  id: number;
+  product_tmpl_id: [number, string];
 }
 
 interface AttrRow {
@@ -125,14 +85,13 @@ async function main(): Promise<void> {
     `[migrate-names] канон ${canons.length} · архів-спека ${archive.length}`,
   );
 
-  await authenticate();
-  await sleep(PAUSE_MS);
+  await sleep(250);
 
   const categories = await searchReadPaged<CatRow>("product.category", [
     "id",
     "complete_name",
-  ]);
-  await sleep(PAUSE_MS);
+  ], { label: "migrate-names" });
+  await sleep(250);
 
   const templates = (
     await searchReadPaged<TmplRow>("product.template", [
@@ -144,26 +103,39 @@ async function main(): Promise<void> {
       "uom_id",
       "attribute_line_ids",
       "product_variant_count",
-    ])
+    ], { label: "migrate-names" })
   ).filter((t) => t.active);
-  await sleep(PAUSE_MS);
+  await sleep(250);
 
   const attrLines = await searchReadPaged<AttrLineRow>(
     "product.template.attribute.line",
     ["id", "product_tmpl_id", "attribute_id"],
+    { label: "migrate-names" },
   );
-  await sleep(PAUSE_MS);
+  await sleep(250);
 
   const boms = await searchReadPaged<BomRow>("mrp.bom", [
     "id",
     "product_tmpl_id",
-  ]);
-  await sleep(PAUSE_MS);
+  ], { label: "migrate-names" });
+  await sleep(250);
+
+  const bomLines = await searchReadPaged<BomLineRow>("mrp.bom.line", [
+    "id",
+    "product_id",
+  ], { label: "migrate-names" });
+  await sleep(250);
+
+  const variants = await searchReadPaged<VariantRow>("product.product", [
+    "id",
+    "product_tmpl_id",
+  ], { label: "migrate-names" });
+  await sleep(250);
 
   const colorAttrs = await searchReadPaged<AttrRow>(
     "product.attribute",
     ["id", "name"],
-    [["name", "=", "Колір Ламінату"]],
+    { domain: [["name", "=", "Колір Ламінату"]], label: "migrate-names" },
   );
 
   const catById = new Map(categories.map((c) => [c.id, c.complete_name]));
@@ -181,6 +153,18 @@ async function main(): Promise<void> {
     bomByTmpl.set(tid, (bomByTmpl.get(tid) ?? 0) + 1);
   }
 
+  const variantToTmpl = new Map<number, number>();
+  for (const v of variants) {
+    variantToTmpl.set(v.id, v.product_tmpl_id[0]);
+  }
+  const componentUse = new Map<number, number>();
+  for (const line of bomLines) {
+    if (!line.product_id) continue;
+    const tid = variantToTmpl.get(line.product_id[0]);
+    if (tid == null) continue;
+    componentUse.set(tid, (componentUse.get(tid) ?? 0) + 1);
+  }
+
   const live: LiveTemplate[] = templates.map((t) => ({
     id: t.id,
     name: t.name,
@@ -193,6 +177,7 @@ async function main(): Promise<void> {
     attrNames: attrsByTmpl.get(t.id) ?? [],
     variants: t.product_variant_count ?? 0,
     bomCount: bomByTmpl.get(t.id) ?? 0,
+    componentUse: componentUse.get(t.id) ?? 0,
   }));
 
   const liveCats: LiveCategory[] = categories.map((c) => ({
@@ -204,20 +189,69 @@ async function main(): Promise<void> {
     (c) => c.complete_name === "Послуги" || c.complete_name.endsWith(" / Послуги"),
   );
 
-  const plan = buildMigratePlan(canons, archive, live, liveCats, {
+  const extra = {
     laminateColorExists: colorAttrs.length > 0,
     poslugyExists,
-  });
-
+  };
+  const plan = buildMigratePlan(canons, archive, live, liveCats, extra);
   const when = new Date().toISOString().slice(0, 19).replace("T", " ");
+  const detailed = buildDetailedMigratePlan(
+    canons,
+    archive,
+    live,
+    liveCats,
+    extra,
+    when,
+  );
+
   const dir = path.resolve("temp");
   fs.mkdirSync(dir, { recursive: true });
   const mdPath = path.join(dir, "migrate-names-dry-run.md");
   const jsonPath = path.join(dir, "migrate-names-plan.json");
+  const detailedJson = path.join(dir, "migrate-detailed-plan.json");
+  const detailedMd = path.join(dir, "migrate-detailed-plan.md");
+
   fs.writeFileSync(mdPath, renderPlanMarkdown(plan, when), "utf-8");
   fs.writeFileSync(
     jsonPath,
     `${JSON.stringify({ when, counts: plan.counts, issues: plan.issues, ops: plan.ops }, null, 2)}\n`,
+    "utf-8",
+  );
+  fs.writeFileSync(
+    detailedJson,
+    `${JSON.stringify(detailed, null, 2)}\n`,
+    "utf-8",
+  );
+  fs.writeFileSync(detailedMd, renderDetailedPlanMarkdown(detailed), "utf-8");
+
+  const journal = buildJournalFromDetailed(detailed);
+  const health = orderHealthCheck(detailed);
+  const journalPaths = saveJournal(journal);
+  const healthPath = path.join(dir, "migrate-order-health.md");
+  fs.writeFileSync(
+    healthPath,
+    [
+      "# Order / feasibility check",
+      "",
+      `When: ${when}`,
+      "",
+      "## Bottom→top",
+      "",
+      ...health.map((h) => `- ${h}`),
+      "",
+      "## Docs cross-check (Odoo 19)",
+      "",
+      "- Archive `product.template` → archives variants; MRP also archives linked BOMs on active write.",
+      "- If product still on **active BOM line as component**, Odoo warns but allows archive — hanging refs. We remap first.",
+      "- Prefer archive over unlink (stock/MO history).",
+      "- UOM change blocked if other UOMs already used on BOM — we do not change UOM in this plan.",
+      "",
+      "## Live dump gates",
+      "",
+      "- See dump-full + warnings above for open MO / BOM counts.",
+      "- This dry-run does **not** execute writes; staging apply is the real proof.",
+      "",
+    ].join("\n"),
     "utf-8",
   );
 
@@ -228,14 +262,22 @@ async function main(): Promise<void> {
   console.log(
     `keep ${plan.counts.keep}  rename ${plan.counts.rename}  update ${plan.counts.update}  merge ${plan.counts["merge-archive"]}  archive ${plan.counts.archive}  create ${plan.counts.create}  orphan ${plan.counts.orphan}  cat ${plan.counts["cat-rename"]}`,
   );
+  console.log(
+    `detailed: mergeGroups ${detailed.summary.mergeGroups}  patternB ${detailed.summary.patternBSplits}  creates ${detailed.summary.creates}`,
+  );
   console.log(`blockers ${blockers.length}  warnings ${warnings.length}`);
   for (const i of blockers) console.log(`  ! ${i.message}`);
-  for (const i of warnings.slice(0, 20)) console.log(`  ? ${i.message}`);
-  if (warnings.length > 20) {
-    console.log(`  ? … ще ${warnings.length - 20} warning у файлі`);
+  for (const i of warnings.slice(0, 12)) console.log(`  ? ${i.message}`);
+  if (warnings.length > 12) {
+    console.log(`  ? … ще ${warnings.length - 12} warning у файлі`);
   }
   console.log(`[migrate-names] ${mdPath}`);
   console.log(`[migrate-names] ${jsonPath}`);
+  console.log(`[migrate-names] ${detailedMd}`);
+  console.log(`[migrate-names] ${detailedJson}`);
+  console.log(`[migrate-names] journal ${journalPaths.mdPath}`);
+  console.log(`[migrate-names] ${healthPath}`);
+  for (const h of health.slice(0, 6)) console.log(`  · ${h}`);
 }
 
 main().catch((err) => {

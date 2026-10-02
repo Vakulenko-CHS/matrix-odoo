@@ -15,6 +15,8 @@ export interface LiveTemplate {
   attrNames: string[];
   variants: number;
   bomCount: number;
+  /** BOM lines where this template's variants are components */
+  componentUse?: number;
 }
 
 export interface LiveCategory {
@@ -93,18 +95,26 @@ function attrMismatch(
   return `attrs [${have}] → [${want}]`;
 }
 
+function usageTotal(t: LiveTemplate): number {
+  return t.bomCount * 10 + (t.componentUse ?? 0) + t.variants;
+}
+
 function pickKeep(
   lives: LiveTemplate[],
   canon: CanonItem,
   archiveIds: Set<number>,
 ): LiveTemplate {
-  const exact = lives.find((l) => l.name === canon.name);
-  if (exact) return exact;
-  const notArch = lives.find((l) => !archiveIds.has(l.id));
-  if (notArch) return notArch;
-  return [...lives].sort(
-    (a, b) => b.variants - a.variants || a.id - b.id,
-  )[0];
+  return [...lives].sort((a, b) => {
+    const ua = usageTotal(a);
+    const ub = usageTotal(b);
+    if (ub !== ua) return ub - ua;
+    if (a.name === canon.name && b.name !== canon.name) return -1;
+    if (b.name === canon.name && a.name !== canon.name) return 1;
+    if (archiveIds.has(a.id) !== archiveIds.has(b.id)) {
+      return archiveIds.has(a.id) ? 1 : -1;
+    }
+    return a.id - b.id;
+  })[0];
 }
 
 function productChanges(
