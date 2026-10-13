@@ -3,7 +3,7 @@
 Session notes → [logs/](logs/). Keep this file slim.  
 Start: [.ai/INDEX.md](./INDEX.md) → **this file**. Open logs only when **Log index** matches.
 
-Last updated: **2026-10-02**
+Last updated: **2026-10-12**
 
 ---
 
@@ -93,7 +93,7 @@ UOM: `m²` id=10, `m` id=8.
 
 | ID | File | Topics | Read when | Updated |
 |----|------|--------|-----------|---------|
-| L-odoo | [logs/odoo-db.md](logs/odoo-db.md) | odoo, ids, attr, workcenter, uom, api | будь-яка робота з живою базою / IDs | 2026-10-02 |
+| L-odoo | [logs/odoo-db.md](logs/odoo-db.md) | odoo, ids, attr, workcenter, uom, api | будь-яка робота з живою базою / IDs | 2026-10-12 |
 | L-nakladky | [logs/nakladky.md](logs/nakladky.md) | накладки, nakladky, ламінат кольоровий, кромка, ширина кромки | sync/fix overlays & colored sheets | 2026-10-02 |
 | L-formats | [logs/formats.md](logs/formats.md) | формат, format, BOM_FORMAT, docs/formats | юзер каже «файл з форматом» / reuse format | 2026-10-02 |
 

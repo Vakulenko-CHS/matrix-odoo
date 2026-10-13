@@ -2,6 +2,12 @@
 
 ## Entries (newest first)
 
+### 2026-10-12 — furniture + Lili BOM lamels
+
+- **Summary:** Created tmpl **1307** Куток великий чорний, **1308** Ламель 585, **1309** Ламель 735 (cat Сировина / Фурнітура). Added 8×735 + 8×585 to `tmpl::Диван Лілі Механізм` BOM (Ц9). Snapshot `pre-furniture-kutok-lameli-2026-10-12`.
+- **Tools:** `src/tools/ensure-furniture-products.ts`, `add-lili-lamel-bom-lines.ts`, `sync-template-bom-missing-lines.ts` (slow; prefer targeted).
+- **Note:** `Диван Угол Реал-2 Т` still no root tmpl in Odoo — Куток only in specs until import.
+
 ### 2026-10-02 — initial DB snapshot
 
 - **Agent / human:** agent
