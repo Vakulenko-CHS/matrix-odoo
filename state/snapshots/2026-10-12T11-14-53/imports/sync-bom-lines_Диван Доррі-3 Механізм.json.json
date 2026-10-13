@@ -1,0 +1,18 @@
+{
+  "snapshotTimestamp": "2026-10-12T11-14-53",
+  "label": "sync-bom-lines:Диван Доррі-3 Механізм.json",
+  "createdAt": "2026-10-12T11:34:18.939Z",
+  "ids": {
+    "productTemplates": [],
+    "productVariants": [],
+    "productAttributes": [],
+    "productAttributeValues": [],
+    "boms": [],
+    "bomLines": [
+      283183,
+      283184
+    ],
+    "bomOperations": [],
+    "workcenters": []
+  }
+}

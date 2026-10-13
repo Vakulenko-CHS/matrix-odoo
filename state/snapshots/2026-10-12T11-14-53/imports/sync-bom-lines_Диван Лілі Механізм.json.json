@@ -1,0 +1,17 @@
+{
+  "snapshotTimestamp": "2026-10-12T11-14-53",
+  "label": "sync-bom-lines:Диван Лілі Механізм.json",
+  "createdAt": "2026-10-12T12:12:05.000Z",
+  "ids": {
+    "productTemplates": [],
+    "productVariants": [],
+    "productAttributes": [],
+    "productAttributeValues": [],
+    "boms": [],
+    "bomLines": [
+      285625
+    ],
+    "bomOperations": [],
+    "workcenters": []
+  }
+}

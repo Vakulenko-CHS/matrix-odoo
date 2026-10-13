@@ -18,5 +18,15 @@
     "timestamp": "2026-07-28T07-11-26",
     "label": "snapshot-2026-07-28T07-11-26",
     "type": "snapshot"
+  },
+  {
+    "timestamp": "2026-10-12T11-07-41",
+    "label": "pre-furniture-kutok-lameli-2026-10-12",
+    "type": "snapshot"
+  },
+  {
+    "timestamp": "2026-10-12T11-14-53",
+    "label": "pre-hackmd-sofas-update-2026-10-12",
+    "type": "snapshot"
   }
 ]
