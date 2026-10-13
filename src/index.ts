@@ -56,6 +56,12 @@ async function main() {
       break;
     }
 
+    case "push-hackmd": {
+      const { runPushHackmd } = await import("./tools/push-hackmd");
+      await runPushHackmd(args);
+      break;
+    }
+
     case "batch-format": {
       const { runBatchFormat } = await import("./commands/batchFormat");
       await runBatchFormat(args);
