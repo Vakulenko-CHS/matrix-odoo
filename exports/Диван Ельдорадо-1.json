@@ -1,0 +1,1976 @@
+{
+  "sourceFile": "Диван Ельдорадо-1.md",
+  "generatedAt": "2026-10-12T11:15:57.076Z",
+  "boms": [
+    {
+      "product": {
+        "templateName": "🪵[Каркас - нарізана деревина] Д.Ельдорадо",
+        "attributes": [],
+        "variantDisplayName": "🪵[Каркас - нарізана деревина] Д.Ельдорадо",
+        "qty": 1
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №1) 🪵[Каркас - нарізана деревина] Д.Ельдорадо",
+          "workcenterName": "Цех №1 Дерева (Нарізка)",
+          "priceRate": 158,
+          "odooWorkcenterId": 19
+        }
+      ],
+      "components": [
+        {
+          "templateName": "Дерево",
+          "attributes": [],
+          "qty": 0.067,
+          "uom": "m³",
+          "operationIndex": 0,
+          "odooTemplateId": 35,
+          "odooVariantId": 59,
+          "odooUomId": 30
+        }
+      ]
+    },
+    {
+      "product": {
+        "templateName": "🧩[Бильце - нарізані деталі] Ніша 107",
+        "attributes": [
+          {
+            "attributeName": "Диван Розмір Бильця❌",
+            "value": "%Диван Розмір Бильця❌%"
+          }
+        ],
+        "variantDisplayName": "🧩[Бильце - нарізані деталі] Ніша 107 (%Диван Розмір Бильця❌%)",
+        "qty": 1,
+        "odooTemplateId": 1001
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №2-1) 🧩[Бильце - нарізані деталі] Ніша 107 (%Диван Розмір Бильця❌%)",
+          "workcenterName": "Цех №2-1 ДСП (Нарізка Бильце)",
+          "priceRate": 32,
+          "odooWorkcenterId": 20
+        }
+      ],
+      "components": [
+        {
+          "templateName": "[ДСП]",
+          "attributes": [],
+          "qty": 1.29,
+          "uom": "m²",
+          "operationIndex": 0,
+          "odooTemplateId": 13,
+          "odooVariantId": 31,
+          "odooUomId": 10
+        },
+        {
+          "templateName": "[ДВП]",
+          "attributes": [
+            {
+              "attributeName": "ДВП",
+              "value": "Звичайний"
+            }
+          ],
+          "qty": 0.28,
+          "uom": "m²",
+          "operationIndex": 0,
+          "odooTemplateId": 14,
+          "odooVariantId": 324,
+          "odooUomId": 10
+        }
+      ],
+      "expand": {
+        "Диван Розмір Бильця❌": [
+          "❌"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "🧩[Бильце - нарізані деталі] Накладка Дсп 107",
+        "attributes": [
+          {
+            "attributeName": "Диван Розмір Бильця❌",
+            "value": "%Диван Розмір Бильця❌%"
+          }
+        ],
+        "variantDisplayName": "🧩[Бильце - нарізані деталі] Накладка Дсп 107 (%Диван Розмір Бильця❌%)",
+        "qty": 1
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №2-1) 🧩[Бильце - нарізані деталі] Накладка Дсп 107 (%Диван Розмір Бильця❌%)",
+          "workcenterName": "Цех №2-1 ДСП (Нарізка Бильце)",
+          "priceRate": 32,
+          "odooWorkcenterId": 20
+        }
+      ],
+      "components": [
+        {
+          "templateName": "[ДСП]",
+          "attributes": [],
+          "qty": 1,
+          "uom": "m²",
+          "operationIndex": 0,
+          "odooTemplateId": 13,
+          "odooVariantId": 31,
+          "odooUomId": 10
+        }
+      ],
+      "expand": {
+        "Диван Розмір Бильця❌": [
+          "❌"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "🧩[Каркас - нарізані деталі] Д.Ельдорадо",
+        "attributes": [
+          {
+            "attributeName": "Дно Каркасу",
+            "value": "%Дно Каркасу%"
+          }
+        ],
+        "variantDisplayName": "🧩[Каркас - нарізані деталі] Д.Ельдорадо (%Дно Каркасу%)",
+        "qty": 1
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №2-2) 🧩[Каркас - нарізані деталі] Д.Ельдорадо (%Дно Каркасу%)",
+          "workcenterName": "Цех №2-2 ДСП (Нарізка Каркас)",
+          "priceRate": 54,
+          "odooWorkcenterId": 21
+        }
+      ],
+      "components": [
+        {
+          "templateName": "[ДСП]",
+          "attributes": [],
+          "qty": 0.57,
+          "uom": "m²",
+          "operationIndex": 0,
+          "odooTemplateId": 13,
+          "odooVariantId": 31,
+          "odooUomId": 10
+        },
+        {
+          "templateName": "[ДВП]",
+          "attributes": [
+            {
+              "attributeName": "ДВП",
+              "value": "Звичайний"
+            }
+          ],
+          "qty": 2.45,
+          "uom": "m²",
+          "operationIndex": 0,
+          "odooTemplateId": 14,
+          "odooVariantId": 324,
+          "odooUomId": 10
+        },
+        {
+          "templateName": "[ДВП]",
+          "attributes": [
+            {
+              "attributeName": "ДВП",
+              "value": "Білий"
+            }
+          ],
+          "qty": 1.49,
+          "uom": "m²",
+          "operationIndex": 0,
+          "odooTemplateId": 14,
+          "odooVariantId": 325,
+          "odooUomId": 10
+        },
+        {
+          "templateName": "Фанера",
+          "attributes": [],
+          "qty": 1.65,
+          "uom": "m²",
+          "operationIndex": 0,
+          "odooTemplateId": 15,
+          "odooVariantId": 33,
+          "odooUomId": 10
+        }
+      ],
+      "expand": {
+        "Дно Каркасу": [
+          "ДВП Черновое",
+          "ДВП Білий",
+          "- без дна"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "🧩[Каркас - нарізані деталі] Д.Ельдорадо",
+        "attributes": [
+          {
+            "attributeName": "Дно Каркасу",
+            "value": "%Дно Каркасу%"
+          }
+        ],
+        "variantDisplayName": "🧩[Каркас - нарізані деталі] Д.Ельдорадо (%Дно Каркасу%)",
+        "qty": 1
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №2-2) 🧩[Каркас - нарізані деталі] Д.Ельдорадо (%Дно Каркасу%)",
+          "workcenterName": "Цех №2-2 ДСП (Нарізка Каркас)",
+          "priceRate": 54,
+          "odooWorkcenterId": 21
+        }
+      ],
+      "components": [
+        {
+          "templateName": "[ДСП]",
+          "attributes": [],
+          "qty": 0.57,
+          "uom": "m²",
+          "operationIndex": 0,
+          "odooTemplateId": 13,
+          "odooVariantId": 31,
+          "odooUomId": 10
+        },
+        {
+          "templateName": "[ДВП]",
+          "attributes": [
+            {
+              "attributeName": "ДВП",
+              "value": "Звичайний"
+            }
+          ],
+          "qty": 2.45,
+          "uom": "m²",
+          "operationIndex": 0,
+          "odooTemplateId": 14,
+          "odooVariantId": 324,
+          "odooUomId": 10
+        },
+        {
+          "templateName": "[ДВП]",
+          "attributes": [
+            {
+              "attributeName": "ДВП",
+              "value": "Звичайний"
+            }
+          ],
+          "qty": 1.49,
+          "uom": "m²",
+          "operationIndex": 0,
+          "odooTemplateId": 14,
+          "odooVariantId": 324,
+          "odooUomId": 10
+        },
+        {
+          "templateName": "Фанера",
+          "attributes": [],
+          "qty": 1.65,
+          "uom": "m²",
+          "operationIndex": 0,
+          "odooTemplateId": 15,
+          "odooVariantId": 33,
+          "odooUomId": 10
+        }
+      ],
+      "expand": {
+        "Дно Каркасу": [
+          "ДВП Черновое",
+          "ДВП Білий",
+          "- без дна"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "🧩[Планка - нарізані деталі] Планка 194",
+        "attributes": [],
+        "variantDisplayName": "🧩[Планка - нарізані деталі] Планка 194",
+        "qty": 1,
+        "odooTemplateId": 1003,
+        "odooVariantId": 252399
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №2-3) 🧩[Планка - нарізані деталі] Планка 194",
+          "workcenterName": "Цех №2-3 ДСП (Нарізка Планка)",
+          "priceRate": 13,
+          "odooWorkcenterId": 22
+        }
+      ],
+      "components": [
+        {
+          "templateName": "[ДВП]",
+          "attributes": [
+            {
+              "attributeName": "ДВП",
+              "value": "Звичайний"
+            }
+          ],
+          "qty": 0.6,
+          "uom": "m²",
+          "operationIndex": 0,
+          "odooTemplateId": 14,
+          "odooVariantId": 324,
+          "odooUomId": 10
+        },
+        {
+          "templateName": "[ДСП]",
+          "attributes": [],
+          "qty": 0.12,
+          "uom": "m²",
+          "operationIndex": 0,
+          "odooTemplateId": 13,
+          "odooVariantId": 31,
+          "odooUomId": 10
+        }
+      ]
+    },
+    {
+      "product": {
+        "templateName": "🧩[Ламінат - нарізані деталі] Д.Ельдорадо",
+        "attributes": [
+          {
+            "attributeName": "Колір Ламінату❌",
+            "value": "%Колір Ламінату❌%"
+          }
+        ],
+        "variantDisplayName": "🧩[Ламінат - нарізані деталі] Д.Ельдорадо (%Колір Ламінату❌%)",
+        "qty": 1
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №3-1) 🧩[Ламінат - нарізані деталі] Д.Ельдорадо (%Колір Ламінату❌%)",
+          "workcenterName": "Цех №3-1 ЛДСП (Нарізка Ламінату)",
+          "priceRate": 0,
+          "odooWorkcenterId": 23
+        }
+      ],
+      "components": [
+        {
+          "templateName": "🧩[Ламінат - лист]",
+          "attributes": [
+            {
+              "attributeName": "Ламінат Розмір",
+              "value": "1940x225"
+            }
+          ],
+          "qty": 2,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 18,
+          "odooVariantId": 41895,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "🧩[Ламінат - лист]",
+          "attributes": [
+            {
+              "attributeName": "Ламінат Розмір",
+              "value": "670x225"
+            }
+          ],
+          "qty": 2,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 18,
+          "odooVariantId": 309,
+          "odooUomId": 1
+        }
+      ],
+      "expand": {
+        "Колір Ламінату❌": [
+          "❌"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "🪤[Бильце - напівфабрикат] Ніша 107",
+        "attributes": [
+          {
+            "attributeName": "Диван Розмір Бильця❌",
+            "value": "%Диван Розмір Бильця❌%"
+          }
+        ],
+        "variantDisplayName": "🪤[Бильце - напівфабрикат] Ніша 107 (%Диван Розмір Бильця❌%)",
+        "qty": 1,
+        "odooTemplateId": 1005
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №4-1) 🪤[Бильце - напівфабрикат] Ніша 107 (%Диван Розмір Бильця❌%)",
+          "workcenterName": "Цех №4-1 збірка Бильце",
+          "priceRate": 29
+        }
+      ],
+      "components": [
+        {
+          "templateName": "🧩[Бильце - нарізані деталі] Ніша 107",
+          "attributes": [
+            {
+              "attributeName": "Диван Розмір Бильця❌",
+              "value": "%Диван Розмір Бильця❌%"
+            }
+          ],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 1001,
+          "odooUomId": 1
+        }
+      ],
+      "expand": {
+        "Диван Розмір Бильця❌": [
+          "❌"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "🪤[Бильце - напівфабрикат] Накладка Дсп 107",
+        "attributes": [
+          {
+            "attributeName": "Диван Розмір Бильця❌",
+            "value": "%Диван Розмір Бильця❌%"
+          }
+        ],
+        "variantDisplayName": "🪤[Бильце - напівфабрикат] Накладка Дсп 107 (%Диван Розмір Бильця❌%)",
+        "qty": 1
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №4-1) 🪤[Бильце - напівфабрикат] Накладка Дсп 107 (%Диван Розмір Бильця❌%)",
+          "workcenterName": "Цех №4-1 збірка Бильце",
+          "priceRate": 29
+        }
+      ],
+      "components": [
+        {
+          "templateName": "🧩[Бильце - нарізані деталі] Накладка Дсп 107",
+          "attributes": [
+            {
+              "attributeName": "Диван Розмір Бильця❌",
+              "value": "%Диван Розмір Бильця❌%"
+            }
+          ],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooUomId": 1
+        }
+      ],
+      "expand": {
+        "Диван Розмір Бильця❌": [
+          "❌"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "🪤[Каркас - напівфабрикат] Д.Ельдорадо",
+        "attributes": [
+          {
+            "attributeName": "Колір Ламінату❌",
+            "value": "%Колір Ламінату❌%"
+          },
+          {
+            "attributeName": "Дно Каркасу",
+            "value": "%Дно Каркасу%"
+          }
+        ],
+        "variantDisplayName": "🪤[Каркас - напівфабрикат] Д.Ельдорадо (%Колір Ламінату❌%, %Дно Каркасу%)",
+        "qty": 1
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №4-2) 🪤[Каркас - напівфабрикат] Д.Ельдорадо (%Колір Ламінату❌%, %Дно Каркасу%)",
+          "workcenterName": "Цех №4-2 збірка Каркас",
+          "priceRate": 136
+        }
+      ],
+      "components": [
+        {
+          "templateName": "🧩[Каркас - нарізані деталі] Д.Ельдорадо",
+          "attributes": [
+            {
+              "attributeName": "Дно Каркасу",
+              "value": "%Дно Каркасу%"
+            }
+          ],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "🪵[Каркас - нарізана деревина] Д.Ельдорадо",
+          "attributes": [],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "🧩[Ламінат - нарізані деталі] Д.Ельдорадо",
+          "attributes": [
+            {
+              "attributeName": "Колір Ламінату❌",
+              "value": "%Колір Ламінату❌%"
+            }
+          ],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooUomId": 1
+        }
+      ],
+      "expand": {
+        "Колір Ламінату❌": [
+          "❌"
+        ],
+        "Дно Каркасу": [
+          "ДВП Черновое",
+          "ДВП Білий",
+          "- без дна"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "🪤[Планка - напівфабрикат] Планка 194",
+        "attributes": [],
+        "variantDisplayName": "🪤[Планка - напівфабрикат] Планка 194",
+        "qty": 1,
+        "odooTemplateId": 1007,
+        "odooVariantId": 252403
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №4-3) 🪤[Планка - напівфабрикат] Планка 194",
+          "workcenterName": "Цех №4-3 збірка Планка",
+          "priceRate": 0
+        }
+      ],
+      "components": [
+        {
+          "templateName": "🧩[Планка - нарізані деталі] Планка 194",
+          "attributes": [],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 1003,
+          "odooVariantId": 252399,
+          "odooUomId": 1
+        }
+      ]
+    },
+    {
+      "product": {
+        "templateName": "🧩[Поролон - нарізані компоненти] Д.Елегант",
+        "attributes": [
+          {
+            "attributeName": "Диван Пружинний Блок",
+            "value": "%Диван Пружинний Блок%"
+          },
+          {
+            "attributeName": "Диван Розмір Бильця❌",
+            "value": "%Диван Розмір Бильця❌%"
+          }
+        ],
+        "variantDisplayName": "🧩[Поролон - нарізані компоненти] Д.Елегант (%Диван Пружинний Блок%, %Диван Розмір Бильця❌%)",
+        "qty": 1,
+        "ifAttr": {
+          "Диван Пружинний Блок": "Звичайний Блок"
+        },
+        "odooTemplateId": 994
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №5) 🧩[Поролон - нарізані компоненти] Д.Елегант (%Диван Пружинний Блок%, %Диван Розмір Бильця❌%)",
+          "workcenterName": "Цех №5 Порезка Поролон",
+          "priceRate": 50,
+          "odooWorkcenterId": 6
+        }
+      ],
+      "components": [
+        {
+          "templateName": "[Поролон]",
+          "attributes": [
+            {
+              "attributeName": "Поролон",
+              "value": "ST-2535 (2000x1600x20)"
+            }
+          ],
+          "qty": 1.6,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 19,
+          "odooVariantId": 1778,
+          "odooUomId": 15
+        },
+        {
+          "templateName": "[Поролон]",
+          "attributes": [
+            {
+              "attributeName": "Поролон",
+              "value": "ST-2218 (2000x1600x30)"
+            }
+          ],
+          "qty": 0.27,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 19,
+          "odooUomId": 15
+        },
+        {
+          "templateName": "[Поролон]",
+          "attributes": [
+            {
+              "attributeName": "Поролон",
+              "value": "ST-2233 (2000x1600x40x105)"
+            }
+          ],
+          "qty": 0.93,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 19,
+          "odooVariantId": 515,
+          "odooUomId": 15
+        },
+        {
+          "templateName": "[Поролон]",
+          "attributes": [
+            {
+              "attributeName": "Поролон",
+              "value": "ST-2233 (2000x1600x10)"
+            }
+          ],
+          "qty": 0.704,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 19,
+          "odooVariantId": 517,
+          "odooUomId": 15
+        },
+        {
+          "templateName": "[Поролон]",
+          "attributes": [
+            {
+              "attributeName": "Поролон",
+              "value": "ST-2233 (2000x1400x10)"
+            }
+          ],
+          "qty": 0.616,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 19,
+          "odooVariantId": 518,
+          "odooUomId": 15
+        },
+        {
+          "templateName": "[Поролон]",
+          "attributes": [
+            {
+              "attributeName": "Поролон",
+              "value": "ST-2233 (2000x1600x40x70)"
+            }
+          ],
+          "qty": 1.048,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 19,
+          "odooVariantId": 516,
+          "odooUomId": 15
+        },
+        {
+          "templateName": "[Войлок]",
+          "attributes": [
+            {
+              "attributeName": "Войлок",
+              "value": "1.60"
+            }
+          ],
+          "qty": 2,
+          "uom": "m",
+          "operationIndex": 0,
+          "odooTemplateId": 20,
+          "odooVariantId": 330,
+          "odooUomId": 8
+        }
+      ],
+      "expand": {
+        "Диван Пружинний Блок": [
+          "Посилений",
+          "Звичайний"
+        ],
+        "Диван Розмір Бильця❌": [
+          "❌"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "🧩[Поролон - нарізані компоненти] Д.Елегант",
+        "attributes": [
+          {
+            "attributeName": "Диван Пружинний Блок",
+            "value": "%Диван Пружинний Блок%"
+          },
+          {
+            "attributeName": "Диван Розмір Бильця❌",
+            "value": "%Диван Розмір Бильця❌%"
+          }
+        ],
+        "variantDisplayName": "🧩[Поролон - нарізані компоненти] Д.Елегант (%Диван Пружинний Блок%, %Диван Розмір Бильця❌%)",
+        "qty": 1,
+        "ifAttr": {
+          "Диван Пружинний Блок": "Посилений Блок"
+        },
+        "odooTemplateId": 994
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №5) 🧩[Поролон - нарізані компоненти] Д.Елегант (%Диван Пружинний Блок%, %Диван Розмір Бильця❌%)",
+          "workcenterName": "Цех №5 Порезка Поролон",
+          "priceRate": 50,
+          "odooWorkcenterId": 6
+        }
+      ],
+      "components": [
+        {
+          "templateName": "[Поролон]",
+          "attributes": [
+            {
+              "attributeName": "Поролон",
+              "value": "ST-2535 (2000x1600x20)"
+            }
+          ],
+          "qty": 1.6,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 19,
+          "odooVariantId": 1778,
+          "odooUomId": 15
+        },
+        {
+          "templateName": "[Поролон]",
+          "attributes": [
+            {
+              "attributeName": "Поролон",
+              "value": "ST-2218 (2000x1600x30)"
+            }
+          ],
+          "qty": 0.27,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 19,
+          "odooUomId": 15
+        },
+        {
+          "templateName": "[Поролон]",
+          "attributes": [
+            {
+              "attributeName": "Поролон",
+              "value": "ST-2233 (2000x1600x40x105)"
+            }
+          ],
+          "qty": 0.93,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 19,
+          "odooVariantId": 515,
+          "odooUomId": 15
+        },
+        {
+          "templateName": "[Поролон]",
+          "attributes": [
+            {
+              "attributeName": "Поролон",
+              "value": "ST-2233 (2000x1600x10)"
+            }
+          ],
+          "qty": 0.704,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 19,
+          "odooVariantId": 517,
+          "odooUomId": 15
+        },
+        {
+          "templateName": "[Поролон]",
+          "attributes": [
+            {
+              "attributeName": "Поролон",
+              "value": "ST-2233 (2000x1400x10)"
+            }
+          ],
+          "qty": 0.616,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 19,
+          "odooVariantId": 518,
+          "odooUomId": 15
+        },
+        {
+          "templateName": "[Поролон]",
+          "attributes": [
+            {
+              "attributeName": "Поролон",
+              "value": "ST-2233 (2000x1600x40x70)"
+            }
+          ],
+          "qty": 2.096,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 19,
+          "odooVariantId": 516,
+          "odooUomId": 15
+        },
+        {
+          "templateName": "[Войлок]",
+          "attributes": [
+            {
+              "attributeName": "Войлок",
+              "value": "1.60"
+            }
+          ],
+          "qty": 4,
+          "uom": "m",
+          "operationIndex": 0,
+          "odooTemplateId": 20,
+          "odooVariantId": 330,
+          "odooUomId": 8
+        }
+      ],
+      "expand": {
+        "Диван Пружинний Блок": [
+          "Посилений",
+          "Звичайний"
+        ],
+        "Диван Розмір Бильця❌": [
+          "❌"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "[Наволочка] Д.Ельдорадо",
+        "attributes": [],
+        "variantDisplayName": "[Наволочка] Д.Ельдорадо",
+        "qty": 1
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №5-1) [Наволочка] Д.Ельдорадо",
+          "workcenterName": "Цех №5-1 Наволочка",
+          "priceRate": 1,
+          "odooWorkcenterId": 17
+        }
+      ],
+      "components": [
+        {
+          "templateName": "[Флізелін]",
+          "attributes": [
+            {
+              "attributeName": "Флізелін",
+              "value": "30"
+            }
+          ],
+          "qty": 1.3,
+          "uom": "m",
+          "operationIndex": 0,
+          "odooTemplateId": 25,
+          "odooVariantId": 340,
+          "odooUomId": 8
+        }
+      ]
+    },
+    {
+      "product": {
+        "templateName": "🪤🧽[Каркас + Поролон - напівфабрикат 2] Д.Елегант",
+        "attributes": [
+          {
+            "attributeName": "Диван Пружинний Блок",
+            "value": "%Диван Пружинний Блок%"
+          },
+          {
+            "attributeName": "Диван Розмір Бильця❌",
+            "value": "%Диван Розмір Бильця❌%"
+          },
+          {
+            "attributeName": "Колір Ламінату❌",
+            "value": "%Колір Ламінату❌%"
+          },
+          {
+            "attributeName": "Дно Каркасу",
+            "value": "%Дно Каркасу%"
+          }
+        ],
+        "variantDisplayName": "🪤🧽[Каркас + Поролон - напівфабрикат 2] Д.Елегант (%Диван Пружинний Блок%, %Диван Розмір Бильця❌%, %Колір Ламінату❌%, %Дно Каркасу%)",
+        "qty": 1
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №6) 🪤🧽[Каркас + Поролон - напівфабрикат 2] Д.Елегант (%Диван Пружинний Блок%, %Диван Розмір Бильця❌%, %Колір Ламінату❌%, %Дно Каркасу%)",
+          "workcenterName": "Цех №6 Поклейки Поролона + Сбивка",
+          "priceRate": 258,
+          "odooWorkcenterId": 9
+        }
+      ],
+      "components": [
+        {
+          "templateName": "🧩[Поролон - нарізані компоненти] Д.Елегант",
+          "attributes": [
+            {
+              "attributeName": "Диван Пружинний Блок",
+              "value": "%Диван Пружинний Блок%"
+            },
+            {
+              "attributeName": "Диван Розмір Бильця❌",
+              "value": "%Диван Розмір Бильця❌%"
+            }
+          ],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 994,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "🪤[Бильце - напівфабрикат] Ніша 107",
+          "attributes": [
+            {
+              "attributeName": "Диван Розмір Бильця❌",
+              "value": "%Диван Розмір Бильця❌%"
+            }
+          ],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 1005,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "🪤[Бильце - напівфабрикат] Накладка Дсп 107",
+          "attributes": [
+            {
+              "attributeName": "Диван Розмір Бильця❌",
+              "value": "%Диван Розмір Бильця❌%"
+            }
+          ],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "🪤[Каркас - напівфабрикат] Д.Ельдорадо",
+          "attributes": [
+            {
+              "attributeName": "Колір Ламінату❌",
+              "value": "%Колір Ламінату❌%"
+            },
+            {
+              "attributeName": "Дно Каркасу",
+              "value": "%Дно Каркасу%"
+            }
+          ],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "🪤[Планка - напівфабрикат] Планка 194",
+          "attributes": [],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 1007,
+          "odooVariantId": 252403,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "[Боннель]",
+          "attributes": [
+            {
+              "attributeName": "Боннель",
+              "value": "1900x700"
+            }
+          ],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 24,
+          "odooVariantId": 55,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "[Боннель]",
+          "attributes": [
+            {
+              "attributeName": "Боннель",
+              "value": "1870x750"
+            }
+          ],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 24,
+          "odooVariantId": 313,
+          "odooUomId": 1
+        }
+      ],
+      "expand": {
+        "Диван Пружинний Блок": [
+          "Посилений",
+          "Звичайний"
+        ],
+        "Диван Розмір Бильця❌": [
+          "❌"
+        ],
+        "Колір Ламінату❌": [
+          "❌"
+        ],
+        "Дно Каркасу": [
+          "ДВП Черновое",
+          "ДВП Білий",
+          "- без дна"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "🧩[Чохол - нарізані матеріали] Д.Елегант",
+        "attributes": [
+          {
+            "attributeName": "Тканина",
+            "value": "%Тканина%"
+          },
+          {
+            "attributeName": "Диван Розмір Бильця❌",
+            "value": "%Диван Розмір Бильця❌%"
+          }
+        ],
+        "variantDisplayName": "🧩[Чохол - нарізані матеріали] Д.Елегант (%Тканина%, %Диван Розмір Бильця❌%)",
+        "qty": 1
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №7) 🧩[Чохол - нарізані матеріали] Д.Елегант (%Тканина%, %Диван Розмір Бильця❌%)",
+          "workcenterName": "Цех №7 Закройка Тканини",
+          "priceRate": 204,
+          "odooWorkcenterId": 7
+        }
+      ],
+      "components": [
+        {
+          "templateName": "[Синтепон]",
+          "attributes": [
+            {
+              "attributeName": "Синтепон",
+              "value": "100"
+            }
+          ],
+          "qty": 3,
+          "uom": "m",
+          "operationIndex": 0,
+          "odooTemplateId": 159,
+          "odooVariantId": 310,
+          "odooUomId": 8
+        },
+        {
+          "templateName": "[Тканина]",
+          "attributes": [
+            {
+              "attributeName": "Тканина",
+              "value": "%Тканина%"
+            }
+          ],
+          "qty": 13.7,
+          "uom": "m",
+          "operationIndex": 0,
+          "odooTemplateId": 181,
+          "odooVariantId": 1731,
+          "odooUomId": 8
+        },
+        {
+          "templateName": "[Флізелін]",
+          "attributes": [
+            {
+              "attributeName": "Флізелін",
+              "value": "60"
+            }
+          ],
+          "qty": 4.1,
+          "uom": "m",
+          "operationIndex": 0,
+          "odooTemplateId": 25,
+          "odooVariantId": 341,
+          "odooUomId": 8
+        }
+      ],
+      "expand": {
+        "Тканина": [
+          "Заказна Тканина",
+          "Шкіра",
+          "Рене 20",
+          "Рене 23",
+          "Рене 26",
+          "Едисон 03",
+          "Едисон 05",
+          "Едисон 16",
+          "Едисон 17",
+          "Каламбус 05",
+          "Каламбус 23",
+          "Каламбус 24",
+          "Грегор 04",
+          "Грегор 12",
+          "Бонапарт 03",
+          "Бонапарт 04",
+          "Бонапарт 06",
+          "Бонапарт 07",
+          "Конрад 3",
+          "Конрад 4",
+          "Конрад 18",
+          "Конрад 19",
+          "Комо 02",
+          "Комо 04",
+          "Комо 08",
+          "Комо 09",
+          "Комо 11",
+          "Комо 13",
+          "Комо 14",
+          "Софи 02",
+          "Софи 03",
+          "Софи 06",
+          "Софи 16",
+          "Блум 04",
+          "Блум 09",
+          "Блум 15",
+          "Блум 93",
+          "Блум 97",
+          "Гранд 01",
+          "Дольче 04",
+          "Гранд 11",
+          "Рене 4",
+          "Гранд 33",
+          "Дольче 03",
+          "Дольче 05",
+          "Дольче 08",
+          "Дольче 09",
+          "Айс 10",
+          "Айс 22",
+          "Хилтон 21",
+          "Небраска 11",
+          "Небраска 14",
+          "Невада 14",
+          "Нувола 80",
+          "Нувола 86",
+          "Нувола 30",
+          "Делемонт лайт беж",
+          "Оскар 03",
+          "Оскар 04",
+          "Оскар 09",
+          "Оскар 12",
+          "Оскар 22",
+          "Мартин 3",
+          "Мартин 4",
+          "Мартин 5",
+          "Мартин 6",
+          "Мартин 9",
+          "Даллас 600",
+          "Даллас 610",
+          "Даллас 910",
+          "Вега 06",
+          "Вега 10",
+          "Вега 33",
+          "Вега 34",
+          "Вега 35",
+          "Вега 36",
+          "Комо 07",
+          "Рене 22",
+          "Прадо 02",
+          "Касія 6",
+          "Касія 15",
+          "Касія 90",
+          "Касія 96",
+          "Сав нова браун 03",
+          "Сав Нова Сильвер",
+          "Сав Нова Дк Грей 14",
+          "validate-all",
+          "validate"
+        ],
+        "Диван Розмір Бильця❌": [
+          "❌"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "🪤[Чохол - напівфабрикат] Д.Елегант",
+        "attributes": [
+          {
+            "attributeName": "Тканина",
+            "value": "%Тканина%"
+          },
+          {
+            "attributeName": "Диван Розмір Бильця❌",
+            "value": "%Диван Розмір Бильця❌%"
+          }
+        ],
+        "variantDisplayName": "🪤[Чохол - напівфабрикат] Д.Елегант (%Тканина%, %Диван Розмір Бильця❌%)",
+        "qty": 1
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №8) 🪤[Чохол - напівфабрикат] Д.Елегант (%Тканина%, %Диван Розмір Бильця❌%)",
+          "workcenterName": "Цех №8 Швейка",
+          "priceRate": 336,
+          "odooWorkcenterId": 8
+        }
+      ],
+      "components": [
+        {
+          "templateName": "🧩[Чохол - нарізані матеріали] Д.Елегант",
+          "attributes": [
+            {
+              "attributeName": "Тканина",
+              "value": "%Тканина%"
+            },
+            {
+              "attributeName": "Диван Розмір Бильця❌",
+              "value": "%Диван Розмір Бильця❌%"
+            }
+          ],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooUomId": 1
+        }
+      ],
+      "expand": {
+        "Тканина": [
+          "Заказна Тканина",
+          "Шкіра",
+          "Рене 20",
+          "Рене 23",
+          "Рене 26",
+          "Едисон 03",
+          "Едисон 05",
+          "Едисон 16",
+          "Едисон 17",
+          "Каламбус 05",
+          "Каламбус 23",
+          "Каламбус 24",
+          "Грегор 04",
+          "Грегор 12",
+          "Бонапарт 03",
+          "Бонапарт 04",
+          "Бонапарт 06",
+          "Бонапарт 07",
+          "Конрад 3",
+          "Конрад 4",
+          "Конрад 18",
+          "Конрад 19",
+          "Комо 02",
+          "Комо 04",
+          "Комо 08",
+          "Комо 09",
+          "Комо 11",
+          "Комо 13",
+          "Комо 14",
+          "Софи 02",
+          "Софи 03",
+          "Софи 06",
+          "Софи 16",
+          "Блум 04",
+          "Блум 09",
+          "Блум 15",
+          "Блум 93",
+          "Блум 97",
+          "Гранд 01",
+          "Дольче 04",
+          "Гранд 11",
+          "Рене 4",
+          "Гранд 33",
+          "Дольче 03",
+          "Дольче 05",
+          "Дольче 08",
+          "Дольче 09",
+          "Айс 10",
+          "Айс 22",
+          "Хилтон 21",
+          "Небраска 11",
+          "Небраска 14",
+          "Невада 14",
+          "Нувола 80",
+          "Нувола 86",
+          "Нувола 30",
+          "Делемонт лайт беж",
+          "Оскар 03",
+          "Оскар 04",
+          "Оскар 09",
+          "Оскар 12",
+          "Оскар 22",
+          "Мартин 3",
+          "Мартин 4",
+          "Мартин 5",
+          "Мартин 6",
+          "Мартин 9",
+          "Даллас 600",
+          "Даллас 610",
+          "Даллас 910",
+          "Вега 06",
+          "Вега 10",
+          "Вега 33",
+          "Вега 34",
+          "Вега 35",
+          "Вега 36",
+          "Комо 07",
+          "Рене 22",
+          "Прадо 02",
+          "Касія 6",
+          "Касія 15",
+          "Касія 90",
+          "Касія 96",
+          "Сав нова браун 03",
+          "Сав Нова Сильвер",
+          "Сав Нова Дк Грей 14",
+          "validate-all",
+          "validate"
+        ],
+        "Диван Розмір Бильця❌": [
+          "❌"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "[Подушка] Д.Ельдорадо",
+        "attributes": [
+          {
+            "attributeName": "Тканина",
+            "value": "%Тканина%"
+          },
+          {
+            "attributeName": "Диван Наповнювач Подушек",
+            "value": "%Диван Наповнювач Подушек%"
+          }
+        ],
+        "variantDisplayName": "[Подушка] Д.Ельдорадо (%Тканина%, %Диван Наповнювач Подушек%)",
+        "qty": 1,
+        "ifAttr": {
+          "Диван Наповнювач Подушек": "ППУ Крихта"
+        }
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №9-1) [Подушка] Д.Ельдорадо (%Тканина%, %Диван Наповнювач Подушек%)",
+          "workcenterName": "Цех №9-1 Набивки Подушек",
+          "priceRate": 0,
+          "odooWorkcenterId": 12
+        }
+      ],
+      "components": [
+        {
+          "templateName": "[Наволочка] Д.Ельдорадо",
+          "attributes": [],
+          "qty": 2,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "Крихта ППУ",
+          "attributes": [],
+          "qty": 3.5,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 145,
+          "odooVariantId": 261,
+          "odooUomId": 15
+        }
+      ],
+      "expand": {
+        "Тканина": [
+          "Заказна Тканина",
+          "Шкіра",
+          "Рене 20",
+          "Рене 23",
+          "Рене 26",
+          "Едисон 03",
+          "Едисон 05",
+          "Едисон 16",
+          "Едисон 17",
+          "Каламбус 05",
+          "Каламбус 23",
+          "Каламбус 24",
+          "Грегор 04",
+          "Грегор 12",
+          "Бонапарт 03",
+          "Бонапарт 04",
+          "Бонапарт 06",
+          "Бонапарт 07",
+          "Конрад 3",
+          "Конрад 4",
+          "Конрад 18",
+          "Конрад 19",
+          "Комо 02",
+          "Комо 04",
+          "Комо 08",
+          "Комо 09",
+          "Комо 11",
+          "Комо 13",
+          "Комо 14",
+          "Софи 02",
+          "Софи 03",
+          "Софи 06",
+          "Софи 16",
+          "Блум 04",
+          "Блум 09",
+          "Блум 15",
+          "Блум 93",
+          "Блум 97",
+          "Гранд 01",
+          "Дольче 04",
+          "Гранд 11",
+          "Рене 4",
+          "Гранд 33",
+          "Дольче 03",
+          "Дольче 05",
+          "Дольче 08",
+          "Дольче 09",
+          "Айс 10",
+          "Айс 22",
+          "Хилтон 21",
+          "Небраска 11",
+          "Небраска 14",
+          "Невада 14",
+          "Нувола 80",
+          "Нувола 86",
+          "Нувола 30",
+          "Делемонт лайт беж",
+          "Оскар 03",
+          "Оскар 04",
+          "Оскар 09",
+          "Оскар 12",
+          "Оскар 22",
+          "Мартин 3",
+          "Мартин 4",
+          "Мартин 5",
+          "Мартин 6",
+          "Мартин 9",
+          "Даллас 600",
+          "Даллас 610",
+          "Даллас 910",
+          "Вега 06",
+          "Вега 10",
+          "Вега 33",
+          "Вега 34",
+          "Вега 35",
+          "Вега 36",
+          "Комо 07",
+          "Рене 22",
+          "Прадо 02",
+          "Касія 6",
+          "Касія 15",
+          "Касія 90",
+          "Касія 96",
+          "Сав нова браун 03",
+          "Сав Нова Сильвер",
+          "Сав Нова Дк Грей 14",
+          "validate-all",
+          "validate"
+        ],
+        "Диван Наповнювач Подушек": [
+          "Холлофайбер",
+          "ППУ Крихта"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "[Подушка] Д.Ельдорадо",
+        "attributes": [
+          {
+            "attributeName": "Тканина",
+            "value": "%Тканина%"
+          },
+          {
+            "attributeName": "Диван Наповнювач Подушек",
+            "value": "%Диван Наповнювач Подушек%"
+          }
+        ],
+        "variantDisplayName": "[Подушка] Д.Ельдорадо (%Тканина%, %Диван Наповнювач Подушек%)",
+        "qty": 1,
+        "ifAttr": {
+          "Диван Наповнювач Подушек": "Холлофайбер"
+        }
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №9-1) [Подушка] Д.Ельдорадо (%Тканина%, %Диван Наповнювач Подушек%)",
+          "workcenterName": "Цех №9-1 Набивки Подушек",
+          "priceRate": 0,
+          "odooWorkcenterId": 12
+        }
+      ],
+      "components": [
+        {
+          "templateName": "[Наволочка] Д.Ельдорадо",
+          "attributes": [],
+          "qty": 2,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "Холлофайбер",
+          "attributes": [],
+          "qty": 3.5,
+          "uom": "кг",
+          "operationIndex": 0,
+          "odooTemplateId": 204,
+          "odooVariantId": 704,
+          "odooUomId": 15
+        }
+      ],
+      "expand": {
+        "Тканина": [
+          "Заказна Тканина",
+          "Шкіра",
+          "Рене 20",
+          "Рене 23",
+          "Рене 26",
+          "Едисон 03",
+          "Едисон 05",
+          "Едисон 16",
+          "Едисон 17",
+          "Каламбус 05",
+          "Каламбус 23",
+          "Каламбус 24",
+          "Грегор 04",
+          "Грегор 12",
+          "Бонапарт 03",
+          "Бонапарт 04",
+          "Бонапарт 06",
+          "Бонапарт 07",
+          "Конрад 3",
+          "Конрад 4",
+          "Конрад 18",
+          "Конрад 19",
+          "Комо 02",
+          "Комо 04",
+          "Комо 08",
+          "Комо 09",
+          "Комо 11",
+          "Комо 13",
+          "Комо 14",
+          "Софи 02",
+          "Софи 03",
+          "Софи 06",
+          "Софи 16",
+          "Блум 04",
+          "Блум 09",
+          "Блум 15",
+          "Блум 93",
+          "Блум 97",
+          "Гранд 01",
+          "Дольче 04",
+          "Гранд 11",
+          "Рене 4",
+          "Гранд 33",
+          "Дольче 03",
+          "Дольче 05",
+          "Дольче 08",
+          "Дольче 09",
+          "Айс 10",
+          "Айс 22",
+          "Хилтон 21",
+          "Небраска 11",
+          "Небраска 14",
+          "Невада 14",
+          "Нувола 80",
+          "Нувола 86",
+          "Нувола 30",
+          "Делемонт лайт беж",
+          "Оскар 03",
+          "Оскар 04",
+          "Оскар 09",
+          "Оскар 12",
+          "Оскар 22",
+          "Мартин 3",
+          "Мартин 4",
+          "Мартин 5",
+          "Мартин 6",
+          "Мартин 9",
+          "Даллас 600",
+          "Даллас 610",
+          "Даллас 910",
+          "Вега 06",
+          "Вега 10",
+          "Вега 33",
+          "Вега 34",
+          "Вега 35",
+          "Вега 36",
+          "Комо 07",
+          "Рене 22",
+          "Прадо 02",
+          "Касія 6",
+          "Касія 15",
+          "Касія 90",
+          "Касія 96",
+          "Сав нова браун 03",
+          "Сав Нова Сильвер",
+          "Сав Нова Дк Грей 14",
+          "validate-all",
+          "validate"
+        ],
+        "Диван Наповнювач Подушек": [
+          "Холлофайбер",
+          "ППУ Крихта"
+        ]
+      }
+    },
+    {
+      "product": {
+        "templateName": "Диван Ельдорадо-1",
+        "attributes": [
+          {
+            "attributeName": "Тканина",
+            "value": "%Тканина%"
+          },
+          {
+            "attributeName": "Диван Пружинний Блок",
+            "value": "%Диван Пружинний Блок%"
+          },
+          {
+            "attributeName": "Диван Наповнювач Подушек",
+            "value": "%Диван Наповнювач Подушек%"
+          },
+          {
+            "attributeName": "Дно Каркасу",
+            "value": "%Дно Каркасу%"
+          }
+        ],
+        "variantDisplayName": "Диван Ельдорадо-1 (%Тканина%, %Диван Пружинний Блок%, %Диван Наповнювач Подушек%, %Дно Каркасу%)",
+        "qty": 1
+      },
+      "operations": [
+        {
+          "name": "Операція (Цех №9) Диван Ельдорадо-1 (%Тканина%, %Диван Пружинний Блок%, %Диван Наповнювач Подушек%, %Дно Каркасу%)",
+          "workcenterName": "Цех №9 Оббивки",
+          "priceRate": 384,
+          "odooWorkcenterId": 10
+        },
+        {
+          "name": "Операція (Цех №10) Диван Ельдорадо-1 (%Тканина%, %Диван Пружинний Блок%, %Диван Наповнювач Подушек%, %Дно Каркасу%)",
+          "workcenterName": "Цех №10 Упаковки",
+          "priceRate": 120,
+          "odooWorkcenterId": 11
+        },
+        {
+          "name": "ВТК Диван Ельдорадо-1 (%Тканина%, %Диван Пружинний Блок%, %Диван Наповнювач Подушек%, %Дно Каркасу%)",
+          "workcenterName": "ВТК",
+          "priceRate": 25
+        }
+      ],
+      "components": [
+        {
+          "templateName": "🪤🧽[Каркас + Поролон - напівфабрикат 2] Д.Елегант",
+          "attributes": [
+            {
+              "attributeName": "Диван Пружинний Блок",
+              "value": "%Диван Пружинний Блок%"
+            },
+            {
+              "attributeName": "Диван Розмір Бильця❌",
+              "value": "%Диван Розмір Бильця❌%"
+            },
+            {
+              "attributeName": "Колір Ламінату❌",
+              "value": "%Колір Ламінату❌%"
+            },
+            {
+              "attributeName": "Дно Каркасу",
+              "value": "%Дно Каркасу%"
+            }
+          ],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "🪤[Чохол - напівфабрикат] Д.Елегант",
+          "attributes": [
+            {
+              "attributeName": "Тканина",
+              "value": "%Тканина%"
+            },
+            {
+              "attributeName": "Диван Розмір Бильця❌",
+              "value": "%Диван Розмір Бильця❌%"
+            }
+          ],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "[Подушка] Д.Ельдорадо",
+          "attributes": [
+            {
+              "attributeName": "Тканина",
+              "value": "%Тканина%"
+            },
+            {
+              "attributeName": "Диван Наповнювач Подушек",
+              "value": "%Диван Наповнювач Подушек%"
+            }
+          ],
+          "qty": 2,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "Опора ролик Н32",
+          "attributes": [],
+          "qty": 4,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 403,
+          "odooVariantId": 123902,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "Завіса Накладна",
+          "attributes": [],
+          "qty": 4,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 1269,
+          "odooVariantId": 353951,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "Опора стопор для єврокнижки 416",
+          "attributes": [],
+          "qty": 2,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 7,
+          "odooVariantId": 22,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "Завіса 190 113.02 Етера пласт",
+          "attributes": [],
+          "qty": 2,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 1271,
+          "odooVariantId": 353953,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "З'єднувач 83 економ",
+          "attributes": [],
+          "qty": 2,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 404,
+          "odooVariantId": 123903,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "Зачіп Краб",
+          "attributes": [],
+          "qty": 8,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 281,
+          "odooVariantId": 42625,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "Ніжка під шуруп Н30",
+          "attributes": [],
+          "qty": 4,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 1273,
+          "odooVariantId": 353955,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "Ніжка трикутна",
+          "attributes": [],
+          "qty": 8,
+          "uom": "шт",
+          "operationIndex": 0,
+          "odooTemplateId": 1276,
+          "odooVariantId": 353958,
+          "odooUomId": 1
+        },
+        {
+          "templateName": "Скотч",
+          "attributes": [],
+          "qty": 50,
+          "uom": "m",
+          "operationIndex": 1,
+          "odooTemplateId": 72,
+          "odooVariantId": 188,
+          "odooUomId": 8
+        },
+        {
+          "templateName": "Плівка",
+          "attributes": [],
+          "qty": 2,
+          "uom": "кг",
+          "operationIndex": 1,
+          "odooTemplateId": 28,
+          "odooVariantId": 46,
+          "odooUomId": 15
+        },
+        {
+          "templateName": "Картон",
+          "attributes": [],
+          "qty": 2.5,
+          "uom": "m",
+          "operationIndex": 1,
+          "odooTemplateId": 29,
+          "odooVariantId": 47,
+          "odooUomId": 8
+        },
+        {
+          "templateName": "Перевірка Якості",
+          "attributes": [],
+          "qty": 1,
+          "uom": "шт",
+          "operationIndex": 2,
+          "isService": true,
+          "odooTemplateId": 221,
+          "odooVariantId": 13440,
+          "odooUomId": 1
+        }
+      ],
+      "expand": {
+        "Тканина": [
+          "Заказна Тканина",
+          "Шкіра",
+          "Рене 20",
+          "Рене 23",
+          "Рене 26",
+          "Едисон 03",
+          "Едисон 05",
+          "Едисон 16",
+          "Едисон 17",
+          "Каламбус 05",
+          "Каламбус 23",
+          "Каламбус 24",
+          "Грегор 04",
+          "Грегор 12",
+          "Бонапарт 03",
+          "Бонапарт 04",
+          "Бонапарт 06",
+          "Бонапарт 07",
+          "Конрад 3",
+          "Конрад 4",
+          "Конрад 18",
+          "Конрад 19",
+          "Комо 02",
+          "Комо 04",
+          "Комо 08",
+          "Комо 09",
+          "Комо 11",
+          "Комо 13",
+          "Комо 14",
+          "Софи 02",
+          "Софи 03",
+          "Софи 06",
+          "Софи 16",
+          "Блум 04",
+          "Блум 09",
+          "Блум 15",
+          "Блум 93",
+          "Блум 97",
+          "Гранд 01",
+          "Дольче 04",
+          "Гранд 11",
+          "Рене 4",
+          "Гранд 33",
+          "Дольче 03",
+          "Дольче 05",
+          "Дольче 08",
+          "Дольче 09",
+          "Айс 10",
+          "Айс 22",
+          "Хилтон 21",
+          "Небраска 11",
+          "Небраска 14",
+          "Невада 14",
+          "Нувола 80",
+          "Нувола 86",
+          "Нувола 30",
+          "Делемонт лайт беж",
+          "Оскар 03",
+          "Оскар 04",
+          "Оскар 09",
+          "Оскар 12",
+          "Оскар 22",
+          "Мартин 3",
+          "Мартин 4",
+          "Мартин 5",
+          "Мартин 6",
+          "Мартин 9",
+          "Даллас 600",
+          "Даллас 610",
+          "Даллас 910",
+          "Вега 06",
+          "Вега 10",
+          "Вега 33",
+          "Вега 34",
+          "Вега 35",
+          "Вега 36",
+          "Комо 07",
+          "Рене 22",
+          "Прадо 02",
+          "Касія 6",
+          "Касія 15",
+          "Касія 90",
+          "Касія 96",
+          "Сав нова браун 03",
+          "Сав Нова Сильвер",
+          "Сав Нова Дк Грей 14",
+          "validate-all",
+          "validate"
+        ],
+        "Диван Пружинний Блок": [
+          "Посилений",
+          "Звичайний"
+        ],
+        "Диван Наповнювач Подушек": [
+          "Холлофайбер",
+          "ППУ Крихта"
+        ],
+        "Дно Каркасу": [
+          "ДВП Черновое",
+          "ДВП Білий",
+          "- без дна"
+        ],
+        "Диван Розмір Бильця❌": [
+          "❌"
+        ],
+        "Колір Ламінату❌": [
+          "❌"
+        ]
+      }
+    }
+  ]
+}
