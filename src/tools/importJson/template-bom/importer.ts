@@ -223,6 +223,11 @@ const RAW_MATERIAL_CATEGORY: Array<
   ["Зацеп", "Сировина / Фурнітура"],
   ["Распорка", "Сировина / Фурнітура"],
   ["Алігатор", "Сировина / Фурнітура"],
+  ["Сабля", "Сировина / Фурнітура"],
+  ["Направляюч", "Сировина / Фурнітура"],
+  ["МДФ", "Сировина / Дерево"],
+  ["Липучка", "Сировина / Тканина"],
+  ["Пас 100", "Сировина / Тканина"],
 ];
 
 const FINAL_PRODUCT_CATEGORY = "Готова продукція / Дивани";
@@ -233,8 +238,9 @@ function extractCehToken(text: string): string | null {
 }
 
 function classifyRawByKeyword(name: string): string | null {
+  const lower = name.toLocaleLowerCase("uk");
   for (const [kw, catName] of RAW_MATERIAL_CATEGORY) {
-    if (name.includes(kw)) return catName;
+    if (lower.includes(kw.toLocaleLowerCase("uk"))) return catName;
   }
   return null;
 }
