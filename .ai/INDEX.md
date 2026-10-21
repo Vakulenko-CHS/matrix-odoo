@@ -14,6 +14,7 @@ Repo wins over `~/.ai` on conflicts for this project.
 | 1b | [logs/](logs/) | **On demand** — Topics match only |
 | 2 | [docs/formats/README.md](../docs/formats/README.md) | Юзер каже «формат», накладки, ламінат, BOM spec |
 | 2b | [docs/BOM_FORMAT.md](../docs/BOM_FORMAT.md) | Markdown BOM диванів |
+| 2c | [docs/README.md](../docs/README.md) | Канон `docs_first-fixed` + `exports/` |
 | 2c | [right_names.md](../right_names.md) | Канон назв товарів |
 
 ---

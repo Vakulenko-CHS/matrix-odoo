@@ -1,9 +1,15 @@
 # exports/
 
-JSON для `npm run import-template-bom`, згенерований з markdown BOM (`npm run export-json`).
+Пари до [`docs/docs_first-fixed/<назва>.md`](../docs/docs_first-fixed/): тут `\<назва\>.json`.
 
-- **Редагуємо** спеки в HackMD / `temp/batches/links-N/docs/*.md`, не ці файли.
-- У git уже є історичні знімки; **нові batch JSON** (links-3 тощо) зазвичай **не комітимо** — відновлюються з `.md`.
-- Якщо потрібен знімок у репо: комітити разом із відповідними `.md` у `temp/batches/…` (локально) або після винесення specs у tracked `docs/`.
+Генерація:
 
-Див. [docs/sofa-batches.md](../docs/sofa-batches.md).
+```bash
+npm run export-json -- "docs/docs_first-fixed/Диван X.md"
+```
+
+Імпорт у Odoo: `npm run import-template-bom -- "exports/Диван X.json"`.
+
+Деякі старі JSON мають префікс `-` у імені (історичний артефакт) — відповідний MD у каноні без префікса. Нові файли називайте як `.md` без `-`.
+
+Див. [docs/README.md](../docs/README.md).

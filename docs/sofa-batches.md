@@ -1,52 +1,36 @@
 # Sofa import batches (HackMD → Odoo)
 
-## Джерело правди
+## Джерело правди в git
 
-| Шар | Де | Роль |
-|-----|-----|------|
-| **Markdown BOM** | HackMD + локальна копія `temp/batches/links-N/docs/*.md` | Єдиний формат, який редагуємо |
-| **JSON** | `exports/<назва>.json` | Артефакт `npm run export-json` для `import-template-bom` |
-| **Odoo** | template BOM `tmpl::<назва>` | Продакшен після імпорту |
+| Шар | Шлях |
+|-----|------|
+| **Markdown BOM** | [`docs/docs_first-fixed/<назва>.md`](docs_first-fixed/) |
+| **JSON** | [`exports/<назва>.json`](../exports/) |
+| **Список URL пакета** | [`docs/batches/links-N.tsv`](batches/) |
 
-**Не комітити лише JSON** без відповідного `.md` у пакеті — з репо не відновити спеку. Історичні файли в `exports/` у git залишаються як знімки старих імпортів; нові після batch краще не додавати (генеруються з `docs/`).
+HackMD / `temp/batches/` — робоча зона (gitignored); після перевірки копіюємо `.md` у `docs_first-fixed` і комітимо разом з `exports/*.json`.
 
-## Локальна структура `temp/` (gitignored)
-
-```
-temp/
-  README.md
-  batches/
-    links-2/          # TSV, docs/, звіти, push-manifest
-    links-3/          # docs/, reports/, run-import.sh
-    links-4/          # batch.tsv — наступна пачка
-  shared/             # Ламінат.tsv, Накладки.tsv, nakladky-fix-list.md
-  archive/            # старі hackmd-дампи, логи, migrate
-```
-
-## Новий пакет (links-4)
+## Команди
 
 ```bash
-# 1) TSV: назва + URL HackMD → temp/batches/links-4/batch.tsv
-npm run sofa-batch-prep -- temp/batches/links-4/batch.tsv temp/batches/links-4/docs
-
-# 2) ai-check / правки в docs/
-npm run ai-check -- temp/batches/links-4/docs/*.md
-
-# 3) оцінка часу
-npm run estimate-import -- temp/batches/links-4/docs
-
-# 4) імпорт (один процес, не паралельно кілька скриптів)
-npm run snapshot -- pre-links-4
-# по одному дивану або свій run-import.sh за зразком links-3
+npm run ai-check -- "docs/docs_first-fixed/Диван X.md"
+npm run export-json -- "docs/docs_first-fixed/Диван X.md"
+npm run import-template-bom -- "exports/Диван X.json"
 ```
 
-## Імпорт links-3
+Повний prep з TSV:
 
-Див. `temp/batches/links-3/README-import.md`. Після pre-seed у коді зливаються дублікати PTAL (не запускати кілька імпортів одночасно).
+```bash
+npm run sofa-batch-prep -- temp/batches/links-4/batch.tsv temp/batches/links-4/docs
+# після правок — sync у docs/docs_first-fixed + export-json
+```
 
-## Корисні npm
+## links-3
 
-- `pull-hackmd` / `push-hackmd` — синх з HackMD
-- `sofa-batch-prep` — pull + format + ai-check JSON + estimate
-- `estimate-import` — час dry-run імпорту
-- `import-template-bom` — запис у Odoo (потрібні `.env` / `.env.local`)
+Імпортовано 25/25. Логи: `temp/batches/links-3/reports/` (локально).
+
+## links-4
+
+`docs/batches/links-4.tsv` — Хілтон ×3, Бонд-К.
+
+Див. також [`docs/README.md`](README.md), [`exports/README.md`](../exports/README.md).

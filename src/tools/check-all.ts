@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { isBlockingIssue, runSpecTools } from "../validator/specPipeline";
 
-const BASE_FOLDER = "docs_fixed";
+const BASE_FOLDER = path.join("docs", "archive", "check-all-out");
 const GOOD_FOLDER = path.join(BASE_FOLDER, "good");
 const BAD_FOLDER = path.join(BASE_FOLDER, "bad");
 
