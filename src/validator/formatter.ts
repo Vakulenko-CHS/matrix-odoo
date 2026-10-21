@@ -133,13 +133,20 @@ function fixAttributeSpaces(line: string): string {
 }
 
 function fixAttributeCapitalization(line: string): string {
-  return line.replace(/\(([^)]+)\)/g, (_match, inner) => {
-    // Capitalize first letter of each standalone Cyrillic word (2+ chars, not mid-word)
-    // Negative lookbehind prevents capitalizing suffixes like "ех" in "Цех" or "ерадо" in "Верадо"
-    const fixed = inner.replace(
+  const capWords = (segment: string) =>
+    segment.replace(
       /(?<![А-ЯҐЄІЇЁа-яґєіїё])[а-яґєіїє]{2,}/g,
       (word: string) => word.charAt(0).toUpperCase() + word.slice(1),
     );
+
+  return line.replace(/\(([^)]+)\)/g, (_match, inner) => {
+    // Do not alter %Attr% placeholders — names must match СПИСОК АТРИБУТІВ
+    const fixed = inner
+      .split(/(%[^%]+%)/g)
+      .map((part: string) =>
+        part.startsWith("%") && part.endsWith("%") ? part : capWords(part),
+      )
+      .join("");
     return `(${fixed})`;
   });
 }

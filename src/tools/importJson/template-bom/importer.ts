@@ -694,12 +694,56 @@ export async function importTemplateBomGroup(
     console.log(`    [op] "${op.workcenterName}" (${op.priceRate} грн)`);
   }
 
+  // Альтернативні операції (інша штучна), коли кілька BomEntry з ifAttr — напр. Бонд-К короб
+  const altOpIdByEntry = new Map<number, number[]>();
+  for (let ei = 1; ei < entries.length; ei++) {
+    const altIds: number[] = [];
+    for (let i = 0; i < entries[ei].operations.length; i++) {
+      const base = entries[0].operations[i];
+      const op = entries[ei].operations[i];
+      if (!op || base?.priceRate === op.priceRate) {
+        altIds.push(opIds[i]);
+        continue;
+      }
+      const wcId = await getOrCreateWorkcenter(op.workcenterName);
+      const baseName = cleanOpName(op.name) || op.workcenterName;
+      const entryIfAttr = entries[ei].product.ifAttr;
+      const tag = entryIfAttr
+        ? Object.values(entryIfAttr).join(", ")
+        : `варіант ${ei + 1}`;
+      const opId = await create("mrp.routing.workcenter", {
+        name: `${baseName} · ${tag}`,
+        bom_id: bomId,
+        workcenter_id: wcId,
+        sequence: i + 1,
+        x_studio_piece_rate_2: op.priceRate,
+      });
+      track.operation(opId);
+      altIds.push(opId);
+      console.log(
+        `    [op] "${op.workcenterName}" (${op.priceRate} грн) · ${tag}`,
+      );
+    }
+    altOpIdByEntry.set(ei, altIds);
+  }
+
+  const resolveOpId = (
+    entryIndex: number,
+    operationIndex: number,
+  ): number | false => {
+    if (entryIndex === 0) return opIds[operationIndex] ?? false;
+    const alt = altOpIdByEntry.get(entryIndex);
+    if (alt?.[operationIndex]) return alt[operationIndex];
+    return opIds[operationIndex] ?? false;
+  };
+
   await applyRoutes(tmplId, templateName);
   await preSeedPtavCache(tmplId);
 
   let lineSeq = 1;
 
-  for (const entry of entries) {
+  for (let entryIndex = 0; entryIndex < entries.length; entryIndex++) {
+    const entry = entries[entryIndex];
     const expand = entry.expand ?? {};
 
     const fixedProductAttrs = entry.product.attributes.filter(
@@ -735,7 +779,7 @@ export async function importTemplateBomGroup(
           product_qty: q1.qty,
           product_uom_id: q1.uomId,
           sequence: lineSeq++,
-          operation_id: opIds[comp.operationIndex] ?? false,
+          operation_id: resolveOpId(entryIndex, comp.operationIndex),
           ...(entryPtavIds.length > 0
             ? {
                 bom_product_template_attribute_value_ids: [
@@ -807,7 +851,7 @@ export async function importTemplateBomGroup(
           product_qty: q2.qty,
           product_uom_id: q2.uomId,
           sequence: lineSeq++,
-          operation_id: opIds[comp.operationIndex] ?? false,
+          operation_id: resolveOpId(entryIndex, comp.operationIndex),
           ...(allPtavIds.length > 0
             ? { bom_product_template_attribute_value_ids: [[6, 0, allPtavIds]] }
             : {}),
