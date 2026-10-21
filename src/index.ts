@@ -68,6 +68,18 @@ async function main() {
       break;
     }
 
+    case "estimate-import": {
+      const { runEstimateImport } = await import("./tools/template-bom-estimate");
+      await runEstimateImport(args);
+      break;
+    }
+
+    case "sofa-batch-prep": {
+      const { runSofaBatchPrep } = await import("./tools/sofa-batch-prep");
+      await runSofaBatchPrep(args);
+      break;
+    }
+
     case "add-fabric": {
       const { runAddFabric } = await import("./commands/addFabric");
       await runAddFabric(args[0]);

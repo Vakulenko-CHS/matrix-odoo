@@ -3,7 +3,7 @@
 Session notes → [logs/](logs/). Keep this file slim.  
 Start: [.ai/INDEX.md](./INDEX.md) → **this file**. Open logs only when **Log index** matches.
 
-Last updated: **2026-10-12**
+Last updated: **2026-10-21**
 
 ---
 
@@ -22,8 +22,8 @@ Last updated: **2026-10-12**
 
 | id | name | Notes |
 |----|------|--------|
-| 18 | `🧩[Ламінат - лист]` | Білий; size attr; TSV `temp/Ламінат.tsv` |
-| 214 | `🧩[Ламінат кольоровий - лист]` | size × color; TSV `temp/Накладки.tsv` |
+| 18 | `🧩[Ламінат - лист]` | Білий; size attr; TSV `temp/shared/Ламінат.tsv` |
+| 214 | `🧩[Ламінат кольоровий - лист]` | size × color; TSV `temp/shared/Накладки.tsv` |
 | 209 | `[Ламінат]` | raw, color only |
 | 210 | `[Кромка]` | color × **Ширина Кромки** |
 | 1247–1265 | `🪤[Накладка] …` | точковий фікс диванів — `temp/nakladky-fix-list.md` |
@@ -96,5 +96,6 @@ UOM: `m²` id=10, `m` id=8.
 | L-odoo | [logs/odoo-db.md](logs/odoo-db.md) | odoo, ids, attr, workcenter, uom, api | будь-яка робота з живою базою / IDs | 2026-10-12 |
 | L-nakladky | [logs/nakladky.md](logs/nakladky.md) | накладки, nakladky, ламінат кольоровий, кромка, ширина кромки | sync/fix overlays & colored sheets | 2026-10-02 |
 | L-formats | [logs/formats.md](logs/formats.md) | формат, format, BOM_FORMAT, docs/formats | юзер каже «файл з форматом» / reuse format | 2026-10-02 |
+| L-1021 | [logs/2026-10-21-links-3-import.md](logs/2026-10-21-links-3-import.md) | links-3, import, PTAL, temp batches, sofa-batch-prep | пакетні імпорти диванів / temp/batches | 2026-10-21 |
 
 **Session end:** prepend matching log; update row here.

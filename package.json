@@ -37,7 +37,9 @@
     "migrate-apply": "ts-node src/tools/migrate-apply.ts",
     "pull-hackmd": "ts-node src/index.ts pull-hackmd",
     "push-hackmd": "ts-node src/index.ts push-hackmd",
-    "batch-format": "ts-node src/index.ts batch-format"
+    "batch-format": "ts-node src/index.ts batch-format",
+    "estimate-import": "ts-node src/index.ts estimate-import",
+    "sofa-batch-prep": "ts-node src/index.ts sofa-batch-prep"
   },
   "keywords": [],
   "author": "",

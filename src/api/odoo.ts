@@ -1,6 +1,8 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv';
+import * as path from 'path';
 
+dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 dotenv.config();
 
 const ODOO_URL = process.env.ODOO_URL!;

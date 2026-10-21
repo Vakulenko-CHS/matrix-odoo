@@ -2,6 +2,7 @@ import { searchRead, write, create, createMany, unlink, executeKw } from '../../
 import { getOrCreateWorkcenter } from '../../bom/product';
 import { ensureVariantFromAttrs, preSeedAttributeLines, clearVariantDisplayCache } from './resolver';
 import { expandEntry } from './expander';
+import { ensureVariantLimit } from './variantLimit';
 import { track, resetSession, saveSession } from '../../state/tracker';
 import type { BomEntry } from '../docToJson/types';
 import { convertFilmQty } from '../../validator/filmUom';
@@ -21,24 +22,6 @@ function uomStrToId(uom: string): number {
 
 function sec(start: number): string {
   return `${((Date.now() - start) / 1000).toFixed(2)}s`;
-}
-
-async function ensureVariantLimit(minLimit = 10000): Promise<void> {
-  const [existing] = await searchRead<{ id: number; value: string }>(
-    'ir.config_parameter',
-    [['key', '=', 'product.dynamic_variant_limit']],
-    ['id', 'value'], 1
-  );
-  if (existing) {
-    const current = parseInt(existing.value, 10);
-    if (current < minLimit) {
-      await write('ir.config_parameter', [existing.id], { value: String(minLimit) });
-      console.log(`[config] product.dynamic_variant_limit: ${current} → ${minLimit}`);
-    }
-  } else {
-    await create('ir.config_parameter', { key: 'product.dynamic_variant_limit', value: String(minLimit) });
-    console.log(`[config] product.dynamic_variant_limit = ${minLimit}`);
-  }
 }
 
 async function deleteWrongBoms(code: string): Promise<void> {

@@ -1,6 +1,7 @@
 import { create, searchRead, write } from "../../../api/odoo";
 import { findTemplate, getOrCreateWorkcenter } from "../../../bom/product";
 import { ensureVariantFromAttrs, preSeedAttributeLines } from "../resolver";
+import { ensureVariantLimit } from "../variantLimit";
 import { expandEntry } from "../expander";
 import { preSeedPtavCache, getPtavId } from "./ptav";
 import { track, resetSession, saveSession } from "../../../state/tracker";
@@ -508,7 +509,7 @@ function cleanOpName(name: string): string {
  * each model-specific semi-finished product becomes its own unique template,
  * exactly like the чохол templates in цехи 7–8.
  */
-function applyModelTransform(entries: BomEntry[]): BomEntry[] {
+export function applyModelTransform(entries: BomEntry[]): BomEntry[] {
   const filterAttrs = (attrs: AttributeVal[]): AttributeVal[] =>
     attrs.filter(
       (a) => a.attributeName !== "Модель" && !a.attributeName.includes("❌"),
@@ -843,6 +844,7 @@ export async function importAllTemplateBoms(
   const totalStart = Date.now();
 
   await loadRoutes();
+  await ensureVariantLimit(10000);
 
   // Step 1: embed "Модель" in template name, strip ❌ attrs for all model-based entries
   const transformedBoms = applyModelTransform(boms);
