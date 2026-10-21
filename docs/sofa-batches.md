@@ -31,7 +31,7 @@ npm run sofa-batch-prep -- temp/batches/links-4/batch.tsv temp/batches/links-4/d
 
 ## links-4
 
-`docs/batches/links-4.tsv` — Хілтон ×3, Бонд-К.
+`docs/batches/links-4.tsv` — Хілтон ×3, Бонд-К. Імпорт **4/4 OK** (2026-10-21); лог: `temp/batches/links-4/reports/import-2026-10-21T12-04-22.log`.
 
 Робоча зона (gitignored):
 
