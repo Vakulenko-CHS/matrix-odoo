@@ -33,4 +33,14 @@ npm run sofa-batch-prep -- temp/batches/links-4/batch.tsv temp/batches/links-4/d
 
 `docs/batches/links-4.tsv` — Хілтон ×3, Бонд-К.
 
+Робоча зона (gitignored):
+
+```text
+temp/batches/links-4/
+  batch.tsv, links-4.tsv   # копія з docs/batches/links-4.tsv
+  docs/                    # sofa-batch-prep; Бонд-К → з docs/docs_first-fixed
+  reports/                 # import-*.log, manifest
+  run-import.sh
+```
+
 Див. також [`docs/README.md`](README.md), [`exports/README.md`](../exports/README.md).
