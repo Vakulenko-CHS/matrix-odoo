@@ -3,7 +3,7 @@
 Session notes → [logs/](logs/). Keep this file slim.  
 Start: [.ai/INDEX.md](./INDEX.md) → **this file**. Open logs only when **Log index** matches.
 
-Last updated: **2026-10-22** (enable is_storable / Облік запасів)
+Last updated: **2026-10-22** (deleted archived warehouses; only MATRIX left)
 
 ---
 
