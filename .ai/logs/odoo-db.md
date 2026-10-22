@@ -2,6 +2,14 @@
 
 ## Entries (newest first)
 
+### 2026-10-22 — enable Облік запасів (is_storable)
+
+- **Agent / human:** agent
+- **Summary:** Turned on `is_storable` for all goods (`type=consu`) templates. 904 off → on; 24 already on. Left 3 services off.
+- **Files:** `src/commands/enableStorable.ts`, `package.json` (`npm run enable-storable`)
+- **Git:** not committed
+- **Notes:** Dry-run default; `--apply` writes in batches of 80.
+
 ### 2026-10-12 — furniture + Lili BOM lamels
 
 - **Summary:** Created tmpl **1307** Куток великий чорний, **1308** Ламель 585, **1309** Ламель 735 (cat Сировина / Фурнітура). Added 8×735 + 8×585 to `tmpl::Диван Лілі Механізм` BOM (Ц9). Snapshot `pre-furniture-kutok-lameli-2026-10-12`.

@@ -3,7 +3,7 @@
 Session notes → [logs/](logs/). Keep this file slim.  
 Start: [.ai/INDEX.md](./INDEX.md) → **this file**. Open logs only when **Log index** matches.
 
-Last updated: **2026-10-21** (no-category canon apply)
+Last updated: **2026-10-22** (enable is_storable / Облік запасів)
 
 ---
 
@@ -59,6 +59,7 @@ UOM: `m²` id=10, `m` id=8.
 
 ## What is done (recent)
 
+- Облік запасів (`is_storable`) on all goods templates (`npm run enable-storable`).
 - Name-canon migration phases 1–6 (+ pillow archive).
 - White laminate sheet BOM sync (`sync-laminate-sheet-boms`).
 - Nakladky + colored sheet reshape/sync (`sync-nakladky`) 2026-10-02.
@@ -93,7 +94,7 @@ UOM: `m²` id=10, `m` id=8.
 
 | ID | File | Topics | Read when | Updated |
 |----|------|--------|-----------|---------|
-| L-odoo | [logs/odoo-db.md](logs/odoo-db.md) | odoo, ids, attr, workcenter, uom, api | будь-яка робота з живою базою / IDs | 2026-10-12 |
+| L-odoo | [logs/odoo-db.md](logs/odoo-db.md) | odoo, ids, attr, workcenter, uom, api, is_storable | будь-яка робота з живою базою / IDs | 2026-10-22 |
 | L-nakladky | [logs/nakladky.md](logs/nakladky.md) | накладки, nakladky, ламінат кольоровий, кромка, ширина кромки | sync/fix overlays & colored sheets | 2026-10-02 |
 | L-formats | [logs/formats.md](logs/formats.md) | формат, format, BOM_FORMAT, docs/formats | юзер каже «файл з форматом» / reuse format | 2026-10-02 |
 | L-1021 | [logs/2026-10-21-links-3-import.md](logs/2026-10-21-links-3-import.md) | links-3, import, PTAL, temp batches, sofa-batch-prep | пакетні імпорти диванів / temp/batches | 2026-10-21 |
