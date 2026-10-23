@@ -2,6 +2,20 @@
 
 ## Entries (newest first)
 
+### 2026-10-23 — import is_storable + raw Buy (UNTESTED)
+
+- **Agent / human:** agent
+- **Summary:** Import sets `is_storable` on goods create/post-pass. After types+categories, Сировина + `purchase_ok` get WH/Stock orderpoint route Придбати, min/max 0/0. Marked TEST/UNTESTED — verify on first sofa import.
+- **Files:** `src/tools/importJson/stockAndBuy.ts`, resolver, template-bom/batch/old importers, `ensureRawBuyOrderpoints.ts`
+- **Git:** this commit
+
+### 2026-10-23 — Сировина Buy orderpoints
+
+- **Agent / human:** agent
+- **Summary:** Сировина storable **341** (232 active + 109 archived) WH/Stock orderpoint min/max **0/0**, trigger auto, route **Придбати** (54). `purchase_ok` on `[Поролон]` + `Опора ролик Н32`. Dropped MTO from `[ДВП]`, `[ДСП]`, `[ДВП дно]`, `[Поролон]` (Buy rule is MTS; MTO could not match). Left Тканина Рене 20 at 50/50.
+- **Files:** `src/commands/ensureRawBuyOrderpoints.ts`, `package.json` `ensure-raw-buy`
+- **Git:** not committed
+
 ### 2026-10-23 — merge lowercase Цех №4-* збірка workcenters
 
 - **Agent / human:** agent

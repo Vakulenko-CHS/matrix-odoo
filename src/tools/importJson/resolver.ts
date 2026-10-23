@@ -90,6 +90,8 @@ export async function preSeedAttributeLines(entries: BomEntry[]): Promise<void> 
       templateId = await create('product.template', {
         name: templateName,
         type: isService ? 'service' : await getStorableType(),
+        // TEST / UNTESTED: Odoo 19 «Облік запасів» = is_storable, not type=product.
+        ...(isService ? {} : { is_storable: true }),
         uom_id: 1,
         ...(isComponent ? { sale_ok: false } : {}),
       });
@@ -204,6 +206,8 @@ export async function ensureVariantFromAttrs(
     templateId = await create('product.template', {
       name: templateName,
       type: isService ? 'service' : await getStorableType(),
+      // TEST / UNTESTED: Odoo 19 «Облік запасів» = is_storable, not type=product.
+      ...(isService ? {} : { is_storable: true }),
       uom_id: 1,
       ...(isComponent ? { sale_ok: false } : {}),
     });

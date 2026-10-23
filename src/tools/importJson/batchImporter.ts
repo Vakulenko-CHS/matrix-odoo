@@ -6,6 +6,7 @@ import { ensureVariantLimit } from './variantLimit';
 import { track, resetSession, saveSession } from '../../state/tracker';
 import type { BomEntry } from '../docToJson/types';
 import { convertFilmQty } from '../../validator/filmUom';
+import { afterImportStockAndBuy } from './stockAndBuy';
 
 const UOM_MAP: Record<string, number> = {
   'шт': 1, 'шт.': 1, 'm': 8, 'm²': 10, 'г': 14, 'g': 14, 'кг': 15, 'm³': 30,
@@ -283,6 +284,8 @@ export async function batchImportAllBoms(boms: BomEntry[], label?: string): Prom
 
   if (toCreate.length === 0) {
     console.log(`\n[batch] Нічого нового для створення.`);
+    // TEST / UNTESTED: is_storable + Сировина Buy orderpoints. Verify on first import.
+    await afterImportStockAndBuy(boms);
     printSummary(phases, 0, existedCount, skippedCount, totalStart);
     return;
   }
@@ -338,6 +341,9 @@ export async function batchImportAllBoms(boms: BomEntry[], label?: string): Prom
   const createdLineIds = await createLinesBatch(lineGroups);
   track.bomLines(createdLineIds);
   phase(`Створення ${createdLineIds.length} рядків BOM`, t);
+
+  // TEST / UNTESTED: is_storable + Сировина Buy orderpoints. Verify on first import.
+  await afterImportStockAndBuy(boms);
 
   // ── Summary ───────────────────────────────────────────────────────────────
   saveSession(label);

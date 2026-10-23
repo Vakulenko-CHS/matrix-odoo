@@ -11,6 +11,7 @@ import type {
   ComponentEntry,
 } from "../../docToJson/types";
 import { convertFilmQty } from "../../../validator/filmUom";
+import { afterImportStockAndBuy } from "../stockAndBuy";
 
 const UOM_MAP: Record<string, number> = {
   шт: 1,
@@ -997,6 +998,9 @@ export async function importAllTemplateBoms(
 
   // Assign product.category for raw material components and any remaining templates
   await applyProductCategories(transformedBoms);
+
+  // TEST / UNTESTED: is_storable + Сировина Buy orderpoints 0/0. Verify on first import.
+  await afterImportStockAndBuy(transformedBoms);
 
   saveSession(label);
   const totalSec = ((Date.now() - totalStart) / 1000).toFixed(2);

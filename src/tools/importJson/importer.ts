@@ -14,6 +14,7 @@ import { ensureVariantLimit } from './variantLimit';
 import { expandEntry } from './expander';
 import type { BomEntry } from '../docToJson/types';
 import { convertFilmQty } from '../../validator/filmUom';
+import { afterImportStockAndBuy } from './stockAndBuy';
 
 const UOM_MAP: Record<string, number> = {
   'шт': 1,
@@ -191,6 +192,9 @@ export async function importAllBoms(boms: BomEntry[], label?: string): Promise<v
     console.log(`  [час] Загалом: ${sec(entryStart)}`);
     cехStats.push({ name: entry.product.variantDisplayName, elapsed, created: eCr, existed: eEx, skipped: eSk, errors: eEr });
   }
+
+  // TEST / UNTESTED: is_storable + Сировина Buy orderpoints 0/0. Verify on first import.
+  await afterImportStockAndBuy(boms);
 
   saveSession(label);
   const LINE = '='.repeat(60);

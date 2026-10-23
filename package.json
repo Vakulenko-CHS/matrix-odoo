@@ -29,6 +29,7 @@
     "fix-product-types": "ts-node src/commands/fixProductTypes.ts",
     "enable-storable": "ts-node src/commands/enableStorable.ts",
     "ensure-wh-stock": "ts-node src/commands/ensureWhStockQuants.ts",
+    "ensure-raw-buy": "ts-node src/commands/ensureRawBuyOrderpoints.ts",
     "diagnose-mo": "ts-node src/tools/diagnose-mo.ts",
     "find-no-category": "ts-node src/tools/find-no-category.ts",
     "sync-base": "ts-node src/tools/sync-base.ts",
