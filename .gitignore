@@ -7,4 +7,4 @@ dist
 /dist
 /temp
 docs/archive/check-all-out/
-state/snapshots/**/snapshot.json
+state/snapshots/*/snapshot.json
