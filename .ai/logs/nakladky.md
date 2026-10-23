@@ -2,6 +2,13 @@
 
 ## Entries (newest first)
 
+### 2026-10-23 — merge size-in-name colored sheets
+
+- **Agent / human:** agent
+- **Summary:** 23 split `🧩[Ламінат кольоровий - лист] {size}` tmpls remapped into tmpl **214** variants (size×color), then archived. BOM lines + explode colorless tmpl-BOM by overlay color PTAV. `purchase_ok=false` on 214. Import keyword: skip 🧩🪤🪵 as Сировина; Упаковка → `Сировина / Упаковка`.
+- **Files:** `src/commands/mergeColoredSheetSplits.ts`, `src/tools/importJson/template-bom/importer.ts`
+- **Git:** not committed
+
 ### 2026-10-02 — sync-nakladky apply
 
 - **Agent / human:** agent

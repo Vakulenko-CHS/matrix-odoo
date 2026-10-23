@@ -2,6 +2,13 @@
 
 ## Entries (newest first)
 
+### 2026-10-23 — sale/buy by category + Елегант БН import
+
+- **Agent / human:** agent
+- **Summary:** Rule: Сировина (+Упаковка) buy; Готова продукція sale; Цех mfg-only. Flags now **0** mismatches. Reverted tmpl **18** categ after import keyword false-positive. Imported HackMD `JPv5D217QGOL4Q49dGqbbA` → Диван Елегант БН (BOMs existed, types/cats applied). Leftover `…Д.Елегант БН/ПБ` каркас tmpls still in 4-2, flags mfg-only.
+- **Files:** live Odoo + `mergeColoredSheetSplits.ts`
+- **Git:** committed with merge command + import fixes
+
 ### 2026-10-23 — import is_storable + raw Buy (UNTESTED)
 
 - **Agent / human:** agent

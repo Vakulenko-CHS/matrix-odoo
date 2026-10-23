@@ -3,7 +3,7 @@
 Session notes → [logs/](logs/). Keep this file slim.  
 Start: [.ai/INDEX.md](./INDEX.md) → **this file**. Open logs only when **Log index** matches.
 
-Last updated: **2026-10-23** (import: is_storable + raw Buy orderpoints, UNTESTED)
+Last updated: **2026-10-23** (sale/buy flags; merge colored sheets; Елегант БН)
 
 ---
 
@@ -95,7 +95,7 @@ UOM: `m²` id=10, `m` id=8.
 | ID | File | Topics | Read when | Updated |
 |----|------|--------|-----------|---------|
 | L-odoo | [logs/odoo-db.md](logs/odoo-db.md) | odoo, ids, attr, workcenter, uom, api, is_storable, orderpoint, buy | будь-яка робота з живою базою / IDs | 2026-10-23 |
-| L-nakladky | [logs/nakladky.md](logs/nakladky.md) | накладки, nakladky, ламінат кольоровий, кромка, ширина кромки | sync/fix overlays & colored sheets | 2026-10-02 |
+| L-nakladky | [logs/nakladky.md](logs/nakladky.md) | накладки, nakladky, ламінат кольоровий, кромка, ширина кромки | sync/fix overlays & colored sheets | 2026-10-23 |
 | L-formats | [logs/formats.md](logs/formats.md) | формат, format, BOM_FORMAT, docs/formats | юзер каже «файл з форматом» / reuse format | 2026-10-02 |
 | L-1021 | [logs/2026-10-21-links-3-import.md](logs/2026-10-21-links-3-import.md) | links-3, import, PTAL, temp batches, sofa-batch-prep | пакетні імпорти диванів / temp/batches | 2026-10-21 |
 | L-1021b | [logs/2026-10-21-no-category-canon.md](logs/2026-10-21-no-category-canon.md) | no-category, categ_id, right_names, Липучка, МДФ | товари без категорії / rename в Odoo | 2026-10-21 |

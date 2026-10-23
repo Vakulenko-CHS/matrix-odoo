@@ -192,9 +192,9 @@ async function applyProductTypes(boms: BomEntry[]): Promise<void> {
 const RAW_MATERIAL_CATEGORY: Array<
   [keyword: string, categoryCompleteName: string]
 > = [
-  ["Скотч", "Упаковка"],
-  ["Плівка", "Упаковка"],
-  ["Картон", "Упаковка"],
+  ["Скотч", "Сировина / Упаковка"],
+  ["Плівка", "Сировина / Упаковка"],
+  ["Картон", "Сировина / Упаковка"],
 
   ["ДВП", "Сировина / Дерево"],
   ["ДСП", "Сировина / Дерево"],
@@ -239,7 +239,10 @@ function extractCehToken(text: string): string | null {
 }
 
 function classifyRawByKeyword(name: string): string | null {
-  const lower = name.toLocaleLowerCase("uk");
+  const t = name.trim();
+  // Semi-finished prefixes: never treat as Сировина even if name contains «Ламінат».
+  if (/^[🧩🪤🪵]/.test(t)) return null;
+  const lower = t.toLocaleLowerCase("uk");
   for (const [kw, catName] of RAW_MATERIAL_CATEGORY) {
     if (lower.includes(kw.toLocaleLowerCase("uk"))) return catName;
   }
