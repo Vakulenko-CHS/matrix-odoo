@@ -21,28 +21,28 @@
 - **Agent / human:** agent
 - **Summary:** Applied inventory **10000** (product UOM) on WH/Stock for **236** Сировина variants. Absolute set (e.g. ДСП 20028→10000).
 - **Files:** `src/commands/setRawInventory.ts --apply`
-- **Git:** not committed
+- **Git:** this commit
 
 ### 2026-10-22 — hide Сировина on MO product picker
 
 - **Agent / human:** agent
 - **Summary:** ir.ui.view **3843** inherit mrp.production form: `product_id` domain excludes categ **5** Сировина (+ children). Components unchanged.
 - **Files:** `src/commands/hideRawOnMoPicker.ts --apply`
-- **Git:** not committed
+- **Git:** this commit
 
 ### 2026-10-22 — delete empty WH/С* WH/П* locations
 
 - **Agent / human:** agent
 - **Summary:** Removed custom shop locations. Empty П* unlinked. С* + П6П had move history — retargeted to WH/Stock then SQL-deleted (`stock.location.unlink` only archives). Kept Stock/Input/QC/Output/Packing (+ archived Pre/Post-Production).
 - **Files:** `src/commands/deleteEmptyShopLocations.ts --apply`
-- **Git:** not committed
+- **Git:** this commit
 
 ### 2026-10-22 — consolidate shop WH qty into WH/Stock
 
 - **Agent / human:** agent
 - **Summary:** Internal pickings WH/INT/00002–00008 moved 32 quants from П6П/С1–С6 into **WH/Stock**. Left **Output** and **Packing Zone**. Shop locs leftover nonzero = 0.
 - **Files:** `src/commands/moveShopStockToWhStock.ts --apply`
-- **Git:** not committed
+- **Git:** this commit
 
 ### 2026-10-22 — delete archived warehouses
 
