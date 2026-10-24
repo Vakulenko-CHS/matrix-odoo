@@ -130,3 +130,16 @@ export function chainBracketFromMessage(message: string): string | null {
     null
   );
 }
+
+/**
+ * Bracket subject from any message:
+ * - CHAIN: `(🧩[Name])` in parens.
+ * - BREAK/FIX/etc.: `🧩[Name]:` after a `[TAG]` prefix, before the first `:`.
+ */
+export function bracketFromMessage(message: string): string | null {
+  const chain = chainBracketFromMessage(message);
+  if (chain) return chain;
+  const stripped = message.replace(/^\[[A-Z-]+\]\s*/u, "");
+  const head = stripped.split(":", 1)[0];
+  return head.match(/([🪵🧩🪤🧽]*\[[^\]]+\])/u)?.[1] ?? null;
+}

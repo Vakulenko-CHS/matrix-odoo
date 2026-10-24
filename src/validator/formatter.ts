@@ -134,11 +134,14 @@ function fixAttributeSpaces(line: string): string {
 
 function fixAttributeCapitalization(line: string): string {
   return line.replace(/\(([^)]+)\)/g, (_match, inner) => {
-    // Capitalize first letter of each standalone Cyrillic word (2+ chars, not mid-word)
-    // Negative lookbehind prevents capitalizing suffixes like "ех" in "Цех" or "ерадо" in "Верадо"
+    // Capitalize first letter of each standalone Cyrillic word (2+ chars, not mid-word).
+    // Preserve %...% placeholders — attribute names are case-sensitive.
     const fixed = inner.replace(
-      /(?<![А-ЯҐЄІЇЁа-яґєіїё])[а-яґєіїє]{2,}/g,
-      (word: string) => word.charAt(0).toUpperCase() + word.slice(1),
+      /%[^%]+%|(?<![А-ЯҐЄІЇЁа-яґєіїё])[а-яґєіїє]{2,}/g,
+      (match: string) =>
+        match.startsWith("%")
+          ? match
+          : match.charAt(0).toUpperCase() + match.slice(1),
     );
     return `(${fixed})`;
   });

@@ -12,7 +12,7 @@ import { applyCanonRewrites, lintSpec, type QuickFix } from "./lint";
 import { formatCharDiff, issueFixDiffs } from "./lineDiff";
 import { parseKnownCatalog } from "./checker";
 import {
-  chainBracketFromMessage,
+  bracketFromMessage,
   lineMentionsChainSubject,
 } from "./docProduct";
 
@@ -84,7 +84,7 @@ function lineFromSnippet(content: string, message: string): number | null {
     .map((m) => m[1])
     .filter((q) => !/Готова продукція/i.test(q));
   const isChain = /^\[CHAIN-/i.test(message);
-  const bracketType = isChain ? chainBracketFromMessage(message) : null;
+  const bracketType = bracketFromMessage(message);
   // CHAIN-*: first quoted id is the subject — prefer it over longer consumers.
   const quotes = isChain
     ? quoteMatches
@@ -93,7 +93,7 @@ function lineFromSnippet(content: string, message: string): number | null {
     const idx = lines.findIndex(
       (l, i) =>
         i >= from &&
-        (isChain
+        (bracketType
           ? lineMentionsChainSubject(l, q, bracketType)
           : l.includes(q)),
     );

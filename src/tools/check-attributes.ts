@@ -115,7 +115,7 @@ function parseAttributeRules(content: string): Attribute[] {
   if (!instrMatch) return attrs;
 
   const instrBlock = instrMatch[1];
-  const workshopRe = /Впливає на цехи:\s*\(([^)]+)\)/u;
+  const workshopRe = /Впливає на цех(?:и)?:\s*\(([^)]+)\)/u;
   const entries = instrBlock.split(/(?=^\d+\.\s+%)/mu).filter((e) => e.trim());
   for (const entry of entries) {
     const nameMatch = /^\d+\.\s+%([^%]+)%/u.exec(entry);
@@ -368,11 +368,15 @@ function requiredTokensFor(
 ): string[] {
   const required = requiredAttrsFor(workshopNum, outputLine, allAttrs);
   const isWorkshop9 = workshopNum === "9";
-  return isWorkshop9
-    ? required.filter((a) => a.active).map((a) => a.paramName)
-    : required.map((a) =>
-        a.active ? a.paramName : a.paramName.replace(/%$/, "❌%"),
-      );
+  return required
+    .filter((a) => {
+      if (a.active) return true;
+      // Inactive: Цех 9 skips all; non-hardcoded attrs (from ## Інструкції)
+      // skip entirely instead of emitting %Attr❌%.
+      if (isWorkshop9) return false;
+      return a.paramName in ATTR_WORKSHOP_MAP;
+    })
+    .map((a) => (a.active ? a.paramName : a.paramName.replace(/%$/, "❌%")));
 }
 
 // ─── Step 5: Main verification and fix ────────────────────────────────────

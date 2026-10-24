@@ -15,7 +15,7 @@ import { inferFixes } from "../../src/validator/inferFixes";
 import { lintSpec, type QuickFix } from "./lint";
 import { parseKnownCatalog } from "../../src/validator/checker";
 import {
-  chainBracketFromMessage,
+  bracketFromMessage,
   lineMentionsChainSubject,
 } from "../../src/validator/docProduct";
 
@@ -80,7 +80,7 @@ function lineFromSnippet(content: string, message: string): number | null {
     .map((m) => m[1])
     .filter((q) => !/Готова продукція/i.test(q));
   const isChain = /^\[CHAIN-/i.test(message);
-  const bracketType = isChain ? chainBracketFromMessage(message) : null;
+  const bracketType = bracketFromMessage(message);
   const quotes = isChain
     ? quoteMatches
     : [...quoteMatches].sort((a, b) => b.length - a.length);
@@ -95,7 +95,7 @@ function lineFromSnippet(content: string, message: string): number | null {
     const idx = lines.findIndex(
       (l, i) =>
         i >= from &&
-        (isChain
+        (bracketType
           ? lineMentionsChainSubject(l, q, bracketType)
           : l.includes(q)),
     );

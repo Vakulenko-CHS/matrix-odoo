@@ -162,6 +162,7 @@ const TYPOS: Array<{ re: RegExp; correct: string }> = [
   { re: /холофайдер/gi, correct: "Холлофайбер" },
   { re: /крошка ппу/gi, correct: "Крихта ППУ" },
   { re: /cинтепон/gi, correct: "Синтепон" },
+  { re: /бортік/gi, correct: "Бортик" },
 ];
 
 const QTY_ONLY_RE = /^-\s*([\d.,]*)\s*(шт\.?|кг|m³|m²|m|г)?\s*$/iu;
@@ -372,7 +373,33 @@ export function lintSpec(
     }
 
     let furnitureHit = false;
-    if (furnIndex && furnIndex.size > 0) {
+
+    // Typo check runs FIRST — a specific «Бортік→Бортик» fix shouldn't be
+    // shadowed by a generic «Нова фурнітура» warning on the same line.
+    for (const typo of TYPOS) {
+      typo.re.lastIndex = 0;
+      if (!typo.re.test(line)) continue;
+      typo.re.lastIndex = 0;
+      hits.push({
+        kind: "error",
+        source: "lint",
+        line: n,
+        message: `Орфографія: має бути «${typo.correct}»`,
+        original: t,
+        fixes: [
+          {
+            id: `spell-${seq++}`,
+            label: `Замінити на «${typo.correct}»`,
+            action: "replace-line",
+            line: n,
+            replacement: line.replace(typo.re, typo.correct),
+          },
+        ],
+      });
+      furnitureHit = true; // suppress furniture/canon follow-up on same line
+    }
+
+    if (!furnitureHit && furnIndex && furnIndex.size > 0) {
       const head = lineFurnitureHead(t);
       const qtyHead = componentHead(t);
       const allowFuzzy =
@@ -473,27 +500,6 @@ export function lintSpec(
       }
     }
 
-    if (!furnitureHit) for (const typo of TYPOS) {
-      typo.re.lastIndex = 0;
-      if (!typo.re.test(line)) continue;
-      typo.re.lastIndex = 0;
-      hits.push({
-        kind: "error",
-        source: "lint",
-        line: n,
-        message: `Орфографія: має бути «${typo.correct}»`,
-        original: t,
-        fixes: [
-          {
-            id: `spell-${seq++}`,
-            label: `Замінити на «${typo.correct}»`,
-            action: "replace-line",
-            line: n,
-            replacement: line.replace(typo.re, typo.correct),
-          },
-        ],
-      });
-    }
 
     if (ZERO_QTY_RE.test(t) || /-\s*0\s*шт/i.test(t)) {
       hits.push({

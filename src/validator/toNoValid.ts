@@ -137,15 +137,30 @@ const CATALOG_NAMES = new Set(ATTR_CATALOG.map((a) => a.name));
 const QUOTED_FLAG_RE = /"([^"]+)",?\s*(✅|❌)/gu;
 const QUOTED_FLAG_LINE_RE = /^\s*"[^"]+",?\s*(?:✅|❌)/u;
 
-function parseQuotedFlags(content: string): Record<string, boolean> | null {
+interface QuotedResult {
+  flags: Record<string, boolean>;
+  extras: string[];
+}
+
+function parseQuotedFlags(content: string): QuotedResult | null {
   const flags: Record<string, boolean> = {};
+  const extras: string[] = [];
   const re = new RegExp(QUOTED_FLAG_RE.source, "gu");
   let m: RegExpExecArray | null;
   while ((m = re.exec(content)) !== null) {
-    if (!CATALOG_NAMES.has(m[1])) continue;
-    flags[m[1]] = m[2] === "✅";
+    const name = m[1];
+    flags[name] = m[2] === "✅";
+    if (!CATALOG_NAMES.has(name) && !extras.includes(name)) {
+      extras.push(name);
+    }
   }
-  return Object.keys(flags).length ? flags : null;
+  return Object.keys(flags).length ? { flags, extras } : null;
+}
+
+function extractInstructions(head: string): string | null {
+  const idx = head.search(/^##\s*Інструкції/mu);
+  if (idx < 0) return null;
+  return head.slice(idx).trimEnd();
 }
 
 function escapeRegExp(value: string): string {
@@ -190,11 +205,15 @@ function inferFlags(notes: string, body: string): Record<string, boolean> {
   return flags;
 }
 
-function renderAttrList(flags: Record<string, boolean>): string {
-  const lines = ATTR_CATALOG.map((attr, i) => {
-    const mark = flags[attr.name] ? "✅" : "❌";
-    const comma = i === ATTR_CATALOG.length - 1 ? "" : ",";
-    return `"${attr.name}"${comma} ${mark}`;
+function renderAttrList(
+  flags: Record<string, boolean>,
+  extras: string[] = [],
+): string {
+  const names = [...ATTR_CATALOG.map((a) => a.name), ...extras];
+  const lines = names.map((name, i) => {
+    const mark = flags[name] ? "✅" : "❌";
+    const comma = i === names.length - 1 ? "" : ",";
+    return `"${name}"${comma} ${mark}`;
   });
   return `# СПИСОК АТРИБУТІВ Готового Дивану:\n\n${lines.join("\n")}`;
 }
@@ -276,13 +295,16 @@ export function toNoValidContent(raw: string): ToNoValidResult {
     changes.push("прибрано шаблон «Синтаксис:»");
   }
 
-  const quotedFlags = parseQuotedFlags(text);
+  const quotedResult = parseQuotedFlags(text);
+  const quotedFlags = quotedResult?.flags ?? null;
+  const extraAttrs = quotedResult?.extras ?? [];
   const argFlags = quotedFlags ? null : parseFlagsFromArgs(text);
   const hasInstructions = /##\s*Інструкції/u.test(text);
   const { head, body } = splitHeadBody(text);
   const title = extractTitle(head);
   const notes = extractNotes(head);
   const flags = quotedFlags ?? argFlags ?? inferFlags(notes, body);
+  const userInstructions = hasInstructions ? extractInstructions(head) : null;
 
   if (!quotedFlags && argFlags) {
     changes.push("згенеровано «# СПИСОК АТРИБУТІВ» з %аргументів% специфікації");
@@ -294,9 +316,9 @@ export function toNoValidContent(raw: string): ToNoValidResult {
   const header = [
     title,
     "",
-    renderAttrList(flags),
+    renderAttrList(flags, extraAttrs),
     "",
-    INSTRUCTIONS_BLOCK,
+    userInstructions ?? INSTRUCTIONS_BLOCK,
     "",
     tidyBody(body),
   ]

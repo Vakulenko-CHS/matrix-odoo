@@ -167,9 +167,10 @@ export function runBomCheck(
 
     // "---" горизонтальна лінія — роздільник між паралельними групами продуктів
     // (наприклад, Д.Леон-Люкс Механізм і 143П в одному цеху).
-    // Це НЕ "або" (альтернатива), але скидає стан блоку щоб не спрацьовував
-    // хибний [BREAK] "відсутнє або" між умовними блоками різних моделей.
-    if (t === "---" || t === "і") {
+    // "і", "і може бути" — опційний додаток/варіант, НЕ строгий "або",
+    // але також скидає стан блоку, щоб не було хибного [BREAK] між
+    // двома умовними output-рядками того самого bracket.
+    if (t === "---" || /^і(?:\s+може\s+бути)?$/iu.test(t)) {
       flushBlock();
       resetBlock();
       seenAbo = true;
@@ -182,7 +183,7 @@ export function runBomCheck(
 
       // Flag missing "або" only when at least one of the two consecutive blocks is conditional
       if (blockOutputLine >= 0 && !seenAbo && (blockIsConditional || isConditional)) {
-        const msg = `[BREAK] ${section}: відсутнє "або" перед "${t}"`;
+        const msg = `[BREAK] рядок ${i + 1}: ${section}: відсутнє "або" перед цим рядком — "${t}"`;
         console.log(`  ${msg}`);
         issues.push(msg);
         // Insert TODO so the user sees the reason in the file
