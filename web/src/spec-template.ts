@@ -1,5 +1,5 @@
 /**
- * Canonical sofa spec from 73 docs (docs_first-fixed + docs_fixed/good).
+ * Canonical sofa spec from docs/docs_first-fixed.
  *
  * Always the same 6 attributes. Title carries only ✅.
  * Empty `# Цех` (no product): parseDoc/import emit no BOM. Omit the live header.

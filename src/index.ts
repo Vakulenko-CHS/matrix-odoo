@@ -56,9 +56,27 @@ async function main() {
       break;
     }
 
+    case "push-hackmd": {
+      const { runPushHackmd } = await import("./tools/push-hackmd");
+      await runPushHackmd(args);
+      break;
+    }
+
     case "batch-format": {
       const { runBatchFormat } = await import("./commands/batchFormat");
       await runBatchFormat(args);
+      break;
+    }
+
+    case "estimate-import": {
+      const { runEstimateImport } = await import("./tools/template-bom-estimate");
+      await runEstimateImport(args);
+      break;
+    }
+
+    case "sofa-batch-prep": {
+      const { runSofaBatchPrep } = await import("./tools/sofa-batch-prep");
+      await runSofaBatchPrep(args);
       break;
     }
 

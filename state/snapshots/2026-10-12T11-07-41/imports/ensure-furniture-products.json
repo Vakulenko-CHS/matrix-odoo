@@ -1,0 +1,17 @@
+{
+  "snapshotTimestamp": "2026-10-12T11-07-41",
+  "label": "ensure-furniture-products",
+  "createdAt": "2026-10-12T11:08:25.935Z",
+  "ids": {
+    "productTemplates": [
+      1309
+    ],
+    "productVariants": [],
+    "productAttributes": [],
+    "productAttributeValues": [],
+    "boms": [],
+    "bomLines": [],
+    "bomOperations": [],
+    "workcenters": []
+  }
+}

@@ -133,16 +133,20 @@ function fixAttributeSpaces(line: string): string {
 }
 
 function fixAttributeCapitalization(line: string): string {
-  return line.replace(/\(([^)]+)\)/g, (_match, inner) => {
-    // Capitalize first letter of each standalone Cyrillic word (2+ chars, not mid-word).
-    // Preserve %...% placeholders — attribute names are case-sensitive.
-    const fixed = inner.replace(
-      /%[^%]+%|(?<![А-ЯҐЄІЇЁа-яґєіїё])[а-яґєіїє]{2,}/g,
-      (match: string) =>
-        match.startsWith("%")
-          ? match
-          : match.charAt(0).toUpperCase() + match.slice(1),
+  const capWords = (segment: string) =>
+    segment.replace(
+      /(?<![А-ЯҐЄІЇЁа-яґєіїё])[а-яґєіїє]{2,}/g,
+      (word: string) => word.charAt(0).toUpperCase() + word.slice(1),
     );
+
+  return line.replace(/\(([^)]+)\)/g, (_match, inner) => {
+    // Do not alter %Attr% placeholders — names must match СПИСОК АТРИБУТІВ
+    const fixed = inner
+      .split(/(%[^%]+%)/g)
+      .map((part: string) =>
+        part.startsWith("%") && part.endsWith("%") ? part : capWords(part),
+      )
+      .join("");
     return `(${fixed})`;
   });
 }
@@ -155,13 +159,29 @@ function fixMcNeo(line: string): string {
   return line.replace(/М Ч /g, "М.Ч.");
 }
 
+function replacePreserveCase(text: string, wrong: string, correct: string): string {
+  const escaped = wrong.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return text.replace(new RegExp(escaped, "gi"), (match) => {
+    if (match[0] !== match[0].toLocaleLowerCase("uk")) {
+      return correct.charAt(0).toLocaleUpperCase("uk") + correct.slice(1);
+    }
+    return correct;
+  });
+}
+
 function fixMaterialNames(line: string): string {
   let result = line;
   for (const [wrong, correct] of Object.entries(MATERIAL_FIXES)) {
-    const re = new RegExp(wrong, "gi");
-    result = result.replace(re, correct);
+    result = replacePreserveCase(result, wrong, correct);
   }
   return result;
+}
+
+/** Workshop titles use Збірка (Odoo WC), not lowercase збірка. */
+function fixWorkshopZbirkaCase(line: string): string {
+  const t = line.trimStart();
+  if (!/^#?\s*Цех\s+№/.test(t)) return line;
+  return line.replace(/сборка/gi, "Збірка").replace(/збірка/g, "Збірка");
 }
 
 function fixTrailingSpacesInBrackets(line: string): string {
@@ -550,6 +570,7 @@ export function formatDocumentContent(original: string): FormatterResult {
     apply(fixPriceTypo, '"Цшна" → "Ціна"');
     apply(fixPriceFormat, '"Ціна Nгрн" → "Ціна N грн"');
     apply(fixWorkshopHeaders, 'заголовок цеху отримав "# " префікс');
+    apply(fixWorkshopZbirkaCase, "заголовок цеху: Збірка з великої");
     apply(fixUom, "одиницю виміру нормалізовано");
     apply(
       (l) => fixTkanynaPlaceholder(l, activeAttrs),

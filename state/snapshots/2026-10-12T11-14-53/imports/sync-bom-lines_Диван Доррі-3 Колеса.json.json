@@ -1,0 +1,25 @@
+{
+  "snapshotTimestamp": "2026-10-12T11-14-53",
+  "label": "sync-bom-lines:Диван Доррі-3 Колеса.json",
+  "createdAt": "2026-10-12T11:25:15.326Z",
+  "ids": {
+    "productTemplates": [
+      1322,
+      1323
+    ],
+    "productVariants": [],
+    "productAttributes": [],
+    "productAttributeValues": [],
+    "boms": [],
+    "bomLines": [
+      282602,
+      282603,
+      282604,
+      282605,
+      282606,
+      282607
+    ],
+    "bomOperations": [],
+    "workcenters": []
+  }
+}

@@ -10,9 +10,11 @@ async function preFetchBoms(): Promise<void> {
 }
 import { getOrCreateWorkcenter } from '../../bom/product';
 import { ensureVariantFromAttrs, preSeedAttributeLines } from './resolver';
+import { ensureVariantLimit } from './variantLimit';
 import { expandEntry } from './expander';
 import type { BomEntry } from '../docToJson/types';
 import { convertFilmQty } from '../../validator/filmUom';
+import { afterImportStockAndBuy } from './stockAndBuy';
 
 const UOM_MAP: Record<string, number> = {
   'шт': 1,
@@ -136,24 +138,6 @@ export async function importBomEntry(entry: BomEntry): Promise<'created' | 'exis
   return 'created';
 }
 
-async function ensureVariantLimit(minLimit = 10000): Promise<void> {
-  const [existing] = await searchRead<{ id: number; value: string }>(
-    'ir.config_parameter',
-    [['key', '=', 'product.dynamic_variant_limit']],
-    ['id', 'value'], 1
-  );
-  if (existing) {
-    const current = parseInt(existing.value, 10);
-    if (current < minLimit) {
-      await write('ir.config_parameter', [existing.id], { value: String(minLimit) });
-      console.log(`[config] product.dynamic_variant_limit: ${current} → ${minLimit}`);
-    }
-  } else {
-    await create('ir.config_parameter', { key: 'product.dynamic_variant_limit', value: String(minLimit) });
-    console.log(`[config] product.dynamic_variant_limit = ${minLimit}`);
-  }
-}
-
 type CехStat = { name: string; elapsed: number; created: number; existed: number; skipped: number; errors: number };
 
 export async function importAllBoms(boms: BomEntry[], label?: string): Promise<void> {
@@ -208,6 +192,9 @@ export async function importAllBoms(boms: BomEntry[], label?: string): Promise<v
     console.log(`  [час] Загалом: ${sec(entryStart)}`);
     cехStats.push({ name: entry.product.variantDisplayName, elapsed, created: eCr, existed: eEx, skipped: eSk, errors: eEr });
   }
+
+  // TEST / UNTESTED: is_storable + Сировина Buy orderpoints 0/0. Verify on first import.
+  await afterImportStockAndBuy(boms);
 
   saveSession(label);
   const LINE = '='.repeat(60);

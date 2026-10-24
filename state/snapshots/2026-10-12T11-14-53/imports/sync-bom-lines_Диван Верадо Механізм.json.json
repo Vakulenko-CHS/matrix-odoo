@@ -1,0 +1,23 @@
+{
+  "snapshotTimestamp": "2026-10-12T11-14-53",
+  "label": "sync-bom-lines:Диван Верадо Механізм.json",
+  "createdAt": "2026-10-12T11:22:30.342Z",
+  "ids": {
+    "productTemplates": [
+      1315,
+      1316
+    ],
+    "productVariants": [],
+    "productAttributes": [],
+    "productAttributeValues": [],
+    "boms": [],
+    "bomLines": [
+      282420,
+      282421,
+      282422,
+      282423
+    ],
+    "bomOperations": [],
+    "workcenters": []
+  }
+}

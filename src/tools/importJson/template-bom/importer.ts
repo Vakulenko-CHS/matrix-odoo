@@ -1,6 +1,7 @@
 import { create, searchRead, write } from "../../../api/odoo";
 import { findTemplate, getOrCreateWorkcenter } from "../../../bom/product";
 import { ensureVariantFromAttrs, preSeedAttributeLines } from "../resolver";
+import { ensureVariantLimit } from "../variantLimit";
 import { expandEntry } from "../expander";
 import { preSeedPtavCache, getPtavId } from "./ptav";
 import { track, resetSession, saveSession } from "../../../state/tracker";
@@ -10,6 +11,7 @@ import type {
   ComponentEntry,
 } from "../../docToJson/types";
 import { convertFilmQty } from "../../../validator/filmUom";
+import { afterImportStockAndBuy } from "../stockAndBuy";
 
 const UOM_MAP: Record<string, number> = {
   шт: 1,
@@ -190,9 +192,9 @@ async function applyProductTypes(boms: BomEntry[]): Promise<void> {
 const RAW_MATERIAL_CATEGORY: Array<
   [keyword: string, categoryCompleteName: string]
 > = [
-  ["Скотч", "Упаковка"],
-  ["Плівка", "Упаковка"],
-  ["Картон", "Упаковка"],
+  ["Скотч", "Сировина / Упаковка"],
+  ["Плівка", "Сировина / Упаковка"],
+  ["Картон", "Сировина / Упаковка"],
 
   ["ДВП", "Сировина / Дерево"],
   ["ДСП", "Сировина / Дерево"],
@@ -222,6 +224,11 @@ const RAW_MATERIAL_CATEGORY: Array<
   ["Зацеп", "Сировина / Фурнітура"],
   ["Распорка", "Сировина / Фурнітура"],
   ["Алігатор", "Сировина / Фурнітура"],
+  ["Сабля", "Сировина / Фурнітура"],
+  ["Направляюч", "Сировина / Фурнітура"],
+  ["МДФ", "Сировина / Дерево"],
+  ["Липучка", "Сировина / Тканина"],
+  ["Пас 100", "Сировина / Тканина"],
 ];
 
 const FINAL_PRODUCT_CATEGORY = "Готова продукція / Дивани";
@@ -232,8 +239,12 @@ function extractCehToken(text: string): string | null {
 }
 
 function classifyRawByKeyword(name: string): string | null {
+  const t = name.trim();
+  // Semi-finished prefixes: never treat as Сировина even if name contains «Ламінат».
+  if (/^[🧩🪤🪵]/.test(t)) return null;
+  const lower = t.toLocaleLowerCase("uk");
   for (const [kw, catName] of RAW_MATERIAL_CATEGORY) {
-    if (name.includes(kw)) return catName;
+    if (lower.includes(kw.toLocaleLowerCase("uk"))) return catName;
   }
   return null;
 }
@@ -508,7 +519,7 @@ function cleanOpName(name: string): string {
  * each model-specific semi-finished product becomes its own unique template,
  * exactly like the чохол templates in цехи 7–8.
  */
-function applyModelTransform(entries: BomEntry[]): BomEntry[] {
+export function applyModelTransform(entries: BomEntry[]): BomEntry[] {
   const filterAttrs = (attrs: AttributeVal[]): AttributeVal[] =>
     attrs.filter(
       (a) => a.attributeName !== "Модель" && !a.attributeName.includes("❌"),
@@ -693,12 +704,56 @@ export async function importTemplateBomGroup(
     console.log(`    [op] "${op.workcenterName}" (${op.priceRate} грн)`);
   }
 
+  // Альтернативні операції (інша штучна), коли кілька BomEntry з ifAttr — напр. Бонд-К короб
+  const altOpIdByEntry = new Map<number, number[]>();
+  for (let ei = 1; ei < entries.length; ei++) {
+    const altIds: number[] = [];
+    for (let i = 0; i < entries[ei].operations.length; i++) {
+      const base = entries[0].operations[i];
+      const op = entries[ei].operations[i];
+      if (!op || base?.priceRate === op.priceRate) {
+        altIds.push(opIds[i]);
+        continue;
+      }
+      const wcId = await getOrCreateWorkcenter(op.workcenterName);
+      const baseName = cleanOpName(op.name) || op.workcenterName;
+      const entryIfAttr = entries[ei].product.ifAttr;
+      const tag = entryIfAttr
+        ? Object.values(entryIfAttr).join(", ")
+        : `варіант ${ei + 1}`;
+      const opId = await create("mrp.routing.workcenter", {
+        name: `${baseName} · ${tag}`,
+        bom_id: bomId,
+        workcenter_id: wcId,
+        sequence: i + 1,
+        x_studio_piece_rate_2: op.priceRate,
+      });
+      track.operation(opId);
+      altIds.push(opId);
+      console.log(
+        `    [op] "${op.workcenterName}" (${op.priceRate} грн) · ${tag}`,
+      );
+    }
+    altOpIdByEntry.set(ei, altIds);
+  }
+
+  const resolveOpId = (
+    entryIndex: number,
+    operationIndex: number,
+  ): number | false => {
+    if (entryIndex === 0) return opIds[operationIndex] ?? false;
+    const alt = altOpIdByEntry.get(entryIndex);
+    if (alt?.[operationIndex]) return alt[operationIndex];
+    return opIds[operationIndex] ?? false;
+  };
+
   await applyRoutes(tmplId, templateName);
   await preSeedPtavCache(tmplId);
 
   let lineSeq = 1;
 
-  for (const entry of entries) {
+  for (let entryIndex = 0; entryIndex < entries.length; entryIndex++) {
+    const entry = entries[entryIndex];
     const expand = entry.expand ?? {};
 
     const fixedProductAttrs = entry.product.attributes.filter(
@@ -734,7 +789,7 @@ export async function importTemplateBomGroup(
           product_qty: q1.qty,
           product_uom_id: q1.uomId,
           sequence: lineSeq++,
-          operation_id: opIds[comp.operationIndex] ?? false,
+          operation_id: resolveOpId(entryIndex, comp.operationIndex),
           ...(entryPtavIds.length > 0
             ? {
                 bom_product_template_attribute_value_ids: [
@@ -806,7 +861,7 @@ export async function importTemplateBomGroup(
           product_qty: q2.qty,
           product_uom_id: q2.uomId,
           sequence: lineSeq++,
-          operation_id: opIds[comp.operationIndex] ?? false,
+          operation_id: resolveOpId(entryIndex, comp.operationIndex),
           ...(allPtavIds.length > 0
             ? { bom_product_template_attribute_value_ids: [[6, 0, allPtavIds]] }
             : {}),
@@ -843,6 +898,7 @@ export async function importAllTemplateBoms(
   const totalStart = Date.now();
 
   await loadRoutes();
+  await ensureVariantLimit(10000);
 
   // Step 1: embed "Модель" in template name, strip ❌ attrs for all model-based entries
   const transformedBoms = applyModelTransform(boms);
@@ -945,6 +1001,9 @@ export async function importAllTemplateBoms(
 
   // Assign product.category for raw material components and any remaining templates
   await applyProductCategories(transformedBoms);
+
+  // TEST / UNTESTED: is_storable + Сировина Buy orderpoints 0/0. Verify on first import.
+  await afterImportStockAndBuy(transformedBoms);
 
   saveSession(label);
   const totalSec = ((Date.now() - totalStart) / 1000).toFixed(2);

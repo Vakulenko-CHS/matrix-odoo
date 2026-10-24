@@ -29,10 +29,15 @@ const UOM_ALIAS: Record<string, string> = {
 
 // Workcenter names in the document that map to a different (existing) name in Odoo
 const WORKCENTER_ALIAS: Record<string, string> = {
-  "Цех №4-1 Сборка Бильце": "Цех №4 Сборка [полуфабрикатів]",
-  "Цех №4-2 Сборка Каркаc": "Цех №4 Сборка [полуфабрикатів]",
+  "Цех №4-1 Сборка Бильце": "Цех №4-1 Збірка Бильце",
+  "Цех №4-2 Сборка Каркаc": "Цех №4-2 Збірка Каркас",
+  "Цех №4-3 Сборка Планка": "Цех №4-3 Збірка Планка",
   ВТК: "Цех Відділ Технічного котнтролю",
 };
+
+function wcKey(name: string): string {
+  return name.trim().replace(/\s+/g, " ").toLocaleLowerCase("uk");
+}
 
 function buildDisplayName(
   templateName: string,
@@ -51,8 +56,12 @@ export function enrichBoms(boms: BomEntry[], snapshot: SnapshotData): void {
     variantByDisplayName.set(v.display_name, v.id),
   );
 
-  const workcenterByName = new Map<string, number>();
-  snapshot.workcenters.forEach((w) => workcenterByName.set(w.name, w.id));
+  const workcenterByKey = new Map<string, number>();
+  snapshot.workcenters.forEach((w) => {
+    const key = wcKey(w.name);
+    if (workcenterByKey.has(key) && !w.code) return;
+    workcenterByKey.set(key, w.id);
+  });
 
   const uomByName = new Map<string, number>();
   snapshot.uoms.forEach((u) => uomByName.set(u.name, u.id));
@@ -84,7 +93,7 @@ export function enrichBoms(boms: BomEntry[], snapshot: SnapshotData): void {
     for (const op of bom.operations) {
       const resolvedName =
         WORKCENTER_ALIAS[op.workcenterName] ?? op.workcenterName;
-      const wcId = workcenterByName.get(resolvedName);
+      const wcId = workcenterByKey.get(wcKey(resolvedName));
       if (wcId !== undefined) op.odooWorkcenterId = wcId;
     }
 

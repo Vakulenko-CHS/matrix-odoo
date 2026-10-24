@@ -153,7 +153,8 @@ const TYPOS: Array<{ re: RegExp; correct: string }> = [
   { re: /карказ/gi, correct: "Каркас" },
   { re: /компонети/gi, correct: "компоненти" },
   { re: /напівфабрікат/gi, correct: "напівфабрикат" },
-  { re: /сборка/gi, correct: "збірка" },
+  { re: /Сборка/g, correct: "Збірка" },
+  { re: /сборка/g, correct: "збірка" },
   { re: /атримбут/gi, correct: "атрибут" },
   { re: /обємі/gi, correct: "об'ємі" },
   { re: /труегольн/gi, correct: "трикутн" },
@@ -500,6 +501,24 @@ export function lintSpec(
       }
     }
 
+    if (/^#\s*Цех\s+№/.test(t) && /збірка/.test(t)) {
+      hits.push({
+        kind: "error",
+        source: "lint",
+        line: n,
+        message: "Заголовок цеху: має бути «Збірка»",
+        original: t,
+        fixes: [
+          {
+            id: `spell-${seq++}`,
+            label: "Замінити на «Збірка»",
+            action: "replace-line",
+            line: n,
+            replacement: line.replace(/збірка/g, "Збірка"),
+          },
+        ],
+      });
+    }
 
     if (ZERO_QTY_RE.test(t) || /-\s*0\s*шт/i.test(t)) {
       hits.push({

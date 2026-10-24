@@ -1,0 +1,12 @@
+---
+description: Matrix Odoo — agent context + format docs before work
+alwaysApply: true
+---
+
+# Matrix Odoo
+
+1. Read **`.ai/INDEX.md`** then **`.ai/CONTEXT.md`** (snapshot + log index only). Open **`.ai/logs/`** only when Topics match.
+2. If user mentions **формат / format / накладки / ламінат / кромка / файл з форматом** → open **`docs/formats/README.md`** then the matching file (usually `docs/formats/nakladky-laminat.md` or `docs/BOM_FORMAT.md`).
+3. Furniture BOM markdown check → `npm run ai-check` (see `ai-spec-check` rule). Do not invent issues.
+4. Odoo writes only with explicit `--apply` / user approval. Creds in `.env.local`, not committed.
+5. After meaningful session: prepend matching `.ai/logs/*.md`; update Log index + Last updated in `CONTEXT.md`.

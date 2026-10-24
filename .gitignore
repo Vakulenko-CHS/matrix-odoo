@@ -1,7 +1,10 @@
 /node_modules
 node_modules
 .env
+.env.local
 web/dist
 dist
 /dist
 /temp
+docs/archive/check-all-out/
+state/snapshots/*/snapshot.json

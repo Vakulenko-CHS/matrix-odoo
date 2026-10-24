@@ -1,4 +1,4 @@
-import { searchRead, create, write, fieldsGet } from '../../api/odoo';
+import { searchRead, create, write, unlink, fieldsGet } from '../../api/odoo';
 import { findTemplate, cacheTemplate, getOrCreateAttribute, getOrCreateAttributeValue, resolveProduct, invalidateTemplateVariantCache } from '../../bom/product';
 import { track } from '../../state/tracker';
 import type { AttributeVal, BomEntry } from '../docToJson/types';
@@ -7,6 +7,46 @@ import type { ResolvedProduct } from '../../bom/types';
 let _storableType: string | null = null;
 const _resolvedCache = new Map<string, ResolvedProduct | null>();
 const _variantByDisplayName = new Map<string, ResolvedProduct>();
+
+/**
+ * Odoo інколи має кілька product.template.attribute.line на один attribute_id
+ * (гонка паралельних імпортів) → комбінаторний вибух варіантів (89×89).
+ * Зливаємо value_ids в один рядок, зайві рядки видаляємо.
+ */
+async function getOrMergeAttrLine(
+  templateId: number,
+  attrId: number,
+): Promise<{ id: number; value_ids: number[] } | null> {
+  const lines = await searchRead<{ id: number; value_ids: number[] }>(
+    'product.template.attribute.line',
+    [['product_tmpl_id', '=', templateId], ['attribute_id', '=', attrId]],
+    ['id', 'value_ids'],
+  );
+  if (lines.length === 0) return null;
+  if (lines.length === 1) return lines[0];
+
+  const keep = lines.reduce((a, b) =>
+    a.value_ids.length >= b.value_ids.length ? a : b,
+  );
+  const merged = [...new Set(lines.flatMap((l) => l.value_ids))].sort((a, b) => a - b);
+  const same =
+    keep.value_ids.length === merged.length &&
+    keep.value_ids.every((id, i) => id === merged[i]);
+  if (!same) {
+    await write('product.template.attribute.line', [keep.id], {
+      value_ids: [[6, 0, merged]],
+    });
+  }
+  const extraIds = lines.filter((l) => l.id !== keep.id).map((l) => l.id);
+  if (extraIds.length > 0) {
+    await unlink('product.template.attribute.line', extraIds);
+    invalidateTemplateVariantCache(templateId);
+    console.warn(
+      `  [!] Видалено ${extraIds.length} дублікат(ів) PTAL (шаблон ${templateId}, attr ${attrId})`,
+    );
+  }
+  return { id: keep.id, value_ids: merged };
+}
 
 /**
  * Pass 1: Для всіх вже-розгорнутих BomEntry зібрати потрібні атрибути по шаблонах
@@ -50,6 +90,8 @@ export async function preSeedAttributeLines(entries: BomEntry[]): Promise<void> 
       templateId = await create('product.template', {
         name: templateName,
         type: isService ? 'service' : await getStorableType(),
+        // TEST / UNTESTED: Odoo 19 «Облік запасів» = is_storable, not type=product.
+        ...(isService ? {} : { is_storable: true }),
         uom_id: 1,
         ...(isComponent ? { sale_ok: false } : {}),
       });
@@ -65,11 +107,7 @@ export async function preSeedAttributeLines(entries: BomEntry[]): Promise<void> 
         valueIds.push(await getOrCreateAttributeValue(attrId, v));
       }
 
-      const [existingLine] = await searchRead<{ id: number; value_ids: number[] }>(
-        'product.template.attribute.line',
-        [['product_tmpl_id', '=', templateId], ['attribute_id', '=', attrId]],
-        ['id', 'value_ids'], 1
-      );
+      const existingLine = await getOrMergeAttrLine(templateId, attrId);
 
       if (existingLine) {
         const missing = valueIds.filter(id => !existingLine.value_ids.includes(id));
@@ -79,6 +117,7 @@ export async function preSeedAttributeLines(entries: BomEntry[]): Promise<void> 
           await write('product.template.attribute.line', [existingLine.id], {
             value_ids: missing.map(id => [4, id]),
           });
+          invalidateTemplateVariantCache(templateId);
           console.log(`  [~] "${templateName}" / "${attrName}": +${missing.length} значень (${sec(t)})`);
         }
       } else {
@@ -167,6 +206,8 @@ export async function ensureVariantFromAttrs(
     templateId = await create('product.template', {
       name: templateName,
       type: isService ? 'service' : await getStorableType(),
+      // TEST / UNTESTED: Odoo 19 «Облік запасів» = is_storable, not type=product.
+      ...(isService ? {} : { is_storable: true }),
       uom_id: 1,
       ...(isComponent ? { sale_ok: false } : {}),
     });
@@ -189,11 +230,7 @@ export async function ensureVariantFromAttrs(
     const attrId = await getOrCreateAttribute(attr.attributeName);
     const valueId = await getOrCreateAttributeValue(attrId, attr.value);
 
-    const [existingLine] = await searchRead<{ id: number; value_ids: number[] }>(
-      'product.template.attribute.line',
-      [['product_tmpl_id', '=', templateId], ['attribute_id', '=', attrId]],
-      ['id', 'value_ids'], 1
-    );
+    const existingLine = await getOrMergeAttrLine(templateId, attrId);
 
     if (existingLine) {
       if (!existingLine.value_ids.includes(valueId)) {

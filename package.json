@@ -27,6 +27,9 @@
     "web:preview": "vite preview --config web/vite.config.ts",
     "import-template-bom": "ts-node src/commands/importTemplateBom.ts",
     "fix-product-types": "ts-node src/commands/fixProductTypes.ts",
+    "enable-storable": "ts-node src/commands/enableStorable.ts",
+    "ensure-wh-stock": "ts-node src/commands/ensureWhStockQuants.ts",
+    "ensure-raw-buy": "ts-node src/commands/ensureRawBuyOrderpoints.ts",
     "diagnose-mo": "ts-node src/tools/diagnose-mo.ts",
     "find-no-category": "ts-node src/tools/find-no-category.ts",
     "sync-base": "ts-node src/tools/sync-base.ts",
@@ -37,7 +40,10 @@
     "migrate-apply": "ts-node src/tools/migrate-apply.ts",
     "pull-hackmd": "ts-node src/index.ts pull-hackmd",
     "batch-format": "ts-node src/index.ts batch-format",
-    "fill-laminate": "ts-node src/tools/fill-laminate-boms.ts"
+    "fill-laminate": "ts-node src/tools/fill-laminate-boms.ts",
+    "push-hackmd": "ts-node src/index.ts push-hackmd",
+    "estimate-import": "ts-node src/index.ts estimate-import",
+    "sofa-batch-prep": "ts-node src/index.ts sofa-batch-prep"
   },
   "keywords": [],
   "author": "",

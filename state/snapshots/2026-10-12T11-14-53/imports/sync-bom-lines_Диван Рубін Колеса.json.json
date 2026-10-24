@@ -1,0 +1,17 @@
+{
+  "snapshotTimestamp": "2026-10-12T11-14-53",
+  "label": "sync-bom-lines:Диван Рубін Колеса.json",
+  "createdAt": "2026-10-12T12:14:39.150Z",
+  "ids": {
+    "productTemplates": [],
+    "productVariants": [],
+    "productAttributes": [],
+    "productAttributeValues": [],
+    "boms": [],
+    "bomLines": [
+      285804
+    ],
+    "bomOperations": [],
+    "workcenters": []
+  }
+}

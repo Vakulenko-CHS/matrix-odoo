@@ -9,6 +9,45 @@ const _templateCache = new Map<string, { id: number } | null>();
 const _attrCache = new Map<string, number>();
 const _attrValueCache = new Map<string, number>();
 const _workcenterCache = new Map<string, number>();
+let _workcenterRows: Array<{ id: number; name: string; code?: string | false; active?: boolean }> | null = null;
+
+function wcKey(name: string): string {
+  return name.trim().replace(/\s+/g, ' ').toLocaleLowerCase('uk');
+}
+
+/** Сборка/сборка → Збірка/збірка. Цех headers always use Збірка. */
+export function canonWorkcenterName(name: string): string {
+  const preserve = (match: string, uk: string) =>
+    match[0] !== match[0].toLocaleLowerCase('uk')
+      ? uk.charAt(0).toLocaleUpperCase('uk') + uk.slice(1)
+      : uk;
+  let n = name.trim().replace(/\s+/g, ' ');
+  n = n.replace(/сборка/gi, (m) => preserve(m, 'збірка'));
+  if (/^Цех\s+№/i.test(n)) n = n.replace(/збірка/gi, 'Збірка');
+  return n;
+}
+
+async function loadWorkcenters() {
+  if (_workcenterRows) return _workcenterRows;
+  _workcenterRows = await searchRead<{ id: number; name: string; code?: string | false; active?: boolean }>(
+    'mrp.workcenter',
+    [],
+    ['id', 'name', 'code', 'active'],
+  );
+  return _workcenterRows;
+}
+
+function pickWorkcenter(
+  rows: Array<{ id: number; name: string; code?: string | false; active?: boolean }>,
+) {
+  const live = rows.filter((r) => r.active !== false);
+  const pool = live.length ? live : rows;
+  return (
+    pool.find((r) => r.code) ??
+    pool.find((r) => r.name.includes('Збірка')) ??
+    pool[0]
+  );
+}
 
 // templateId → [{id, displayName, norms}] — завантажується одним батч-запитом
 const _templateVariantCache = new Map<number, Array<{
@@ -140,18 +179,29 @@ export async function getOrCreateAttributeValue(attrId: number, valueName: strin
   return id;
 }
 
-/** Отримати або створити робочий центр */
+/** Отримати або створити робочий центр. Case-insensitive; never duplicate Збірка/збірка. */
 export async function getOrCreateWorkcenter(name: string): Promise<number> {
-  if (_workcenterCache.has(name)) return _workcenterCache.get(name)!;
-  const [existing] = await searchRead<{ id: number }>(
-    'mrp.workcenter', [['name', '=', name]], ['id'], 1
-  );
-  if (existing) { _workcenterCache.set(name, existing.id); return existing.id; }
+  const canon = canonWorkcenterName(name);
+  for (const key of [name, canon]) {
+    if (_workcenterCache.has(key)) return _workcenterCache.get(key)!;
+  }
+  const rows = await loadWorkcenters();
+  const keys = new Set([wcKey(name), wcKey(canon)]);
+  const hits = rows.filter((r) => keys.has(wcKey(r.name)));
+  if (hits.length) {
+    const existing = pickWorkcenter(hits);
+    for (const key of [name, canon, existing.name]) _workcenterCache.set(key, existing.id);
+    if (existing.name !== name) {
+      console.log(`  [wc] reuse "${existing.name}" (ID: ${existing.id}) for "${name}"`);
+    }
+    return existing.id;
+  }
 
-  const id = await create('mrp.workcenter', { name, time_efficiency: 100 });
+  const id = await create('mrp.workcenter', { name: canon, time_efficiency: 100 });
   track.workcenter(id);
-  console.log(`  [+] Робочий центр створено: "${name}" (ID: ${id})`);
-  _workcenterCache.set(name, id);
+  console.log(`  [+] Робочий центр створено: "${canon}" (ID: ${id})`);
+  _workcenterRows = null;
+  for (const key of [name, canon]) _workcenterCache.set(key, id);
   return id;
 }
 
