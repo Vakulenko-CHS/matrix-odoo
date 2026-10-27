@@ -19,6 +19,12 @@ import {
   finishedGoodName,
   renameCorruptsDocProduct,
 } from "./docProduct";
+import {
+  canonWorkshopHeader,
+  extractWorkshopNum,
+  findCanonWorkcenter,
+  workshopHeaderLine,
+} from "../workcenters/canon";
 
 export interface QuickFix {
   id: string;
@@ -501,23 +507,38 @@ export function lintSpec(
       }
     }
 
-    if (/^#\s*Цех\s+№/.test(t) && /збірка/.test(t)) {
-      hits.push({
-        kind: "error",
-        source: "lint",
-        line: n,
-        message: "Заголовок цеху: має бути «Збірка»",
-        original: t,
-        fixes: [
-          {
-            id: `spell-${seq++}`,
-            label: "Замінити на «Збірка»",
-            action: "replace-line",
-            line: n,
-            replacement: line.replace(/збірка/g, "Збірка"),
-          },
-        ],
-      });
+    if (/^#+\s*Цех\s+№/.test(t) || /^#+\s*ВТК\b/.test(t)) {
+      const canonLine = canonWorkshopHeader(line);
+      if (canonLine && canonLine.trim() !== t) {
+        const wc = findCanonWorkcenter(t);
+        hits.push({
+          kind: "error",
+          source: "lint",
+          line: n,
+          message: wc
+            ? `Заголовок цеху: має бути «${workshopHeaderLine(wc)}»`
+            : "Заголовок цеху: назва/код як в Odoo",
+          original: t,
+          fixes: [
+            {
+              id: `wc-${seq++}`,
+              label: "Odoo назва цеху",
+              action: "replace-line",
+              line: n,
+              replacement: canonLine,
+            },
+          ],
+        });
+      } else if (/^#+\s*Цех\s+№/.test(t) && !findCanonWorkcenter(t)) {
+        hits.push({
+          kind: "warning",
+          source: "lint",
+          line: n,
+          message: `Цех №${extractWorkshopNum(t) ?? "?"} немає в каноні Odoo workcenters`,
+          original: t,
+          fixes: [],
+        });
+      }
     }
 
     if (ZERO_QTY_RE.test(t) || /-\s*0\s*шт/i.test(t)) {

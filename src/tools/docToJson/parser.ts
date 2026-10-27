@@ -7,6 +7,7 @@ import {
 import { lineHtmlCommentFlags } from "../htmlComment";
 import { isPatternBInner } from "../../validator/canonRewrite";
 import { splitQtyTail, unwrapNameBraces } from "../../parser/nameBrace";
+import { canonWorkcenterName } from "../../workcenters/canon";
 
 const DEFAULT_ATTR_NAMES = ["Модель", "Тканина", "Наповнювач"];
 
@@ -468,13 +469,13 @@ function parseWorkshopHeader(line: string): WorkshopInfo | null {
     const opMatch = remainder.match(new RegExp(`^${Q}(.+?)${Q}\\s*$`));
     if (opMatch) {
       return {
-        fullName: `Цех №${number} ${name}`,
+        fullName: canonWorkcenterName(`Цех №${number} ${name}`),
         operationPrefix: opMatch[1].trim(),
       };
     }
     // Fallback: operation prefix not found — use code
     return {
-      fullName: `Цех №${number} ${name}`,
+      fullName: canonWorkcenterName(`Цех №${number} ${name}`),
       operationPrefix: baseMatch[3].trim(),
     };
   }
@@ -483,7 +484,7 @@ function parseWorkshopHeader(line: string): WorkshopInfo | null {
   const vtk = trimmed.match(/^#+\s*(ВТК)\s*$/);
   if (vtk) {
     return {
-      fullName: "ВТК",
+      fullName: canonWorkcenterName("ВТК"),
       operationPrefix: "ВТК",
     };
   }

@@ -1,4 +1,8 @@
 import { BomEntry } from "./types";
+import {
+  canonWorkcenterName,
+  extractWorkshopNum,
+} from "../../workcenters/canon";
 
 interface SnapshotEntity {
   id: number;
@@ -27,13 +31,6 @@ const UOM_ALIAS: Record<string, string> = {
   шт: "Одиниці",
 };
 
-// Workcenter names in the document that map to a different (existing) name in Odoo
-const WORKCENTER_ALIAS: Record<string, string> = {
-  "Цех №4-1 Сборка Бильце": "Цех №4-1 Збірка Бильце",
-  "Цех №4-2 Сборка Каркаc": "Цех №4-2 Збірка Каркас",
-  "Цех №4-3 Сборка Планка": "Цех №4-3 Збірка Планка",
-  ВТК: "Цех Відділ Технічного котнтролю",
-};
 
 function wcKey(name: string): string {
   return name.trim().replace(/\s+/g, " ").toLocaleLowerCase("uk");
@@ -91,9 +88,16 @@ export function enrichBoms(boms: BomEntry[], snapshot: SnapshotData): void {
     if (varId !== undefined) bom.product.odooVariantId = varId;
 
     for (const op of bom.operations) {
-      const resolvedName =
-        WORKCENTER_ALIAS[op.workcenterName] ?? op.workcenterName;
-      const wcId = workcenterByKey.get(wcKey(resolvedName));
+      const resolvedName = canonWorkcenterName(op.workcenterName);
+      let wcId = workcenterByKey.get(wcKey(resolvedName));
+      if (wcId === undefined) {
+        const num = extractWorkshopNum(resolvedName);
+        const sameNum = snapshot.workcenters.filter(
+          (w) => extractWorkshopNum(w.name) === num,
+        );
+        const hit = sameNum.find((w) => w.code) ?? sameNum[0];
+        if (hit) wcId = hit.id;
+      }
       if (wcId !== undefined) op.odooWorkcenterId = wcId;
     }
 

@@ -3,7 +3,7 @@
 Session notes → [logs/](logs/). Keep this file slim.  
 Start: [.ai/INDEX.md](./INDEX.md) → **this file**. Open logs only when **Log index** matches.
 
-Last updated: **2026-10-23** (sale/buy flags; merge colored sheets; Елегант БН)
+Last updated: **2026-10-27** (Odoo workcenter canon + Цех №4-4)
 
 ---
 
@@ -42,13 +42,17 @@ Last updated: **2026-10-23** (sale/buy flags; merge colored sheets; Елеган
 
 ---
 
-## Odoo — workcenters (ламінат/накладки)
+## Odoo — workcenters
 
-| id | name | Use |
-|----|------|-----|
-| 30 | `Цех №3-0 ЛДСП (Нарізка Ламінату)` | BOM листа: Порізка / Поклейка / Присадка |
-| 24 | `Цех №3-2 ЛДСП (Нарізка Накладок)` | BOM накладки |
-| 23 | `Цех №3-1 ЛДСП (Нарізка Ламінату)` | alternate cut |
+Canon (formatter/import): [`src/workcenters/canon.ts`](../src/workcenters/canon.ts). Align live DB: `npm run ensure-workcenters -- --apply`.
+
+| id | code | name | Use |
+|----|------|------|-----|
+| 30 | Ц3лд0 | `Цех №3-0 ЛДСП (Нарізка Ламінату)` | BOM листа |
+| 23 | Ц3лд1 | `Цех №3-1 ЛДСП (Нарізка Ламінату)` | sofa cut |
+| 24 | Ц3лд2 | `Цех №3-2 ЛДСП (Нарізка Накладок)` | накладки |
+| 25–27 | Ц4С1–3 | `Цех №4-* Збірка …` | Бильце / Каркас / Планка |
+| 34 | Ц4С4 | `Цех №4-4 Збірка Бортик` | ліжка |
 
 Piece rate field on `mrp.routing.workcenter`: **`x_studio_piece_rate_2`**.  
 BOM line consume-in-op: **`operation_id`**.
@@ -94,7 +98,8 @@ UOM: `m²` id=10, `m` id=8.
 
 | ID | File | Topics | Read when | Updated |
 |----|------|--------|-----------|---------|
-| L-odoo | [logs/odoo-db.md](logs/odoo-db.md) | odoo, ids, attr, workcenter, uom, api, is_storable, orderpoint, buy | будь-яка робота з живою базою / IDs | 2026-10-23 |
+| L-1027 | [logs/2026-10-27-terry-beds.md](logs/2026-10-27-terry-beds.md) | террі, terry, ліжко, hackmd, size variants | Террі beds / HackMD size specs | 2026-10-27 |
+| L-odoo | [logs/odoo-db.md](logs/odoo-db.md) | odoo, ids, attr, workcenter, uom, api, is_storable, orderpoint, buy | будь-яка робота з живою базою / IDs | 2026-10-27 |
 | L-nakladky | [logs/nakladky.md](logs/nakladky.md) | накладки, nakladky, ламінат кольоровий, кромка, ширина кромки | sync/fix overlays & colored sheets | 2026-10-23 |
 | L-formats | [logs/formats.md](logs/formats.md) | формат, format, BOM_FORMAT, docs/formats | юзер каже «файл з форматом» / reuse format | 2026-10-02 |
 | L-1021 | [logs/2026-10-21-links-3-import.md](logs/2026-10-21-links-3-import.md) | links-3, import, PTAL, temp batches, sofa-batch-prep | пакетні імпорти диванів / temp/batches | 2026-10-21 |

@@ -43,7 +43,8 @@
     "fill-laminate": "ts-node src/tools/fill-laminate-boms.ts",
     "push-hackmd": "ts-node src/index.ts push-hackmd",
     "estimate-import": "ts-node src/index.ts estimate-import",
-    "sofa-batch-prep": "ts-node src/index.ts sofa-batch-prep"
+    "sofa-batch-prep": "ts-node src/index.ts sofa-batch-prep",
+    "ensure-workcenters": "ts-node --transpile-only src/commands/ensureWorkcenters.ts"
   },
   "keywords": [],
   "author": "",

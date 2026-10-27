@@ -1,6 +1,13 @@
 import { searchRead, create, write, executeKw } from '../api/odoo';
 import { track } from '../state/tracker';
 import type { ResolvedProduct } from './types';
+import {
+  canonWorkcenterName,
+  extractWorkshopNum,
+  findCanonWorkcenter,
+} from '../workcenters/canon';
+
+export { canonWorkcenterName };
 
 const normalizeStr = (s: string): string =>
   s.trim().replace(/[Xx]/g, 'х').replace(/\s+/g, ' ').toLowerCase();
@@ -15,17 +22,6 @@ function wcKey(name: string): string {
   return name.trim().replace(/\s+/g, ' ').toLocaleLowerCase('uk');
 }
 
-/** Сборка/сборка → Збірка/збірка. Цех headers always use Збірка. */
-export function canonWorkcenterName(name: string): string {
-  const preserve = (match: string, uk: string) =>
-    match[0] !== match[0].toLocaleLowerCase('uk')
-      ? uk.charAt(0).toLocaleUpperCase('uk') + uk.slice(1)
-      : uk;
-  let n = name.trim().replace(/\s+/g, ' ');
-  n = n.replace(/сборка/gi, (m) => preserve(m, 'збірка'));
-  if (/^Цех\s+№/i.test(n)) n = n.replace(/збірка/gi, 'Збірка');
-  return n;
-}
 
 async function loadWorkcenters() {
   if (_workcenterRows) return _workcenterRows;
@@ -39,9 +35,14 @@ async function loadWorkcenters() {
 
 function pickWorkcenter(
   rows: Array<{ id: number; name: string; code?: string | false; active?: boolean }>,
+  preferredCode?: string,
 ) {
   const live = rows.filter((r) => r.active !== false);
   const pool = live.length ? live : rows;
+  if (preferredCode) {
+    const coded = pool.find((r) => r.code && String(r.code) === preferredCode);
+    if (coded) return coded;
+  }
   return (
     pool.find((r) => r.code) ??
     pool.find((r) => r.name.includes('Збірка')) ??
@@ -179,25 +180,47 @@ export async function getOrCreateAttributeValue(attrId: number, valueName: strin
   return id;
 }
 
-/** Отримати або створити робочий центр. Case-insensitive; never duplicate Збірка/збірка. */
+function workcenterHits(
+  rows: Array<{ id: number; name: string; code?: string | false; active?: boolean }>,
+  name: string,
+  canon: string,
+) {
+  const known = findCanonWorkcenter(name) ?? findCanonWorkcenter(canon);
+  const keys = new Set([wcKey(name), wcKey(canon), ...(known ? [wcKey(known.name)] : [])]);
+  const num = known?.num ?? extractWorkshopNum(canon) ?? extractWorkshopNum(name);
+  return rows.filter((r) => {
+    if (keys.has(wcKey(r.name))) return true;
+    if (known?.code && r.code && String(r.code) === known.code) return true;
+    return num != null && extractWorkshopNum(r.name) === num;
+  });
+}
+
+/** Отримати або створити робочий центр. Known № reuses Odoo row; never duplicate Збірка/збірка. */
 export async function getOrCreateWorkcenter(name: string): Promise<number> {
   const canon = canonWorkcenterName(name);
-  for (const key of [name, canon]) {
+  const known = findCanonWorkcenter(name) ?? findCanonWorkcenter(canon);
+  for (const key of [name, canon, known?.name].filter(Boolean) as string[]) {
     if (_workcenterCache.has(key)) return _workcenterCache.get(key)!;
   }
   const rows = await loadWorkcenters();
-  const keys = new Set([wcKey(name), wcKey(canon)]);
-  const hits = rows.filter((r) => keys.has(wcKey(r.name)));
+  const hits = workcenterHits(rows, name, canon);
   if (hits.length) {
-    const existing = pickWorkcenter(hits);
-    for (const key of [name, canon, existing.name]) _workcenterCache.set(key, existing.id);
+    const existing = pickWorkcenter(hits, known?.code);
+    for (const key of [name, canon, existing.name, known?.name].filter(Boolean) as string[]) {
+      _workcenterCache.set(key, existing.id);
+    }
     if (existing.name !== name) {
       console.log(`  [wc] reuse "${existing.name}" (ID: ${existing.id}) for "${name}"`);
     }
     return existing.id;
   }
 
-  const id = await create('mrp.workcenter', { name: canon, time_efficiency: 100 });
+  const payload: { name: string; time_efficiency: number; code?: string } = {
+    name: canon,
+    time_efficiency: 100,
+  };
+  if (known?.code) payload.code = known.code;
+  const id = await create('mrp.workcenter', payload);
   track.workcenter(id);
   console.log(`  [+] Робочий центр створено: "${canon}" (ID: ${id})`);
   _workcenterRows = null;

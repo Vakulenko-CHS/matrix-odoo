@@ -2,6 +2,23 @@
 
 ## Entries (newest first)
 
+### 2026-10-27 — live WC check; created 4-4
+
+- **Agent / human:** agent / user
+- **Summary:** Live 19 WC, no `Сборка`. 4-1/2/3 already `Збірка` (ids 25–27). Created **id=34** `Цех №4-4 Збірка Бортик` / Ц4С4. Snapshot Oct 21 still had Сборка + dup 31–33; those gone.
+- **Files:** live Odoo
+- **Theme push:** no
+- **Git:** not committed
+
+### 2026-10-27 — hardcode Odoo workcenter names + Цех №4-4
+
+- **Agent / human:** agent / user
+- **Summary:** Spec `# Цех` headers rewrite to Odoo name+code (`Ц4С1`, `Ц3лд1` not client `Ц4С`/`Ц3лд0`). Import reuses WC by №. New shop **Цех №4-4 Збірка Бортик** / `Ц4С4` in canon.
+- **Files:** `src/workcenters/canon.ts`, `src/validator/formatter.ts`, `src/validator/lint.ts`, `src/bom/product.ts`, `src/commands/ensureWorkcenters.ts`
+- **Theme push:** no
+- **Git:** not committed
+- **Notes:** 2-4 / 6-1 not in canon.
+
 ### 2026-10-23 — sale/buy by category + Елегант БН import
 
 - **Agent / human:** agent

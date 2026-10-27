@@ -3,6 +3,7 @@ import * as path from "path";
 import { lineHtmlCommentFlags } from "../tools/htmlComment";
 import { isPatternBInner } from "./canonRewrite";
 import { matchUnbraced, testUnbraced } from "../parser/nameBrace";
+import { canonWorkshopHeader } from "../workcenters/canon";
 
 // Авто-виправлення типових помилок форматування сирих документів.
 // Не змінює смислову структуру — тільки текстові артефакти.
@@ -182,6 +183,11 @@ function fixWorkshopZbirkaCase(line: string): string {
   const t = line.trimStart();
   if (!/^#?\s*Цех\s+№/.test(t)) return line;
   return line.replace(/сборка/gi, "Збірка").replace(/збірка/g, "Збірка");
+}
+
+/** Known `# Цех №N` / `# ВТК` → exact Odoo name + code. */
+function fixWorkshopCanon(line: string): string {
+  return canonWorkshopHeader(line) ?? line;
 }
 
 function fixTrailingSpacesInBrackets(line: string): string {
@@ -570,6 +576,7 @@ export function formatDocumentContent(original: string): FormatterResult {
     apply(fixPriceTypo, '"Цшна" → "Ціна"');
     apply(fixPriceFormat, '"Ціна Nгрн" → "Ціна N грн"');
     apply(fixWorkshopHeaders, 'заголовок цеху отримав "# " префікс');
+    apply(fixWorkshopCanon, "заголовок цеху: назва/код як в Odoo");
     apply(fixWorkshopZbirkaCase, "заголовок цеху: Збірка з великої");
     apply(fixUom, "одиницю виміру нормалізовано");
     apply(
