@@ -2,6 +2,19 @@
 
 ## Entries (newest first)
 
+### 2026-10-30 — fix `next()` in SO line uid compute
+
+- **Agent / human:** agent
+- **Summary:** Studio `safe_eval` has no `next`. Compact `x_studio_x_so_line_uid` crashed sale.order.line onchange. Restored for-loop. Field **25210**. S00248 line still `S00248 / № 01`.
+- **Git:** not committed
+
+### 2026-10-29 — compact Studio Python (LoC)
+
+- **Agent / human:** agent / user
+- **Summary:** Same 4 Studio behaviors, denser compute. Live `cloc`-style AST **73** (was ~153 → billed 200). Expect next Extra Modules **1×100 = 12€** not 24. Hide view 3843 untouched. Script `src/commands/compressStudioLoc.ts --apply`. Snapshot S00248 + WH/OUT/00054–55 values unchanged after recompute.
+- **Files:** `src/commands/compressStudioLoc.ts`
+- **Git:** not committed
+
 ### 2026-10-27 — live WC check; created 4-4
 
 - **Agent / human:** agent / user
