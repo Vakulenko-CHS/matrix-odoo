@@ -44,6 +44,9 @@
     "push-hackmd": "ts-node src/index.ts push-hackmd",
     "estimate-import": "ts-node src/index.ts estimate-import",
     "sofa-batch-prep": "ts-node src/index.ts sofa-batch-prep",
+    "payroll-rules": "ts-node --transpile-only src/tools/payroll/worker-pay-rules.ts",
+    "payroll-default-worker": "ts-node --transpile-only src/tools/payroll/default-worker.ts",
+    "payroll-contracts": "ts-node --transpile-only src/tools/payroll/worker-contracts.ts",
     "ensure-workcenters": "ts-node --transpile-only src/commands/ensureWorkcenters.ts"
   },
   "keywords": [],
