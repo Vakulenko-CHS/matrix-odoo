@@ -2,6 +2,13 @@
 
 ## Entries (newest first)
 
+### 2026-11-05 — T-FELT-01 apply: [Войлок] 1.40 → 1.45
+
+- **Agent / human:** agent / user
+- **Summary:** 46 mrp.bom.line remapped 43142→329. pav 636 removed; ptav 5102 unlinked; variant 43142 archived. tmpl [Войлок] attrs 1.45+1.60 only. Corrected spring-block felt lines after bad merge. Quants on 43142 kept (no quant unlink ACL).
+- **Files:** `src/commands/feltMerge140To145.ts`, `npm run felt-merge`
+- **Git:** not committed
+
 ### 2026-11-04 — serial sofas; invoice modal not a bug
 
 - **Agent / human:** colleague / user (logged by agent)

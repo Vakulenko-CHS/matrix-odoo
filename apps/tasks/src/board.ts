@@ -1,4 +1,4 @@
-export type ColumnId = "free" | "log" | "doing" | "next" | "backlog" | "low";
+export type ColumnId = "free" | "done" | "log" | "doing" | "next" | "backlog" | "low";
 
 export type Card = {
   id: string;
@@ -20,7 +20,7 @@ export type Column = {
   cards: Card[];
 };
 
-const COL_ORDER: ColumnId[] = ["free", "doing", "next", "backlog", "low", "log"];
+const COL_ORDER: ColumnId[] = ["free", "done", "doing", "next", "backlog", "low", "log"];
 
 export function isFreeGate(gate: string): boolean {
   const g = gate.toLowerCase();
@@ -54,6 +54,7 @@ function parseTable(block: string): Record<string, string>[] {
 function colIdFromHeading(h: string): ColumnId | null {
   const t = h.toLowerCase();
   if (t.includes("doing")) return "doing";
+  if (t.includes("done")) return "done";
   if (t.includes("next")) return "next";
   if (t.includes("backlog")) return "backlog";
   if (t.includes("low")) return "low";
@@ -68,7 +69,7 @@ function rowToCard(row: Record<string, string>, column: ColumnId): Card {
     prio: stripMd(row["p"] ?? ""),
     title: stripMd(row["назва"] ?? ""),
     beds: stripMd(row["beds"] ?? ""),
-    gate: stripMd(row["gate"] ?? ""),
+    gate: stripMd(row["доступ"] ?? row["gate"] ?? ""),
     blocked,
     updated: stripMd(row["updated"] ?? ""),
     note: stripMd(row["нотатка"] ?? ""),
@@ -112,10 +113,10 @@ export function parseBoard(md: string): { updated: string; columns: Column[] } {
       all.push(c);
     }
   }
-  const freeCards = all.filter((c) => isFreeGate(c.gate) && c.column !== "log");
+  const freeCards = all.filter((c) => isFreeGate(c.gate) && c.column !== "log" && c.column !== "done");
   byCol.set("free", {
     id: "free",
-    heading: "Колонка: вільні (зібрано з Gate)",
+    heading: "Колонка: вільні",
     emptyNote: "Немає карток з Gate «вільна» / «частина вільна».",
     cards: freeCards,
   });

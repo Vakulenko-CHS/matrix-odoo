@@ -46,13 +46,59 @@ function inline(s: string): string {
     .replace(/`([^`]+)`/g, "<code>$1</code>");
 }
 
+const COL_LABEL: Record<ColumnId, string> = {
+  free: "Вільні",
+  doing: "В роботі",
+  next: "Далі",
+  backlog: "Черга",
+  low: "Низький пріоритет",
+  log: "Журнал",
+};
+
 function colLabel(col: Column): string {
-  const short = col.heading.replace(/^Колонка:\s*/i, "").replace(/\s*\(.+\)\s*$/, "");
-  return `${short} ${col.cards.length}`;
+  return `${COL_LABEL[col.id] ?? col.id} ${col.cards.length}`;
 }
 
 function col(): Column {
   return columns.find((c) => c.id === colId) ?? columns[0];
+}
+
+function bedsLabel(beds: string): string {
+  if (beds === "yes") return "так";
+  if (beds === "maybe") return "можливо";
+  if (beds === "no") return "ні";
+  return beds.trim() || "—";
+}
+
+function renderProps(card: Card): void {
+  const rows: [string, string][] = [
+    ["id", card.id],
+    ["колонка", COL_LABEL[card.column] ?? card.column],
+  ];
+  if (card.prio.trim()) rows.push(["пріоритет", card.prio]);
+  if (card.gate.trim()) rows.push(["доступ", card.gate]);
+  if (card.beds.trim()) rows.push(["ліжка", bedsLabel(card.beds)]);
+  if (card.updated.trim()) rows.push(["оновлено", card.updated]);
+  const blocked = card.blocked.trim();
+  if (blocked) rows.push(["блокери", blocked === "—" ? "—" : blocked]);
+  if (card.note.trim()) rows.push(["нотатка", card.note]);
+
+  cardMetaEl.replaceChildren();
+  const table = document.createElement("table");
+  table.className = "task-props";
+  const tbody = document.createElement("tbody");
+  for (const [key, value] of rows) {
+    const tr = document.createElement("tr");
+    const th = document.createElement("th");
+    th.scope = "row";
+    th.textContent = key;
+    const td = document.createElement("td");
+    td.textContent = value;
+    tr.append(th, td);
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  cardMetaEl.appendChild(table);
 }
 
 function show(card: Card | null) {
@@ -60,25 +106,14 @@ function show(card: Card | null) {
   listEl.querySelectorAll(".task-card.on").forEach((n) => n.classList.remove("on"));
   if (!card) {
     titleEl.textContent = "Картка";
-    cardMetaEl.textContent = "";
+    cardMetaEl.replaceChildren();
     bodyEl.textContent = "Обери рядок зліва.";
     return;
   }
   document.querySelector(`[data-id="${card.id}"]`)?.classList.add("on");
   titleEl.textContent = card.title;
-  cardMetaEl.textContent = [
-    card.id,
-    card.prio,
-    card.gate,
-    card.beds === "yes" ? "торкається ліжок" : card.beds === "maybe" ? "ліжка можливо" : "",
-    card.blocked && card.blocked !== "—" && card.blocked !== "немає"
-      ? `блокери: ${card.blocked}`
-      : "",
-    card.note,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-  bodyEl.innerHTML = renderMd(card.body || card.note || card.title);
+  renderProps(card);
+  bodyEl.innerHTML = renderMd(card.body || card.title);
 }
 
 function paintList() {

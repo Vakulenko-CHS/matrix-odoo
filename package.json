@@ -49,7 +49,9 @@
     "payroll-rules": "ts-node --transpile-only src/tools/payroll/worker-pay-rules.ts",
     "payroll-default-worker": "ts-node --transpile-only src/tools/payroll/default-worker.ts",
     "payroll-contracts": "ts-node --transpile-only src/tools/payroll/worker-contracts.ts",
-    "ensure-workcenters": "ts-node --transpile-only src/commands/ensureWorkcenters.ts"
+    "ensure-workcenters": "ts-node --transpile-only src/commands/ensureWorkcenters.ts",
+    "felt-merge": "ts-node --transpile-only src/commands/feltMerge140To145.ts",
+    "export-sofa-volume-tsv": "ts-node --transpile-only src/commands/exportSofaVolumeTsv.ts"
   },
   "keywords": [],
   "author": "",
