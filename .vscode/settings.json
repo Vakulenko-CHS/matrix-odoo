@@ -1,0 +1,25 @@
+{
+    "quickCommandButtons.buttons": [
+        {
+            "command": "pnpm web",
+            "insertOnly": false,
+            "name": "$(globe) web",
+            "terminalName": "web",
+            "useVsCodeApi": false
+        },
+        {
+            "command": "pnpm beds",
+            "insertOnly": false,
+            "name": "$(tools) beds",
+            "terminalName": "beds",
+            "useVsCodeApi": false
+        },
+        {
+            "command": "pnpm tasks",
+            "insertOnly": false,
+            "name": "$(tasklist) tasks",
+            "terminalName": "tasks",
+            "useVsCodeApi": false
+        }
+    ]
+}

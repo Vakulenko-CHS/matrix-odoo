@@ -1,0 +1,642 @@
+[
+  {
+    "slug": "delta",
+    "name": "Ліжко Дельта",
+    "hackmd": "https://hackmd.io/Q1bCEGp9QOqE4kM_fFy1Ag",
+    "note_id": "Q1bCEGp9QOqE4kM_fFy1Ag",
+    "progress": "",
+    "comment": "",
+    "new_components": "🪵[Каркас - нарізана деревина] Ліжко Дельта\n🧩[Каркас - нарізані деталі] Ліжко Дельта\n🪤[Каркас - напівфабрикат] Ліжко Дельта\n🧩[Ламінат - нарізані деталі] Ліжко Дельта\n🧩[Поролон - нарізані компоненти] Ліжко Дельта\n🪤🧽[Каркас + Поролон - напівфабрикат 2] Ліжко Дельта\n🧩[Чохол - нарізані матеріали] Ліжко Дельта\n🪤[Чохол - напівфабрикат] Ліжко Дельта\n[Подушка] Ліжко Дельта\n[Наволочка] Ліжко Дельта",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "Готово 😎"
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "terry-80x190",
+    "name": "Ліжко Террі 80х190",
+    "hackmd": "https://hackmd.io/mfvW0wlTTxiMqOowVhzscg",
+    "note_id": "mfvW0wlTTxiMqOowVhzscg",
+    "progress": "",
+    "comment": "увага\nперевірка\nряд. 123\nНовий шаблон товару \"Ізголовье в тканині\" — перевірте правильність назви\n[Ізголовье в тканині] - 1.1 m\n\nувага\nперевірка\nряд. 145\nНовий шаблон товару \"Ізголовье в тканині\" — перевірте правильність назви\nІ може бути [Ізголовье в тканині]",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "Питання ❓"
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "terry-90x200",
+    "name": "Ліжко Террі 90х200",
+    "hackmd": "https://hackmd.io/L9mtL7UuRFmfMQdq3cSuTQ",
+    "note_id": "L9mtL7UuRFmfMQdq3cSuTQ",
+    "progress": "",
+    "comment": "[Ізголовье в тканині] - 1.1 m",
+    "new_components": "🪵[Каркас - нарізана деревина] Ліжко Террі 90x200\n🧩[Каркас - нарізані деталі] Ліжко Террі 90x200\n🪤[Каркас - напівфабрикат] Ліжко Террі 90x200\n🧩[Ламінат - нарізані деталі] Ліжко Террі 90x200\n🧩[Поролон - нарізані компоненти] Ліжко Террі 90x200\n🪤🧽[Каркас + Поролон - напівфабрикат 2] Ліжко Террі 90x200\n🧩[Чохол - нарізані матеріали] Ліжко Террі 90x200\n🪤[Чохол - напівфабрикат] Ліжко Террі 90x200",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "Питання ❓"
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "terry-116x200",
+    "name": "Ліжко Террі 116х200",
+    "hackmd": "https://hackmd.io/uPqx2b8PRSeWUWyyDREI7w",
+    "note_id": "uPqx2b8PRSeWUWyyDREI7w",
+    "progress": "",
+    "comment": "[Ізголовье в тканині] - 1.1 m",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "Питання ❓"
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "terry-80x190-gas",
+    "name": "Ліжко Террі 80х190 газ підйомний",
+    "hackmd": "https://hackmd.io/v-c9BkWzQCGFFnuc3UoJ6Q",
+    "note_id": "v-c9BkWzQCGFFnuc3UoJ6Q",
+    "progress": "Нові атрибути ➕",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "В процесі 🫡"
+    },
+    "status": "draft-fixed"
+  },
+  {
+    "slug": "terry-80x200-gas",
+    "name": "Ліжко Террі 80х200 газ підйомний",
+    "hackmd": "https://hackmd.io/p3n9pCeLSTOz8bv_CSlh1w",
+    "note_id": "p3n9pCeLSTOz8bv_CSlh1w",
+    "progress": "Нові атрибути ➕",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "В процесі 🫡"
+    },
+    "status": "draft-fixed"
+  },
+  {
+    "slug": "terry-90x190-gas",
+    "name": "Ліжко Террі 90х190 газ підйомний",
+    "hackmd": "https://hackmd.io/yKiTsaB8SraE2MTH6ZBsNA",
+    "note_id": "yKiTsaB8SraE2MTH6ZBsNA",
+    "progress": "Нові атрибути ➕",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "В процесі 🫡"
+    },
+    "status": "draft-fixed"
+  },
+  {
+    "slug": "terry-90x200-gas",
+    "name": "Ліжко Террі 90х200 газ підйомний",
+    "hackmd": "https://hackmd.io/spSyD54dTXy6iaLycQTsQw",
+    "note_id": "spSyD54dTXy6iaLycQTsQw",
+    "progress": "Нові атрибути ➕",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "Готово 😎"
+    },
+    "status": "etalon"
+  },
+  {
+    "slug": "terry-120x190-gas",
+    "name": "Ліжко Террі 120х190",
+    "hackmd": "https://hackmd.io/xLw64GFRTmOjqc93Y6bKLg",
+    "note_id": "xLw64GFRTmOjqc93Y6bKLg",
+    "progress": "Нові атрибути ➕",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "В процесі 🫡"
+    },
+    "status": "draft-fixed"
+  },
+  {
+    "slug": "terry-120x200-gas",
+    "name": "Ліжко Террі 120х200",
+    "hackmd": "https://hackmd.io/gy5g6r-YQKaVYNwv2GT-nQ",
+    "note_id": "gy5g6r-YQKaVYNwv2GT-nQ",
+    "progress": "Нові атрибути ➕",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "В процесі 🫡"
+    },
+    "status": "draft-fixed"
+  },
+  {
+    "slug": "sky-80x190",
+    "name": "Ліжко Скай 80х190",
+    "hackmd": "https://hackmd.io/P81tLnunRJeqephtsQ5sDw",
+    "note_id": "P81tLnunRJeqephtsQ5sDw",
+    "progress": "",
+    "comment": "і може бути [Ізголовье в тканині] - 1.1 m",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "Питання ❓"
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "sky-90x200",
+    "name": "Ліжко Скай 90х200",
+    "hackmd": "https://hackmd.io/wqHCLi8jQWS-ySE1Sl7bsg",
+    "note_id": "wqHCLi8jQWS-ySE1Sl7bsg",
+    "progress": "",
+    "comment": "і може бути [Ізголовье в тканині] - 1.1 m",
+    "new_components": "🪵[Каркас - нарізана деревина] Ліжко Террі 90x200\n🧩[Каркас - нарізані деталі] Ліжко Террі 90x200\n🪤[Каркас - напівфабрикат] Ліжко Террі 90x200\n🧩[Ламінат - нарізані деталі] Ліжко Террі 90x200\n🧩[Поролон - нарізані компоненти] Ліжко Скай 90x200\n🪤🧽[Каркас + Поролон - напівфабрикат 2] Ліжко Скай 90x200\n🧩[Чохол - нарізані матеріали] Ліжко Скай 90x200\n🪤[Чохол - напівфабрикат] Ліжко Скай 90x200",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "Питання ❓"
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "sky-116x200",
+    "name": "Ліжко Скай 116х200",
+    "hackmd": "https://hackmd.io/1KkGvLevTdmAb-RiRILr4g",
+    "note_id": "1KkGvLevTdmAb-RiRILr4g",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "sky-80x190-gas",
+    "name": "Ліжко Скай 80х190 газ підйомний",
+    "hackmd": "https://hackmd.io/kQ9zlpe1R7iwQB0P7fWPLQ",
+    "note_id": "kQ9zlpe1R7iwQB0P7fWPLQ",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "sky-80x200-gas",
+    "name": "Ліжко Скай 80х200 газ підйомний",
+    "hackmd": "https://hackmd.io/5B_ejT1AQnawyqUGbcKE4w",
+    "note_id": "5B_ejT1AQnawyqUGbcKE4w",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "sky-90x190-gas",
+    "name": "Ліжко Скай 90х190 газ підйомний",
+    "hackmd": "https://hackmd.io/wZaFaszYRPajuOOWyp_YGQ",
+    "note_id": "wZaFaszYRPajuOOWyp_YGQ",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "sky-90x200-gas",
+    "name": "Ліжко Скай 90х200 газ підйомний",
+    "hackmd": "https://hackmd.io/dtL1IwZtQFyPhW5S2bmEvg",
+    "note_id": "dtL1IwZtQFyPhW5S2bmEvg",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "bali-140x200",
+    "name": "Ліжко Балі 140х200",
+    "hackmd": "https://hackmd.io/si4NvbyoSDG0BqG0xLH4DA",
+    "note_id": "si4NvbyoSDG0BqG0xLH4DA",
+    "progress": "",
+    "comment": "увага\nперевірка\nряд. 99\nЦех №5: відсутній варіант \"Посилений Блок\" для [Поролон - нарізані компоненти]. Запропонований блок: або 🧩[Поролон - нарізані компоненти] Ліжко Балі 140x200 (%Диван Пружинний Блок❌%, %Диван Розмір Бильця❌%) // @Диван Пружинний Блок=Посилений Блок [Поролон] (ST-2233 (2000x1600x30)) - 0.70 кг [Поролон] (ST-2233 (2000x1400x10)) - 0.462 кг\nДодати варіант \"Посилений Блок\"\n\nувага\nперевірка\nряд. 139\nМожливо потрібні квадратні дужки: \"Амортизатор 1000\" — перевірте чи це компонент-специфікатор\nАмортизатор 1000 - 2 шт.\n\nувага\nлінтер\nряд. 139\nФурнітура ≈ «Амортизатор 1200» 94, «Амортизатор 1500» 94, «Амортизатор 450» 84\nАмортизатор 1000 - 2 шт.\n\nЗамінити на «Амортизатор 1200»\nЗамінити на «Амортизатор 1500»\nЗамінити на «Амортизатор 450»\nАмортизатор 10200 - 2 шт.\n\nАмортизатор 10500 - 2 шт.\n\nАмортизатор 100450 - 2 шт.\n\nувага\nперевірка\nряд. 146\nМожливо потрібні квадратні дужки: \"амортизатор 1000\" — перевірте чи це компонент-специфікатор\nамортизатор 1000 - 2 шт.\n\nувага\nлінтер\nряд. 146\nФурнітура ≈ «Амортизатор 1200» 94, «Амортизатор 1500» 94, «Амортизатор 450» 84\nамортизатор 1000 - 2 шт.\n\nЗамінити на «Амортизатор 1200»\nЗамінити на «Амортизатор 1500»\nЗамінити на «Амортизатор 450»\nаАмортизатор 10200 - 2 шт.\n\nаАмортизатор 10500 - 2 шт.\n\nаАмортизатор 100450 - 2 шт.",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "Питання ❓"
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "bali-140x190",
+    "name": "Ліжко Балі 140х190",
+    "hackmd": "https://hackmd.io/Kphhu5dJQ3mP9ryNRa9f2A",
+    "note_id": "Kphhu5dJQ3mP9ryNRa9f2A",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "bali-160x200",
+    "name": "Ліжко Балі 160х200",
+    "hackmd": "https://hackmd.io/_x_mooIwQOabP7-Gx29srw",
+    "note_id": "_x_mooIwQOabP7-Gx29srw",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "bali-160x190",
+    "name": "Ліжко Балі 160х190",
+    "hackmd": "https://hackmd.io/ykAqsAHxQBaiuocnzKIqPQ",
+    "note_id": "ykAqsAHxQBaiuocnzKIqPQ",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "bali-180x200",
+    "name": "Ліжко Балі 180х200",
+    "hackmd": "https://hackmd.io/4op9LPy3QGGvVgFWol1mAA",
+    "note_id": "4op9LPy3QGGvVgFWol1mAA",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "faro-160x200",
+    "name": "Ліжко Фаро 160х200",
+    "hackmd": "https://hackmd.io/lvBjFoOyT16TUc9u7vP_MA",
+    "note_id": "lvBjFoOyT16TUc9u7vP_MA",
+    "progress": "",
+    "comment": "",
+    "new_components": "Тетріс(Балюта)\n🪵[Каркас - нарізана деревина] Ліжко Балі 160x200\n🧩[Каркас - нарізані деталі] Ліжко Фаро 160x200\n🧩[Ламінат - нарізані деталі] Ліжко Балі 160x200\n🪤[Каркас - напівфабрикат] Ліжко Фаро 160x200\n🧩[Поролон - нарізані компоненти] Ліжко Фаро 160x200\n🪤🧽[Каркас + Поролон - напівфабрикат 2] Ліжко Фаро 160x200\n🧩[Чохол - нарізані матеріали] Ліжко Фаро 160x200\n🪤[Чохол - напівфабрикат] Ліжко Фаро 160x200",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": "Питання ❓"
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "faro-160x190",
+    "name": "Ліжко Фаро 160х190",
+    "hackmd": "https://hackmd.io/lW9wypR4TBeKmwKGwxdBzA",
+    "note_id": "lW9wypR4TBeKmwKGwxdBzA",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "faro-180x200",
+    "name": "Ліжко Фаро 180х200",
+    "hackmd": "https://hackmd.io/9KiJu2XZQ6i1gtD_RjsR0A",
+    "note_id": "9KiJu2XZQ6i1gtD_RjsR0A",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "milana-140x200",
+    "name": "Ліжко Мілана 140х200",
+    "hackmd": "https://hackmd.io/3gQwlZXhRH-a4WIZ-WiYWg",
+    "note_id": "3gQwlZXhRH-a4WIZ-WiYWg",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "milana-140x190",
+    "name": "Ліжко Мілана 140х190",
+    "hackmd": "https://hackmd.io/OhFcqKqPSPCBIzs-jVHlQQ",
+    "note_id": "OhFcqKqPSPCBIzs-jVHlQQ",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "milana-160x200",
+    "name": "Ліжко Мілана 160х200",
+    "hackmd": "https://hackmd.io/qr4OjZAuR9mrBNiCM8PKLQ",
+    "note_id": "qr4OjZAuR9mrBNiCM8PKLQ",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "milana-160x190",
+    "name": "Ліжко Мілана 160х190",
+    "hackmd": "https://hackmd.io/mWPDgixaRH-X18ACSigG8A",
+    "note_id": "mWPDgixaRH-X18ACSigG8A",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "lira-140x200",
+    "name": "Ліжко Ліра 140х200",
+    "hackmd": "https://hackmd.io/oxrw7ciRTcWeGkOSoqaU6w",
+    "note_id": "oxrw7ciRTcWeGkOSoqaU6w",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "lira-160x200",
+    "name": "Ліжко Ліра 160х200",
+    "hackmd": "https://hackmd.io/cIbH84WNSHGa9qUtbn6sNg",
+    "note_id": "cIbH84WNSHGa9qUtbn6sNg",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "lira2-140x200",
+    "name": "Ліжко Ліра-2 140х200",
+    "hackmd": "https://hackmd.io/Ucg9NtoEQh22JBxC7NM4Iw",
+    "note_id": "Ucg9NtoEQh22JBxC7NM4Iw",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "lira2-160x200",
+    "name": "Ліжко Ліра-2 160х200",
+    "hackmd": "https://hackmd.io/rkIVKq-7Q6ObYtm422YwvQ",
+    "note_id": "rkIVKq-7Q6ObYtm422YwvQ",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "hugo-90x200",
+    "name": "Ліжко Хьюго 90х200",
+    "hackmd": "https://hackmd.io/28w7-XOpTW2TLpWw9t29zg",
+    "note_id": "28w7-XOpTW2TLpWw9t29zg",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "hugo-80x200",
+    "name": "Ліжко Хьюго 80х200",
+    "hackmd": "https://hackmd.io/Owy-FqTOTmOkv512jFv7ug",
+    "note_id": "Owy-FqTOTmOkv512jFv7ug",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "hugo-80x190",
+    "name": "Ліжко Хьюго 80х190",
+    "hackmd": "https://hackmd.io/K9MbMaBCSQq9ECJpixRlUw",
+    "note_id": "K9MbMaBCSQq9ECJpixRlUw",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "hugo-90x190",
+    "name": "Ліжко Хьюго 90х190",
+    "hackmd": "https://hackmd.io/0fhIl4CSR-SspBL97-6Weg",
+    "note_id": "0fhIl4CSR-SspBL97-6Weg",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "leya-90x200",
+    "name": "Ліжко Лея 90х200",
+    "hackmd": "https://hackmd.io/TIjK08qhQP2yJUJHcIbyIg",
+    "note_id": "TIjK08qhQP2yJUJHcIbyIg",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "sky-120x200",
+    "name": "Ліжко Скай 120х200",
+    "hackmd": "https://hackmd.io/7oymKJMrQ9atGGJGqlWuow",
+    "note_id": "7oymKJMrQ9atGGJGqlWuow",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  },
+  {
+    "slug": "sky-120x190",
+    "name": "Ліжко Скай 120х190",
+    "hackmd": "https://hackmd.io/ii-eao66QpKGMU4EulmMmQ",
+    "note_id": "ii-eao66QpKGMU4EulmMmQ",
+    "progress": "",
+    "comment": "",
+    "new_components": "",
+    "checks": {
+      "d": "Готово 😎",
+      "t": "Готово 😎",
+      "l": "Готово 😎",
+      "v": ""
+    },
+    "status": "original-only"
+  }
+]

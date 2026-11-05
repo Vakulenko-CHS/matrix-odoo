@@ -1,0 +1,14 @@
+---
+description: Furniture/bed BOM local review — knowledge + skill
+globs: furniture/**/*.md
+---
+
+# Ліжка / меблі
+
+When editing or reviewing specs under `furniture/` or user says ліжко / ліжка / перевірка меблів:
+
+1. Follow **`.cursor/skills/furniture-check/SKILL.md`**.
+2. Read `furniture/KNOWLEDGE.md` first. Do not load all of `docs/docs_first-fixed/`.
+3. **Never** push HackMD. Writes stay in `furniture/beds/<slug>/`.
+4. After `fixed.md` change: `npm run ai-check --` that path.
+5. Uncertain business rule → `furniture/colleague-questions.md`, not a silent guess.

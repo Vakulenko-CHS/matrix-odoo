@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Ліжка — локально</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body data-chrome="on">
+    <div class="app furn-app">
+      <header class="top">
+        <div class="brand">
+          <span class="brand-mark">MATRIX</span>
+          <span class="brand-sub">ліжка · лише локально</span>
+        </div>
+        <p class="stamp-hint hint">
+          <code>npm run beds</code> · :5191 · Specs → <code>furniture/reference/</code>
+        </p>
+      </header>
+      <div class="furn-layout">
+        <aside class="furn-list" id="list" aria-label="Ліжка"></aside>
+        <section class="furn-main">
+          <details class="furn-diff-note" id="diff-note">
+            <summary id="diff-note-summary">DIFF — пояснення змін (показати / сховати)</summary>
+            <pre class="furn-doc furn-diff-md" id="diff-md"></pre>
+          </details>
+          <div class="furn-toolbar">
+            <p class="furn-meta" id="meta"></p>
+            <button
+              type="button"
+              class="furn-btn-diff"
+              id="btn-unified"
+              aria-pressed="false"
+              aria-controls="pane-uni col-h-uni"
+            >
+              1 вікно
+            </button>
+            <button
+              type="button"
+              class="furn-btn-diff"
+              id="btn-text-diff"
+              aria-pressed="false"
+              aria-controls="pane-git"
+            >
+              diff
+            </button>
+          </div>
+          <div class="furn-grid" id="split-view">
+            <h3 class="furn-col-h" id="col-h-orig">original</h3>
+            <h3 class="furn-col-h" id="col-h-fix">fixed</h3>
+            <h3 class="furn-col-h furn-col-h--uni" id="col-h-uni" hidden>накладений diff</h3>
+            <div class="furn-pane furn-pane--orig" id="pane-orig">
+              <pre class="furn-doc" id="original"></pre>
+            </div>
+            <div class="furn-pane furn-pane--fix" id="pane-fix">
+              <pre class="furn-doc" id="fixed"></pre>
+            </div>
+            <div class="furn-pane furn-pane--git" id="pane-git" hidden>
+              <div class="furn-git" id="git-out" aria-live="polite"></div>
+            </div>
+            <div class="furn-pane furn-pane--uni" id="pane-uni" hidden>
+              <div class="furn-text-diff" id="text-diff-out" aria-live="polite"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

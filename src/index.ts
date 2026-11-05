@@ -100,7 +100,9 @@ async function main() {
   npm run to-novalid "<файл>"    — сирий дамп → documents_no_valid
   npm run validate "<файл>"       — авто-форматування + список помилок
   npm run validate-all [папка]   — валідація всіх .md у папці
-  npm run web                    — сторінка перевірки специфікації
+  npm run web                    — валідатор специфікації (localhost:5190)
+  npm run beds                   — ліжка локально (:5191)
+  npm run tasks                  — дошка задач (:5192)
   npm run ai-check -- "<файл.md>" — звіт помилок у stdout, файли не чіпає
   npm run pull-hackmd -- urls.txt [папка] — дамп публічних HackMD у markdown
   npm run batch-format -- <папка>  — веб-перевірка, 1 кнопка авто, multi → звіт

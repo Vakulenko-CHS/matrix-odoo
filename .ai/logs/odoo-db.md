@@ -2,6 +2,13 @@
 
 ## Entries (newest first)
 
+### 2026-11-04 — serial sofas; invoice modal not a bug
+
+- **Agent / human:** colleague / user (logged by agent)
+- **Summary:** 86 sofa templates `tracking=serial`; Короб Реал `none`. Open MO Елегант БН 00606/00633/00648 need lot. Test WH/MO/00545 + fabric values validate/validate-all/Синтетика still to delete. Invoice modal on already-invoiced SO (S00254 draft). list_price 1 ₴, fabric extras test 100 ₴. Per-sofa extras wanted, not global default extra.
+- **Files:** live Odoo (colleague); notes `tasks/NOTES.md`
+- **Git:** not committed
+
 ### 2026-10-30 — fix `next()` in SO line uid compute
 
 - **Agent / human:** agent

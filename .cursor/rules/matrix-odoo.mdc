@@ -7,6 +7,8 @@ alwaysApply: true
 
 1. Read **`.ai/INDEX.md`** then **`.ai/CONTEXT.md`** (snapshot + log index only). Open **`.ai/logs/`** only when Topics match.
 2. If user mentions **формат / format / накладки / ламінат / кромка / файл з форматом** → open **`docs/formats/README.md`** then the matching file (usually `docs/formats/nakladky-laminat.md` or `docs/BOM_FORMAT.md`).
+2b. Ліжка / перевірка меблів → **`furniture/README.md`** + skill **`.cursor/skills/furniture-check/SKILL.md`**. HackMD не пушити.
 3. Furniture BOM markdown check → `npm run ai-check` (see `ai-spec-check` rule). Do not invent issues.
 4. Odoo writes only with explicit `--apply` / user approval. Creds in `.env.local`, not committed.
 5. After meaningful session: prepend matching `.ai/logs/*.md`; update Log index + Last updated in `CONTEXT.md`.
+6. Client tasks: **`apps/tasks/BOARD.md`** is source of truth. Same-turn update. UI `npm run tasks` (:5192). Beds `npm run beds` (:5191). Validator `npm run web` (:5190). Ports in **`dev/ports.json`**. Never link tasks/beds into Netlify `web/`.
