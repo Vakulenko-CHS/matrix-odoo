@@ -7,6 +7,7 @@ export type Card = {
   beds: string;
   gate: string;
   blocked: string;
+  created: string;
   updated: string;
   note: string;
   column: ColumnId;
@@ -20,11 +21,34 @@ export type Column = {
   cards: Card[];
 };
 
+/** UI tabs (legacy); Kanban uses PIPELINE_COLS only — one card, one column. */
 const COL_ORDER: ColumnId[] = ["free", "done", "doing", "next", "backlog", "low", "log"];
+
+/** Класичний pipeline зліва направо (без віртуальної «вільні»). */
+export const PIPELINE_COLS: ColumnId[] = ["doing", "next", "backlog", "low", "done", "log"];
 
 export function isFreeGate(gate: string): boolean {
   const g = gate.toLowerCase();
   return g.startsWith("вільн") || g === "free";
+}
+
+function isWaitGate(gate: string): boolean {
+  const g = gate.toLowerCase();
+  return g.startsWith("чека") || g === "waiting";
+}
+
+/** Мітки доступу / контексту — не дублюють колонку pipeline. */
+export function cardTags(card: Card): string[] {
+  const tags: string[] = [];
+  const p = card.prio.trim();
+  if (p) tags.push(p);
+  if (isFreeGate(card.gate)) tags.push("вільна");
+  else if (isWaitGate(card.gate)) tags.push("чекає");
+  else if (card.gate.trim()) tags.push(card.gate.trim());
+  if (card.beds === "yes") tags.push("ліжка");
+  else if (card.beds === "maybe") tags.push("ліжка?");
+  if (card.blocked.trim() && card.blocked !== "—") tags.push("блокер");
+  return tags;
 }
 
 function stripMd(s: string): string {
@@ -71,6 +95,7 @@ function rowToCard(row: Record<string, string>, column: ColumnId): Card {
     beds: stripMd(row["beds"] ?? ""),
     gate: stripMd(row["доступ"] ?? row["gate"] ?? ""),
     blocked,
+    created: stripMd(row["створено"] ?? row["created"] ?? row["updated"] ?? ""),
     updated: stripMd(row["updated"] ?? ""),
     note: stripMd(row["нотатка"] ?? ""),
     column,

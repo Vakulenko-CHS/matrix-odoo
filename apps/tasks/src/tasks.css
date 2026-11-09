@@ -1,114 +1,118 @@
 .task-layout {
   display: grid;
-  grid-template-columns: minmax(300px, 38%) 1fr;
+  grid-template-columns: 1fr minmax(220px, 26rem);
   flex: 1;
   min-height: 0;
   border-top: 1px solid var(--rule);
 }
-.task-left {
+.task-kanban-wrap {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--sheet);
+  border-right: 1px solid var(--rule);
+}
+.task-kanban {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  height: 100%;
+  padding: 10px 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.task-kanban-col {
+  flex: 0 0 240px;
+  max-width: 280px;
   display: flex;
   flex-direction: column;
-  min-width: 0;
-  border-right: 1px solid var(--rule);
-  background: var(--sheet);
-}
-.task-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0;
-  border-bottom: 1px solid var(--rule);
-}
-.task-tabs button {
-  flex: 1 1 auto;
-  min-width: 0;
-  margin: 0;
-  padding: 10px 8px;
-  border: 0;
-  border-right: 1px solid var(--rule);
-  background: transparent;
-  cursor: pointer;
-  font-family: var(--ui);
-  font-size: 13px;
-  color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.task-tabs button.on {
-  background: var(--ply-dark);
-  color: var(--graphite);
-  font-weight: 600;
-}
-.task-tabs button.has-open {
-  position: relative;
-  padding-right: 14px;
-}
-.task-tabs button.has-open::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: 7px;
-  width: 6px;
-  height: 6px;
-  margin-top: -3px;
-  border-radius: 50%;
-  background: var(--steel);
-}
-.task-tabs button.on.has-open::after {
-  background: var(--grease);
-}
-.task-list {
-  overflow: auto;
-  flex: 1;
-  padding: 10px;
-}
-.task-card {
-  display: grid;
-  grid-template-columns: auto auto 1fr;
-  grid-template-rows: auto auto;
-  column-gap: 8px;
-  row-gap: 4px;
-  width: 100%;
-  margin: 0 0 8px;
-  padding: 10px 12px;
+  min-height: 0;
   border: 1px solid var(--rule);
   background: var(--ply);
+}
+.task-kanban-head {
+  padding: 8px 10px;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--rule);
+  background: var(--sheet);
+}
+.task-kanban-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px;
+}
+.task-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--rule);
+  background: var(--sheet);
   cursor: pointer;
   font-family: var(--ui);
   color: var(--graphite);
   text-align: left;
+}
+.task-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.task-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.task-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 5px;
+  border-radius: 2px;
+  background: var(--ply-dark);
+  color: var(--muted);
+}
+.task-tag--чекає {
+  color: var(--oxide);
+  background: color-mix(in srgb, var(--oxide) 12%, var(--ply));
+}
+.task-tag--вільна {
+  color: var(--steel);
+}
+.task-tag--P0 {
+  color: var(--grease);
+}
+.task-dates {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--spec);
 }
 .task-card.on {
   background: var(--ply-dark);
   border-color: var(--steel);
 }
 .tid {
-  grid-column: 1;
   font-family: var(--spec);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--steel);
 }
-.tp {
-  grid-column: 2;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--grease);
-}
-.tb {
-  grid-column: 3;
-  justify-self: end;
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--oxide);
-}
 .tt {
-  grid-column: 1 / -1;
-  font-size: 15px;
+  font-size: 13px;
   line-height: 1.35;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-word;
@@ -125,19 +129,19 @@
   min-width: 0;
   min-height: 0;
   overflow: auto;
-  background: var(--sheet);
-  padding: 20px 28px 32px;
+  background: var(--ply);
+  padding: 12px 14px 20px;
 }
 .task-detail h1 {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   font-family: var(--display);
-  font-size: 26px;
+  font-size: 18px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 .task-props-wrap {
-  margin: 0 0 20px;
-  max-width: 36rem;
+  margin: 0 0 12px;
+  max-width: none;
 }
 .task-props {
   width: 100%;
@@ -179,9 +183,9 @@
   color: var(--muted);
 }
 .task-body {
-  font-size: 17px;
-  line-height: 1.6;
-  max-width: 42rem;
+  font-size: 14px;
+  line-height: 1.55;
+  max-width: none;
 }
 .task-body p {
   margin: 0 0 12px;
@@ -222,8 +226,8 @@
   cursor: pointer;
 }
 .task-files-wrap {
-  margin: 0 0 16px;
-  max-width: 42rem;
+  margin: 0 0 12px;
+  max-width: none;
 }
 .task-files-label {
   display: block;
@@ -386,12 +390,12 @@
   outline-offset: 4px;
   scroll-margin-top: 12px;
 }
-@media (max-width: 800px) {
+@media (max-width: 900px) {
   .task-layout {
     grid-template-columns: 1fr;
-    grid-template-rows: 45% 1fr;
+    grid-template-rows: 55% 1fr;
   }
-  .task-left {
+  .task-kanban-wrap {
     border-right: 0;
     border-bottom: 1px solid var(--rule);
   }

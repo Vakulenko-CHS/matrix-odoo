@@ -2,14 +2,19 @@ import "../../../web/src/styles.css";
 import "./tasks.css";
 import boardMd from "../BOARD.md?raw";
 import ports from "../../../dev/ports.json";
-import { parseBoard, type Card, type Column, type ColumnId } from "./board.ts";
+import {
+  parseBoard,
+  PIPELINE_COLS,
+  cardTags,
+  type Card,
+  type ColumnId,
+} from "./board.ts";
 import { extractRepoLinks, hrefToRepoPath, splitRepoHref } from "./repoPaths.ts";
 import { bindRepoLinks, mountRepoBrowser, openRepoPath } from "./repoBrowser.ts";
 
 const { updated, columns } = parseBoard(boardMd);
 
-const tabsEl = document.getElementById("tabs")!;
-const listEl = document.getElementById("list")!;
+const kanbanEl = document.getElementById("kanban")!;
 const metaEl = document.getElementById("meta")!;
 const bodyEl = document.getElementById("body")!;
 const titleEl = document.getElementById("card-title")!;
@@ -18,57 +23,41 @@ const filesEl = document.getElementById("card-files")!;
 
 mountRepoBrowser();
 
-metaEl.textContent = `apps/tasks/BOARD.md · ${updated} · npm run tasks · :${ports.tasks} · не Netlify · клік по файлу → модалка`;
+metaEl.textContent = `apps/tasks/BOARD.md · ${updated} · npm run tasks · :${ports.tasks} · Kanban pipeline · OUTBOUND у BOARD`;
 
 const LS_TASK = "matrix-tasks-selected-id";
-const LS_COL = "matrix-tasks-selected-col";
 
-function defaultColId(): ColumnId {
-  return (
-    columns.find((c) => c.id === "free" && c.cards.length)?.id ??
-    columns.find((c) => c.id === "next" && c.cards.length)?.id ??
-    columns.find((c) => c.cards.length)?.id ??
-    "free"
-  );
-}
+const COL_LABEL: Record<ColumnId, string> = {
+  free: "Вільні (тег)",
+  doing: "В роботі",
+  next: "Далі",
+  backlog: "Черга",
+  low: "Низький",
+  log: "Журнал",
+  done: "Готово",
+};
 
 function findCardById(taskId: string): Card | undefined {
-  for (const c of columns) {
-    const hit = c.cards.find((x) => x.id === taskId);
+  for (const id of PIPELINE_COLS) {
+    const col = columns.find((c) => c.id === id);
+    const hit = col?.cards.find((x) => x.id === taskId);
     if (hit) return hit;
   }
   return undefined;
 }
 
-function tabHasCard(tabId: ColumnId, taskId: string): boolean {
-  return columns.find((c) => c.id === tabId)?.cards.some((x) => x.id === taskId) ?? false;
-}
-
-function restoreSession(): { colId: ColumnId; selected: string | null; hadSaved: boolean } {
+function restoreSession(): { selected: string | null; hadSaved: boolean } {
   const savedId = localStorage.getItem(LS_TASK)?.trim();
-  if (!savedId) {
-    return { colId: defaultColId(), selected: null, hadSaved: false };
-  }
-  const card = findCardById(savedId);
-  if (!card) {
+  if (!savedId) return { selected: null, hadSaved: false };
+  if (!findCardById(savedId)) {
     localStorage.removeItem(LS_TASK);
-    localStorage.removeItem(LS_COL);
-    return { colId: "free", selected: null, hadSaved: true };
+    return { selected: null, hadSaved: true };
   }
-  const savedCol = localStorage.getItem(LS_COL) as ColumnId | null;
-  const colId =
-    savedCol && tabHasCard(savedCol, savedId)
-      ? savedCol
-      : tabHasCard("free", savedId)
-        ? "free"
-        : card.column;
-  return { colId, selected: savedId, hadSaved: true };
+  return { selected: savedId, hadSaved: true };
 }
 
 const restored = restoreSession();
-let colId: ColumnId = restored.colId;
 let selected: string | null = restored.selected;
-/** Після reload: не чіпати першу картку, якщо нічого не відновили (новий візит або зникла id). */
 let initialPickFirst = restored.hadSaved ? restored.selected !== null : true;
 
 function escapeHtml(s: string): string {
@@ -130,24 +119,6 @@ function renderMd(raw: string): string {
     .join("");
 }
 
-const COL_LABEL: Record<ColumnId, string> = {
-  free: "Вільні",
-  doing: "В роботі",
-  next: "Далі",
-  backlog: "Черга",
-  low: "Низький пріоритет",
-  log: "Журнал",
-  done: "Готово",
-};
-
-function colLabel(col: Column): string {
-  return `${COL_LABEL[col.id] ?? col.id} ${col.cards.length}`;
-}
-
-function col(): Column {
-  return columns.find((c) => c.id === colId) ?? columns[0];
-}
-
 function bedsLabel(beds: string): string {
   if (beds === "yes") return "так";
   if (beds === "maybe") return "можливо";
@@ -181,13 +152,12 @@ function renderFiles(card: Card): void {
 }
 
 function renderProps(card: Card): void {
-  const rows: [string, string][] = [
-    ["id", card.id],
-    ["колонка", COL_LABEL[card.column] ?? card.column],
-  ];
+  const rows: [string, string][] = [["id", card.id]];
   if (card.prio.trim()) rows.push(["пріоритет", card.prio]);
+  rows.push(["pipeline", COL_LABEL[card.column] ?? card.column]);
   if (card.gate.trim()) rows.push(["доступ", card.gate]);
   if (card.beds.trim()) rows.push(["ліжка", bedsLabel(card.beds)]);
+  if (card.created.trim()) rows.push(["створено", card.created]);
   if (card.updated.trim()) rows.push(["оновлено", card.updated]);
   const blocked = card.blocked.trim();
   if (blocked) rows.push(["блокери", blocked === "—" ? "—" : blocked]);
@@ -212,26 +182,20 @@ function renderProps(card: Card): void {
 }
 
 function persistSelection(): void {
-  if (selected) {
-    localStorage.setItem(LS_TASK, selected);
-    localStorage.setItem(LS_COL, colId);
-  } else {
-    localStorage.removeItem(LS_TASK);
-    localStorage.removeItem(LS_COL);
-  }
+  if (selected) localStorage.setItem(LS_TASK, selected);
+  else localStorage.removeItem(LS_TASK);
 }
 
 function show(card: Card | null) {
   selected = card?.id ?? null;
-  listEl.querySelectorAll(".task-card.on").forEach((n) => n.classList.remove("on"));
+  kanbanEl.querySelectorAll(".task-card.on").forEach((n) => n.classList.remove("on"));
   if (!card) {
     titleEl.textContent = "Картка";
     cardMetaEl.replaceChildren();
     filesEl.replaceChildren();
     filesEl.hidden = true;
-    bodyEl.textContent = "Обери рядок зліва.";
+    bodyEl.textContent = "Обери картку на дошці.";
     persistSelection();
-    paintTabs();
     return;
   }
   document.querySelector(`[data-id="${card.id}"]`)?.classList.add("on");
@@ -241,73 +205,93 @@ function show(card: Card | null) {
   bodyEl.innerHTML = renderMd(card.body || card.title);
   bindRepoLinks(bodyEl);
   persistSelection();
-  paintTabs();
 }
 
-function paintList(opts?: { pickFirst?: boolean }) {
+function makeCardButton(card: Card): HTMLButtonElement {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "task-card";
+  b.dataset.id = card.id;
+  b.title = card.title;
+
+  const head = document.createElement("div");
+  head.className = "task-card-head";
+  const id = document.createElement("span");
+  id.className = "tid";
+  id.textContent = card.id;
+  head.appendChild(id);
+
+  const tagsEl = document.createElement("div");
+  tagsEl.className = "task-tags";
+  for (const t of cardTags(card)) {
+    const sp = document.createElement("span");
+    sp.className = `task-tag task-tag--${t.replace(/[^a-zа-яіїєґ0-9?]/gi, "")}`;
+    sp.textContent = t;
+    tagsEl.appendChild(sp);
+  }
+
+  const tt = document.createElement("span");
+  tt.className = "tt";
+  tt.textContent = card.title;
+
+  const dates = document.createElement("span");
+  dates.className = "task-dates";
+  const parts: string[] = [];
+  if (card.created && card.created !== card.updated) parts.push(`з ${card.created}`);
+  if (card.updated) parts.push(`↻ ${card.updated}`);
+  dates.textContent = parts.join(" · ");
+
+  b.append(head, tagsEl, tt, dates);
+  b.addEventListener("click", () => show(card));
+  return b;
+}
+
+function paintKanban(opts?: { pickFirst?: boolean }) {
   const pickFirst = opts?.pickFirst ?? false;
-  const c = col();
   const keepOpen = selected ? findCardById(selected) : undefined;
-  listEl.replaceChildren();
-  if (!c.cards.length) {
-    const p = document.createElement("p");
-    p.className = "task-empty";
-    p.textContent = c.emptyNote || "Порожня колонка.";
-    listEl.appendChild(p);
-    show(keepOpen ?? null);
-    return;
+  kanbanEl.replaceChildren();
+
+  for (const colId of PIPELINE_COLS) {
+    const col = columns.find((c) => c.id === colId);
+    if (!col) continue;
+    const colWrap = document.createElement("div");
+    colWrap.className = "task-kanban-col";
+    colWrap.dataset.col = colId;
+
+    const head = document.createElement("header");
+    head.className = "task-kanban-head";
+    head.textContent = `${COL_LABEL[colId] ?? colId} · ${col.cards.length}`;
+    colWrap.appendChild(head);
+
+    const list = document.createElement("div");
+    list.className = "task-kanban-list";
+    if (!col.cards.length) {
+      const p = document.createElement("p");
+      p.className = "task-empty";
+      p.textContent = col.emptyNote || "—";
+      list.appendChild(p);
+    } else {
+      for (const card of col.cards) {
+        list.appendChild(makeCardButton(card));
+      }
+    }
+    colWrap.appendChild(list);
+    kanbanEl.appendChild(colWrap);
   }
-  for (const card of c.cards) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "task-card";
-    b.dataset.id = card.id;
-    b.title = card.title;
-    const id = document.createElement("span");
-    id.className = "tid";
-    id.textContent = card.id;
-    const prio = document.createElement("span");
-    prio.className = "tp";
-    prio.textContent = card.prio;
-    const beds = document.createElement("span");
-    beds.className = "tb";
-    beds.textContent = card.beds === "yes" ? "ліжка" : card.beds === "maybe" ? "ліжка?" : "";
-    const tt = document.createElement("span");
-    tt.className = "tt";
-    tt.textContent = card.title;
-    b.append(id, prio, beds, tt);
-    b.addEventListener("click", () => show(card));
-    listEl.appendChild(b);
-  }
+
   if (keepOpen) {
     show(keepOpen);
     return;
   }
-  show(pickFirst && c.cards[0] ? c.cards[0] : null);
-}
-
-function paintTabs() {
-  tabsEl.replaceChildren();
-  for (const c of columns) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.textContent = colLabel(c);
-    const openHere = selected ? tabHasCard(c.id, selected) : false;
-    b.title = openHere ? `${c.heading} · тут відкрита ${selected}` : c.heading;
-    const cls: string[] = [];
-    if (c.id === colId) cls.push("on");
-    if (openHere) cls.push("has-open");
-    b.className = cls.join(" ");
-    b.addEventListener("click", () => {
-      colId = c.id;
-      paintTabs();
-      paintList();
-      if (selected) persistSelection();
-    });
-    tabsEl.appendChild(b);
+  if (pickFirst) {
+    const first =
+      PIPELINE_COLS.map((id) => columns.find((c) => c.id === id)?.cards[0]).find(Boolean) ??
+      null;
+    show(first ?? null);
+    return;
   }
+  show(null);
 }
 
-paintTabs();
-paintList({ pickFirst: initialPickFirst });
+paintKanban({ pickFirst: initialPickFirst });
 initialPickFirst = true;
