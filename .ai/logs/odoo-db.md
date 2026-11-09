@@ -2,6 +2,29 @@
 
 ## Entries (newest first)
 
+### 2026-11-09 — T-WC-01 ensure-workcenters
+
+- **Summary:** `canon.ts` +2 (2-4 Ц2дс4, 6-1 Ц6П-1). `npm run ensure-workcenters -- --apply` → created id **35**, **36**.
+- **Files:** `src/workcenters/canon.ts`
+
+### 2026-11-05 — T-LAM-01 apply lam-buy
+
+- **Agent / human:** agent / user «так, apply T-LAM-01»
+- **Summary:** 68 templates: purchase_ok, VNZ removed, 3197 WH/Stock orderpoints route Придбати. Verified: lam cut 41/41 buy 0 vnz; white sheet id18 routes [].
+- **Files:** `src/commands/lamBuyRoutes.ts`, `npm run lam-buy`
+
+### 2026-11-05 — T-SER-01 apply junk (A+B+C partial)
+
+- **Agent / human:** agent / user approve in chat
+- **Summary:** `npm run ser-junk -- --apply`. Lot 0000001 quants→0. PAV validate/validate-all/Синтетика (714,713,718) removed from fabric attr lines, `active=false`. Orphan ptav rows may remain (unlink slow/blocked). MO 00545–548 stay done. TEСТ quants purged (20). Location «Тестовый склад» id=168 archived. Restore: `write` pav `active=true` + re-add values to templates or re-import.
+- **Files:** `src/commands/ser01ApplyJunk.ts`, `npm run ser-junk`
+
+### 2026-11-05 — T-SER-01 junk audit (read-only)
+
+- **Agent / human:** agent / user (await approve)
+- **Summary:** Live scan: test MO WH/MO/00545+546–548 + lot 0000001 only (0000002/3 tied S00254/S00256). Fabric pav validate/validate-all/Синтетика → 611 ptav. 5 archived ТЕСТ products + stray quants. 4130 ptav price_extra=100 = reset not archive. Report `furniture/reference/T-SER-01-junk-audit-2026-11-05.md`, `npm run audit-junk`.
+- **Git:** audit script uncommitted
+
 ### 2026-11-05 — T-FELT-01 apply: [Войлок] 1.40 → 1.45
 
 - **Agent / human:** agent / user
