@@ -3,7 +3,7 @@
 Session notes → [logs/](logs/). Keep this file slim.  
 Start: [.ai/INDEX.md](./INDEX.md) → **this file**. Open logs only when **Log index** matches.
 
-Last updated: **2026-11-09** (bed batch format 40/40)
+Last updated: **2026-11-09** (T-DESC-01 related apply)
 
 ---
 
@@ -94,6 +94,7 @@ UOM: `m²` id=10, `m` id=8.
 | T-LAM-01 | Ламінат/накладки = купівля як Боннель, без ВНЗ | Ламає цех 3-1/3-2 на ліжках якщо ігнорувати |
 | T-PRC-01 | Extra тканини per sofa | log 2026-11-05: колега закрив презентацією |
 | T-FAB-01 | 8 замовних тканин (4 назви ще немає) | |
+| T-DESC-01 | Опис рядка SO на MO/WO/якість | related apply 2026-11-09; loc 93/100 |
 | N1 | Variant-level remap диванних BOM (Леон-Люкс etc.) | 33 lines temp→Венге |
 | N2 | Створити накладки з TSV без матчу | Берлін, Барселона, … |
 | N3 | Смужки як окремі моделі/споживання | rows без A в TSV |
@@ -104,10 +105,10 @@ UOM: `m²` id=10, `m` id=8.
 
 | ID | File | Topics | Read when | Updated |
 |----|------|--------|-----------|---------|
-| L-tasks | [logs/client-tasks.md](logs/client-tasks.md) | tasks, slack, kanban, замовна тканина, якість, войлок, серійний | клієнтські задачі / `apps/tasks/BOARD.md` | 2026-11-05 |
+| L-tasks | [logs/client-tasks.md](logs/client-tasks.md) | tasks, slack, kanban, замовна тканина, якість, войлок, серійний, опис рядка | клієнтські задачі / `apps/tasks/BOARD.md` | 2026-11-09 |
 | L-furn | [logs/furniture.md](logs/furniture.md) | furniture, ліжко, ліжка, beds, knowledge, beds UI, git diff | перевірка ліжок / furniture/ / `apps/beds` | 2026-11-09 |
 | L-1027 | [logs/2026-10-27-terry-beds.md](logs/2026-10-27-terry-beds.md) | террі, terry, ліжко, hackmd, size variants | Террі beds / HackMD size specs | 2026-10-27 |
-| L-odoo | [logs/odoo-db.md](logs/odoo-db.md) | odoo, ids, attr, workcenter, uom, api, is_storable, orderpoint, buy, loc, studio, serial, invoice | будь-яка робота з живою базою / IDs | 2026-11-04 |
+| L-odoo | [logs/odoo-db.md](logs/odoo-db.md) | odoo, ids, attr, workcenter, uom, api, is_storable, orderpoint, buy, loc, studio, serial, invoice | будь-яка робота з живою базою / IDs | 2026-11-09 |
 | L-nakladky | [logs/nakladky.md](logs/nakladky.md) | накладки, nakladky, ламінат кольоровий, кромка, ширина кромки | sync/fix overlays & colored sheets | 2026-10-23 |
 | L-formats | [logs/formats.md](logs/formats.md) | формат, format, BOM_FORMAT, docs/formats | юзер каже «файл з форматом» / reuse format | 2026-10-02 |
 | L-1021 | [logs/2026-10-21-links-3-import.md](logs/2026-10-21-links-3-import.md) | links-3, import, PTAL, temp batches, sofa-batch-prep | пакетні імпорти диванів / temp/batches | 2026-10-21 |

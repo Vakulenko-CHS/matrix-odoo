@@ -2,6 +2,11 @@
 
 ## Entries (newest first)
 
+### 2026-11-09 — T-DESC related SO line note
+
+- **Summary:** Fields **25253** MO, **25258** WO, **25260** QC `x_studio_so_line_note` related `sale_line_id.name`. Views **3846–3849**. Loc **93/100**. No Python.
+- **Files:** `src/commands/studioSoLineNote.ts`
+
 ### 2026-11-09 — auto SN copies to QC + lot PDF exists
 
 - **Agent / human:** agent / user «допиши QC + перевір друк»

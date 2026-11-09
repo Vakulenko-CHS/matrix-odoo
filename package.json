@@ -57,7 +57,8 @@
     "ser-junk": "ts-node --transpile-only src/commands/ser01ApplyJunk.ts",
     "lam-buy": "ts-node --transpile-only src/commands/lamBuyRoutes.ts",
     "assign-mo-serials": "ts-node --transpile-only src/commands/assignMoSerials.ts",
-    "studio-auto-serial": "ts-node --transpile-only src/commands/studioAutoSerial.ts"
+    "studio-auto-serial": "ts-node --transpile-only src/commands/studioAutoSerial.ts",
+    "studio-so-note": "ts-node --transpile-only src/commands/studioSoLineNote.ts"
   },
   "keywords": [],
   "author": "",

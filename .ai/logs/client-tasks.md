@@ -2,6 +2,22 @@
 
 ## Entries (newest first)
 
+### 2026-11-09 — T-DESC-01 apply related fields
+
+- **Summary:** `x_studio_so_line_note` related on MO/WO/QC. Views 3846–3849. Studio loc still **93/100**. Sample MO shows `sale.order.line.name`. Client how-to in `furniture/reference/T-DESC-01-povidomlennya-kliyentu.md`. BOARD done.
+- **Files:** `src/commands/studioSoLineNote.ts`, `package.json`, `apps/tasks/BOARD.md`
+
+### 2026-11-09 — T-DESC related not Python (93/100)
+
+- **Summary:** Do not add Studio Python for SO line note. Live loc ~93/100. Related `sale_line_id.name` on MO/WO/QC. How to open action 1157 documented in NOTES.
+- **Files:** `apps/tasks/NOTES.md`
+
+### 2026-11-09 — T-DESC-01 SO line description → MRP/QC
+
+- **Summary:** Client: SO line «Введіть опис» (`sale.order.line.name`) should show on MO / WO / routing print / quality. No Odoo write. Card T-DESC-01 backlog P1; NOTES mapping. Related to T-QAL-02 + `x_studio_x_so_line_uid`.
+- **Files:** `apps/tasks/BOARD.md`, `apps/tasks/NOTES.md`
+- **Git:** uncommitted
+
 ### 2026-11-09 — T-WC done; KNOWLEDGE ops; Terry gas lint headers
 
 - **Summary:** WC 2-4/6-1 Odoo. KNOWLEDGE checklist + import order. 6× Terry gas `fixed.md` цех-коди (Ц3лд1, Ц4С1–4, Ц5Н1). ai-check: lint errors cleared; warnings (Бортик/Ізголовье catalog) — до імпорту.

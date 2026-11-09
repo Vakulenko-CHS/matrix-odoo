@@ -1,5 +1,27 @@
 # Нотатки до карток
 
+## T-DESC-01 — опис рядка SO в MO / цех / якість
+
+Клієнт 2026-11-09: після «Введіть опис» на рядку продажу хоче той самий текст далі по процесу.
+
+| Куди | Модель | Як показати |
+|------|--------|-------------|
+| Рядок SO | `sale.order.line.name` | Уже є (плейсхолдер «Введіть опис») |
+| MO | `mrp.production` | Studio related / copy з `sale_line_id.name` |
+| Операція / цех | `mrp.workorder` | related `production_id.…` + view Shop Floor |
+| Якість | `quality.check` | related `production_id.…` + колонка списку |
+| Друкований маршрут | звіт MO / worksheet | поле в QWeb / Studio report |
+
+Не класти нотатку в `product.template` / BOM / `description_picking` на шаблоні.
+
+**100 рядків Studio.** Зараз Python ≈ **93/100** (compute + automations, у т.ч. авто-SN action 1157). Новий compute/automation = ризик 101 → наступні 100€. Для опису — **related**, не Python (`related` не входить у cloc).
+
+**Відкрити код Studio (прод):** увімкнути режим розробника → Налаштування → Технічні → Дії → Серверні дії → `Авто SN на MO (готовий диван/ліжко)` (id **1157**). Або форма MO → іконка Studio (палітра) → Автоматизації.
+
+**Apply 2026-11-09.** Related `x_studio_so_line_note` (не Python). MO **25253**, WO **25258**, QC **25260**. Views **3846–3849**. Loc лишилось **93/100**. Клієнту: `furniture/reference/T-DESC-01-povidomlennya-kliyentu.md`.
+
+---
+
 ## T-PRC-01 — extra на тканину (колега 2026-11-05)
 
 Скарга клієнта: одна доплата на всі дивани через «Склад → Налаштування → Атрибути → Типова додаткова ціна». Хотіли свою політику на кожну модель.
