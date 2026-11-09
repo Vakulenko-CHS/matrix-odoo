@@ -3,9 +3,8 @@
 | Файл | Роль |
 |------|------|
 | [Specs.csv](./Specs.csv) | Таблиця ліжок і диванів: HackMD, статуси перевірок, коментарі, нові компоненти. **Не правити вручну** без оновлення від клієнта — перегенеруй похідні. |
-| [Specs.ods](./Specs.ods) | Те саме в LibreOffice; зручно клієнту. Джерело правди = те, що клієнт надіслав останнім. |
-| [divany-obem-vaga.tsv](./divany-obem-vaga.tsv) | T-VOL-01: 84 дивани для заповнення об’єму (m³) і ваги (kg). Реген: `npm run export-sofa-volume-tsv`. |
-| [T-VOL-01-povidomlennya-kliyentu.md](./T-VOL-01-povidomlennya-kliyentu.md) | Готовий текст клієнту про цей файл. |
+| [Specs.ods](./Specs.ods) | Те саме в LibreOffice; зручно клієнту. Джерело правди = те, що клієнт надіслав останнім. Колонки **Об’єм (м³)**, **Вага (кг)** — T-VOL-01. |
+| [T-VOL-01-povidomlennya-kliyentu.md](./T-VOL-01-povidomlennya-kliyentu.md) | Готовий текст клієнту про заповнення Specs. |
 
 Похідні в репо (генеруються / підтримуються агентом):
 
