@@ -55,30 +55,56 @@ export type SplitRow = {
   right: string;
   leftKind: "same" | "del" | "empty";
   rightKind: "same" | "add" | "empty";
+  leftLine: number | null;
+  rightLine: number | null;
 };
+
+export type NumberedDiffLine = DiffLine & {
+  oldLine: number | null;
+  newLine: number | null;
+};
+
+export function numberDiffLines(lines: DiffLine[]): NumberedDiffLine[] {
+  let oldLine = 1;
+  let newLine = 1;
+  return lines.map((line) => {
+    if (line.kind === "same") {
+      return { ...line, oldLine: oldLine++, newLine: newLine++ };
+    }
+    if (line.kind === "del") {
+      return { ...line, oldLine: oldLine++, newLine: null };
+    }
+    return { ...line, oldLine: null, newLine: newLine++ };
+  });
+}
 
 /** Pair unified lines into GitHub-style split rows (del+add on one row). */
 export function splitRows(lines: DiffLine[]): SplitRow[] {
+  const numbered = numberDiffLines(lines);
   const out: SplitRow[] = [];
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+  for (let i = 0; i < numbered.length; i++) {
+    const line = numbered[i];
     if (line.kind === "same") {
       out.push({
         left: line.text,
         right: line.text,
         leftKind: "same",
         rightKind: "same",
+        leftLine: line.oldLine,
+        rightLine: line.newLine,
       });
       continue;
     }
     if (line.kind === "del") {
-      const next = lines[i + 1];
+      const next = numbered[i + 1];
       if (next?.kind === "add") {
         out.push({
           left: line.text,
           right: next.text,
           leftKind: "del",
           rightKind: "add",
+          leftLine: line.oldLine,
+          rightLine: next.newLine,
         });
         i++;
       } else {
@@ -87,6 +113,8 @@ export function splitRows(lines: DiffLine[]): SplitRow[] {
           right: "",
           leftKind: "del",
           rightKind: "empty",
+          leftLine: line.oldLine,
+          rightLine: null,
         });
       }
       continue;
@@ -96,6 +124,8 @@ export function splitRows(lines: DiffLine[]): SplitRow[] {
       right: line.text,
       leftKind: "empty",
       rightKind: "add",
+      leftLine: null,
+      rightLine: line.newLine,
     });
   }
   return out;

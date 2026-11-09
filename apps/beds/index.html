@@ -30,7 +30,7 @@
         <section class="furn-main">
           <details class="furn-diff-note" id="diff-note">
             <summary id="diff-note-summary">DIFF — пояснення змін (показати / сховати)</summary>
-            <pre class="furn-doc furn-diff-md" id="diff-md"></pre>
+            <div id="diff-md-host"></div>
           </details>
           <div class="furn-toolbar">
             <p class="furn-meta" id="meta"></p>
@@ -57,17 +57,16 @@
             <h3 class="furn-col-h" id="col-h-orig">original</h3>
             <h3 class="furn-col-h" id="col-h-fix">fixed</h3>
             <h3 class="furn-col-h furn-col-h--uni" id="col-h-uni" hidden>накладений diff</h3>
-            <div class="furn-pane furn-pane--orig" id="pane-orig">
-              <pre class="furn-doc" id="original"></pre>
-            </div>
-            <div class="furn-pane furn-pane--fix" id="pane-fix">
-              <pre class="furn-doc" id="fixed"></pre>
-            </div>
+            <div class="furn-pane furn-pane--orig" id="pane-orig"></div>
+            <div class="furn-pane furn-pane--fix" id="pane-fix"></div>
             <div class="furn-pane furn-pane--git" id="pane-git" hidden>
-              <div class="furn-git" id="git-out" aria-live="polite"></div>
+              <div class="furn-diff-split">
+                <div id="git-out-left" aria-live="polite"></div>
+                <div id="git-out-right"></div>
+              </div>
             </div>
             <div class="furn-pane furn-pane--uni" id="pane-uni" hidden>
-              <div class="furn-text-diff" id="text-diff-out" aria-live="polite"></div>
+              <div id="uni-out" aria-live="polite"></div>
             </div>
           </div>
         </section>

@@ -1,7 +1,9 @@
 import "../../../web/src/styles.css";
+import "./lined-doc.css";
 import "./furniture.css";
 import inventory from "../../../furniture/inventory.json";
-import { diffLines, splitRows } from "./line-diff.ts";
+import { createLinedPane } from "./lined-doc.ts";
+import { mountSplitDiff, mountUnifiedDiff } from "./diff-view.ts";
 
 const files = import.meta.glob("../../../furniture/beds/**/*.md", {
   query: "?raw",
@@ -21,23 +23,29 @@ type View = "plain" | "split" | "unified";
 const items = inventory as Item[];
 const listEl = document.getElementById("list")!;
 const metaEl = document.getElementById("meta")!;
-const originalEl = document.getElementById("original")!;
-const fixedEl = document.getElementById("fixed")!;
-const diffMdEl = document.getElementById("diff-md")!;
+const paneOrig = document.getElementById("pane-orig")!;
+const paneFix = document.getElementById("pane-fix")!;
+const diffMdHost = document.getElementById("diff-md-host")!;
 const diffNoteEl = document.getElementById("diff-note") as HTMLDetailsElement;
 const diffNoteSummary = document.getElementById("diff-note-summary")!;
 const btnTextDiff = document.getElementById("btn-text-diff") as HTMLButtonElement;
 const btnUnified = document.getElementById("btn-unified") as HTMLButtonElement;
-const textDiffOut = document.getElementById("text-diff-out")!;
-const gitOut = document.getElementById("git-out")!;
-const paneOrig = document.getElementById("pane-orig")!;
-const paneFix = document.getElementById("pane-fix")!;
+const gitOutLeft = document.getElementById("git-out-left")!;
+const gitOutRight = document.getElementById("git-out-right")!;
+const uniOut = document.getElementById("uni-out")!;
 const paneGit = document.getElementById("pane-git")!;
 const paneUni = document.getElementById("pane-uni")!;
 const colHOrig = document.getElementById("col-h-orig")!;
 const colHFix = document.getElementById("col-h-fix")!;
 const colHUni = document.getElementById("col-h-uni")!;
 const splitView = document.getElementById("split-view")!;
+
+const originalView = createLinedPane(paneOrig, "original");
+const fixedView = createLinedPane(paneFix, "fixed");
+const diffMdView = createLinedPane(diffMdHost, "diff-md");
+diffMdHost.classList.add("lined-host--compact");
+const splitDiff = mountSplitDiff(gitOutLeft, gitOutRight);
+const unifiedDiff = mountUnifiedDiff(uniOut);
 
 let slug = items[0]?.slug ?? "";
 let view: View = "plain";
@@ -111,40 +119,6 @@ function renderList() {
   }
 }
 
-function cell(text: string, kind: string): HTMLDivElement {
-  const el = document.createElement("div");
-  el.className = `git-cell git-cell--${kind} ${
-    kind === "del" ? "diff-line--del" : kind === "add" ? "diff-line--add" : kind === "same" ? "diff-line--same" : ""
-  }`.trim();
-  el.textContent = text.length ? text : "\u00a0";
-  return el;
-}
-
-function fillDiffs(orig: string | null, fix: string | null) {
-  gitOut.replaceChildren();
-  textDiffOut.replaceChildren();
-  if (!orig || !fix) {
-    const msg = "Потрібні обидва файли для текстового diff.";
-    gitOut.textContent = msg;
-    textDiffOut.textContent = msg;
-    return;
-  }
-  const lines = diffLines(orig, fix);
-  for (const row of splitRows(lines)) {
-    const wrap = document.createElement("div");
-    wrap.className = "git-row";
-    wrap.append(cell(row.left, row.leftKind), cell(row.right, row.rightKind));
-    gitOut.appendChild(wrap);
-  }
-  for (const line of lines) {
-    const row = document.createElement("div");
-    row.className = `diff-line diff-line--${line.kind}`;
-    row.textContent =
-      (line.kind === "del" ? "− " : line.kind === "add" ? "+ " : "  ") + line.text;
-    textDiffOut.appendChild(row);
-  }
-}
-
 function setDiffNoteEnabled(on: boolean) {
   diffNoteEl.classList.toggle("is-off", !on);
   diffNoteEl.toggleAttribute("aria-disabled", !on);
@@ -184,9 +158,10 @@ function applyView() {
 async function load() {
   const it = items.find((x) => x.slug === slug);
   if (!it) {
-    originalEl.textContent = "немає";
-    fixedEl.textContent = "";
-    fillDiffs(null, null);
+    originalView.setText("немає");
+    fixedView.setText("");
+    splitDiff.render(null, null);
+    unifiedDiff.render(null, null);
     setDiffNoteEnabled(false);
     setDiffButtonsEnabled(false);
     applyView();
@@ -200,15 +175,16 @@ async function load() {
     readFile(fileKey(slug, "DIFF")),
   ]);
 
-  originalEl.textContent = orig ?? "немає original.md";
-  fixedEl.textContent = fix ?? "— (fixed.md ще немає)";
+  originalView.setText(orig ?? "немає original.md");
+  fixedView.setText(fix ?? "— (fixed.md ще немає)");
 
   const hasDiffMd = Boolean(diffMd?.trim());
-  diffMdEl.textContent = hasDiffMd ? diffMd! : "немає DIFF.md";
+  diffMdView.setText(hasDiffMd ? diffMd! : "немає DIFF.md");
   setDiffNoteEnabled(hasDiffMd);
   setDiffButtonsEnabled(Boolean(orig && fix));
 
-  fillDiffs(orig, fix);
+  splitDiff.render(orig, fix);
+  unifiedDiff.render(orig, fix);
   applyView();
 }
 

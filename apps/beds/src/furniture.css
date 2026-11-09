@@ -2,10 +2,6 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding-right: 0;
-}
-.app.furn-app .top {
-  padding-right: 20px;
 }
 .furn-layout {
   display: grid;
@@ -115,10 +111,8 @@
   font-weight: 500;
   pointer-events: none;
 }
-.furn-diff-md {
-  max-height: 220px;
+.furn-diff-note #diff-md-host {
   border-top: 1px solid var(--rule);
-  font-size: 14px;
 }
 .furn-toolbar {
   display: flex;
@@ -227,67 +221,14 @@
   border-right: 1px solid var(--rule);
   overflow: hidden;
 }
+.furn-pane--git .furn-diff-split,
+.furn-pane--uni > .lined-host {
+  flex: 1;
+  min-height: 0;
+}
 .furn-col-h[hidden],
 .furn-pane[hidden] {
   display: none !important;
-}
-.furn-doc,
-.furn-text-diff {
-  margin: 0;
-  padding: var(--doc-pad-y) var(--doc-pad-x);
-  overflow: auto;
-  flex: 1;
-  min-height: 0;
-  font-family: var(--spec);
-  font-size: 14px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  background: var(--sheet);
-}
-.diff-line {
-  padding: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: break-word;
-}
-.diff-line--same {
-  color: var(--muted);
-}
-.diff-line--del {
-  background: #f3ddd8;
-}
-.diff-line--add {
-  background: #dce8d6;
-}
-.furn-git {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-  font-family: var(--spec);
-  font-size: 14px;
-  line-height: 1.5;
-  background: var(--sheet);
-  padding: var(--doc-pad-y) 0;
-}
-.git-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-}
-.git-cell {
-  padding: 0 var(--doc-pad-x);
-  border-right: 1px solid var(--rule);
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  min-height: calc(14px * 1.5);
-}
-.git-cell:last-child {
-  border-right: 0;
-}
-.git-cell--empty {
-  background: rgba(42, 38, 34, 0.04);
 }
 @media (max-width: 1100px) {
   .furn-layout {
