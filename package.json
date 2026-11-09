@@ -55,7 +55,9 @@
     "export-sofa-volume-tsv": "ts-node --transpile-only src/commands/exportSofaVolumeTsv.ts",
     "audit-junk": "ts-node --transpile-only src/commands/auditOdooJunk.ts",
     "ser-junk": "ts-node --transpile-only src/commands/ser01ApplyJunk.ts",
-    "lam-buy": "ts-node --transpile-only src/commands/lamBuyRoutes.ts"
+    "lam-buy": "ts-node --transpile-only src/commands/lamBuyRoutes.ts",
+    "assign-mo-serials": "ts-node --transpile-only src/commands/assignMoSerials.ts",
+    "studio-auto-serial": "ts-node --transpile-only src/commands/studioAutoSerial.ts"
   },
   "keywords": [],
   "author": "",

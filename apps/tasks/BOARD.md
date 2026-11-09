@@ -368,7 +368,11 @@
 
 **Статус 2026-11-05 — зроблено.** Apply `npm run ser-junk -- --apply`. **Перевірка UI (Ілля):** на **Диван Джаз** немає validate / validate-all / Синтетика; у **Налаштування → Атрибути → Тканина → Значення** цих трьох теж немає (archived). Lot **0000001** qty 0; **0000002/3** без змін.
 
-**Ліжка:** `tracking=serial` при імпорті — правило в коді/імпортері, після **T-BED-01** (не окремий apply). Аудит: [`T-SER-01-junk-audit-2026-11-05.md`](../../furniture/reference/T-SER-01-junk-audit-2026-11-05.md). Скрипт: `ser01ApplyJunk.ts`.
+**2026-11-09 — призначення SN на відкриті MO:** `npm run assign-mo-serials -- --so S00265 --apply` (WH/MO/00699–700: **0000009**, **0000010**, ref = `S00265 / № 01–02`). Для прикладу з WH/MO/00648 — те саме на **S00261** (лоти **0000011–13**). Dry-run без споживання sequence; поле **Internal Reference** на lot = рядок замовлення `№`.
+
+**2026-11-09 — авто SN:** Studio automation **«Авто SN на MO (готовий диван/ліжко)»** (id=7, action 1157). On create/write MO з `tracking=serial` без lot — sequence `stock.lot.serial`, `ref` = `x_studio_x_so_line_uid`. Пише той самий lot у **Перевірки якості** (`lot_ids` + `finished_lot_ids`, `production_id`). Studio **93/100**. Друк: на партії **Друк → Партійний/серійний номер (PDF)**. Скрипт: `studioAutoSerial.ts`.
+
+**Ліжка:** `tracking=serial` при імпорті — правило в коді/імпортері, після **T-BED-01** (не окремий apply). Аудит: [`T-SER-01-junk-audit-2026-11-05.md`](../../furniture/reference/T-SER-01-junk-audit-2026-11-05.md). Скрипт: `ser01ApplyJunk.ts`. MO: `assignMoSerials.ts`.
 
 ---
 

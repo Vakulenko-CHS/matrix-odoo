@@ -2,6 +2,26 @@
 
 ## Entries (newest first)
 
+### 2026-11-09 — auto SN copies to QC + lot PDF exists
+
+- **Agent / human:** agent / user «допиши QC + перевір друк»
+- **Summary:** Action 1157 now 12 loc (studio **93/100**). QC without `production_id` matched by product + `quality_state=none`. Backfill: QC00117→0000010, QC00118→0000014, QC00119→0000009; QC00116 same as 119. Report **Партійний/серійний номер (PDF)** `stock.report_lot_label` bound to `stock.lot` (`report_action` ok). ZPL also bound. RPC cannot render PDF (private `_render_qweb_pdf`).
+- **Files:** `src/commands/studioAutoSerial.ts`
+
+### 2026-11-09 — studio auto SN on MO
+
+- **Agent / human:** agent / user «так, автоматизація, влізти в 100 рядків»
+- **Summary:** `base.automation` **7** + `ir.actions.server` **1157**. Python 7 loc. Studio billed loc **81 → 88** (cap 100). Existing computes/actions 1143/831/833/1155 untouched. Filter `product_tracking=serial`; skip if lots exist or MO done/cancel.
+- **Files:** `src/commands/studioAutoSerial.ts`, `package.json`
+- **Git:** uncommitted
+
+### 2026-11-09 — assign-mo-serials (S00265, S00261)
+
+- **Agent / human:** agent / user «зроби в Odoo + виправ диван клієнта»
+- **Summary:** `npm run assign-mo-serials`. S00265 → WH/MO/00699 lot **0000009** ref `S00265 / № 01`; WH/MO/00700 lot **0000010** ref `S00265 / № 02`. S00261 → WH/MO/00633 **0000011**; WH/MO/00648 **0000012–13** (lot 8 ref `S00261 / № 03` manual fix). Command `src/commands/assignMoSerials.ts`.
+- **Files:** `src/commands/assignMoSerials.ts`, `package.json`
+- **Git:** uncommitted
+
 ### 2026-11-09 — T-WC-01 ensure-workcenters
 
 - **Summary:** `canon.ts` +2 (2-4 Ц2дс4, 6-1 Ц6П-1). `npm run ensure-workcenters -- --apply` → created id **35**, **36**.
