@@ -13,7 +13,7 @@
       "l": "Готово 😎",
       "v": "Готово 😎"
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "terry-80x190",
@@ -29,7 +29,7 @@
       "l": "Готово 😎",
       "v": "Питання ❓"
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "terry-90x200",
@@ -45,7 +45,7 @@
       "l": "Готово 😎",
       "v": "Питання ❓"
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "terry-116x200",
@@ -61,7 +61,7 @@
       "l": "Готово 😎",
       "v": "Питання ❓"
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "terry-80x190-gas",
@@ -173,7 +173,7 @@
       "l": "Готово 😎",
       "v": "Питання ❓"
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "sky-90x200",
@@ -189,7 +189,7 @@
       "l": "Готово 😎",
       "v": "Питання ❓"
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "sky-116x200",
@@ -205,7 +205,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "sky-80x190-gas",
@@ -221,7 +221,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "sky-80x200-gas",
@@ -237,7 +237,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "sky-90x190-gas",
@@ -253,7 +253,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "sky-90x200-gas",
@@ -269,7 +269,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "bali-140x200",
@@ -285,7 +285,7 @@
       "l": "Готово 😎",
       "v": "Питання ❓"
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "bali-140x190",
@@ -301,7 +301,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "bali-160x200",
@@ -317,7 +317,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "bali-160x190",
@@ -333,7 +333,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "bali-180x200",
@@ -349,7 +349,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "faro-160x200",
@@ -365,7 +365,7 @@
       "l": "Готово 😎",
       "v": "Питання ❓"
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "faro-160x190",
@@ -381,7 +381,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "faro-180x200",
@@ -397,7 +397,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "milana-140x200",
@@ -413,7 +413,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "milana-140x190",
@@ -429,7 +429,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "milana-160x200",
@@ -445,7 +445,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "milana-160x190",
@@ -461,7 +461,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "lira-140x200",
@@ -477,7 +477,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "lira-160x200",
@@ -493,7 +493,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "lira2-140x200",
@@ -509,7 +509,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "lira2-160x200",
@@ -525,7 +525,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "hugo-90x200",
@@ -541,7 +541,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "hugo-80x200",
@@ -557,7 +557,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "hugo-80x190",
@@ -573,7 +573,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "hugo-90x190",
@@ -589,7 +589,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "leya-90x200",
@@ -605,7 +605,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "sky-120x200",
@@ -621,7 +621,7 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   },
   {
     "slug": "sky-120x190",
@@ -637,6 +637,6 @@
       "l": "Готово 😎",
       "v": ""
     },
-    "status": "original-only"
+    "status": "draft-fixed"
   }
 ]

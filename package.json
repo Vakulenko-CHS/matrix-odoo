@@ -42,6 +42,7 @@
     "migrate-apply": "ts-node src/tools/migrate-apply.ts",
     "pull-hackmd": "ts-node src/index.ts pull-hackmd",
     "batch-format": "ts-node src/index.ts batch-format",
+    "bed-batch-format": "ts-node --transpile-only src/index.ts bed-batch-format",
     "fill-laminate": "ts-node src/tools/fill-laminate-boms.ts",
     "push-hackmd": "ts-node src/index.ts push-hackmd",
     "estimate-import": "ts-node src/index.ts estimate-import",
@@ -51,7 +52,10 @@
     "payroll-contracts": "ts-node --transpile-only src/tools/payroll/worker-contracts.ts",
     "ensure-workcenters": "ts-node --transpile-only src/commands/ensureWorkcenters.ts",
     "felt-merge": "ts-node --transpile-only src/commands/feltMerge140To145.ts",
-    "export-sofa-volume-tsv": "ts-node --transpile-only src/commands/exportSofaVolumeTsv.ts"
+    "export-sofa-volume-tsv": "ts-node --transpile-only src/commands/exportSofaVolumeTsv.ts",
+    "audit-junk": "ts-node --transpile-only src/commands/auditOdooJunk.ts",
+    "ser-junk": "ts-node --transpile-only src/commands/ser01ApplyJunk.ts",
+    "lam-buy": "ts-node --transpile-only src/commands/lamBuyRoutes.ts"
   },
   "keywords": [],
   "author": "",

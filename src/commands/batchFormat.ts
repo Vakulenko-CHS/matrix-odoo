@@ -207,6 +207,8 @@ function odsColumnInUrlOrder(outDir: string, bodies: OdsBody[]): string[] {
   });
 }
 
+export { formatOne };
+
 export async function runBatchFormat(argv: string[]): Promise<void> {
   const target = argv[0];
   if (!target) usage();

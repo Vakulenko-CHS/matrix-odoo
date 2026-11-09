@@ -2,6 +2,13 @@
 
 ## Entries (newest first)
 
+### 2026-11-09 — bed batch format 40/40
+
+- **Agent / human:** agent / user
+- **Summary:** `npm run bed-batch-format` на усі 40 slugs; `applyBedPostFormatFixes` (ламінат `{…}`, зняття `+ Бортик` у productId, Блюз qty, `і` перед optional бортик-поролон). `ai-check --as-is`: 40× ready, 0 blocking.
+- **Files:** `furniture/beds/**/fixed.md`, `src/tools/bedSpecPrep.ts`, `src/commands/bedBatchFormat.ts`, `furniture/beds/_batch-summary.md`, `apps/tasks/BOARD.md` (T-BED-01)
+- **Git:** not committed
+
 ### 2026-11-04 — beds UI git split / unified
 
 - **Agent / human:** agent / user

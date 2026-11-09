@@ -68,6 +68,12 @@ async function main() {
       break;
     }
 
+    case "bed-batch-format": {
+      const { runBedBatchFormat } = await import("./commands/bedBatchFormat");
+      await runBedBatchFormat(args);
+      break;
+    }
+
     case "estimate-import": {
       const { runEstimateImport } = await import("./tools/template-bom-estimate");
       await runEstimateImport(args);
