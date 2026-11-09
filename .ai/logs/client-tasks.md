@@ -2,6 +2,11 @@
 
 ## Entries (newest first)
 
+### 2026-11-09 — OUTBOUND + FAB/DESC/SER чекає клієнта
+
+- **Summary:** T-FAB запит **17:43:14** (`temp/1k-usd.md`). T-DESC чеклист **16:46** (`description-places.md`) → backlog `чекає`. **T-SER-02** новa — feedback авто-SN **15:48** (`sn-client-2026-11-09.md`). Журнал [`apps/tasks/OUTBOUND.md`](../../apps/tasks/OUTBOUND.md).
+- **Git:** uncommitted BOARD/README/temp
+
 ### 2026-11-09 — T-DESC-01 apply related fields
 
 - **Summary:** `x_studio_so_line_note` related on MO/WO/QC. Views 3846–3849. Studio loc still **93/100**. Sample MO shows `sale.order.line.name`. Client how-to in `furniture/reference/T-DESC-01-povidomlennya-kliyentu.md`. BOARD done.
