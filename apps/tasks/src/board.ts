@@ -24,7 +24,7 @@ const COL_ORDER: ColumnId[] = ["free", "done", "doing", "next", "backlog", "low"
 
 export function isFreeGate(gate: string): boolean {
   const g = gate.toLowerCase();
-  return g.startsWith("вільн") || g.includes("частина вільна") || g === "free";
+  return g.startsWith("вільн") || g === "free";
 }
 
 function stripMd(s: string): string {
@@ -117,7 +117,7 @@ export function parseBoard(md: string): { updated: string; columns: Column[] } {
   byCol.set("free", {
     id: "free",
     heading: "Колонка: вільні",
-    emptyNote: "Немає карток з Gate «вільна» / «частина вільна».",
+    emptyNote: "Немає карток з Доступ «вільна».",
     cards: freeCards,
   });
 

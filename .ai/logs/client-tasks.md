@@ -2,6 +2,38 @@
 
 ## Entries (newest first)
 
+### 2026-11-09 — T-WC done; KNOWLEDGE ops; Terry gas lint headers
+
+- **Summary:** WC 2-4/6-1 Odoo. KNOWLEDGE checklist + import order. 6× Terry gas `fixed.md` цех-коди (Ц3лд1, Ц4С1–4, Ц5Н1). ai-check: lint errors cleared; warnings (Бортик/Ізголовье catalog) — до імпорту.
+- **Not done:** T-USR/QAL/PUR (Odoo policy, no blind apply). 34 beds still original-only.
+- **Git:** uncommitted
+
+### 2026-11-05 — T-FAB-01 context + tasks UI file browser
+
+- **Summary:** BOARD T-FAB-01: 4/8, multiply, «к»/$, чернетка після T-VOL-01. `#### Файли` на T-FAB/T-VOL. Dev-only `/__repo/list|raw` + modal (chips, links, dir tree) у `npm run tasks`.
+- **Files:** `apps/tasks/{BOARD.md,README.md,src/*,vite/*}`, `furniture/reference/T-FAB-01-povidomlennya-kliyentu.md`
+- **Git:** uncommitted
+
+### 2026-11-05 — T-LAM-01 apply (lam-buy)
+
+- **Summary:** 68 tmpl purchase_ok, drop VNZ, +3197 Buy orderpoints. Script `lamBuyRoutes.ts`, `npm run lam-buy -- --apply`.
+- **Git:** uncommitted
+
+### 2026-11-05 — T-SER-01 → done (UI verified)
+
+- **Summary:** Ілля: Jazz + Атрибути→Тканина — validate/validate-all/Синтетика absent. BOARD column done. Beds `tracking=serial` = note under T-BED-01 import.
+
+### 2026-11-05 — CLIENT-REFERENCES + blocker semantics
+
+- **Summary:** Full client letter in `apps/tasks/CLIENT-REFERENCES.md`; each BOARD card has **Референс (клієнт)**. Blockers = client/colleague only; Odoo apply after chat «так» not a blocker. Removed «частина вільна» from free tab.
+- **Files:** `BOARD.md`, `CLIENT-REFERENCES.md`, `README.md`, `board.ts`
+
+### 2026-11-05 — T-VOL-01 waiting on client
+
+- **Summary:** Request sent in chat for Specs columns Об’єм/Вага. Gate `чекає`. Removed separate TSV; message in `T-VOL-01-povidomlennya-kliyentu.md`.
+- **Files:** `apps/tasks/BOARD.md`, `furniture/reference/*`
+- **Git:** uncommitted cleanup after b182935
+
 ### 2026-11-05 — T-PRC-01 → log
 
 - **Summary:** Колега: extra-ціни вже ок, клієнтам презентація. Картка в log. Не писати PTAV в базу під цю скаргу.
