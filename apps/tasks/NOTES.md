@@ -1,5 +1,11 @@
 # Нотатки до карток
 
+## T-QAL-01 — Якість + зарплата ВТК
+
+[`references/internal/T-QAL-01.md`](./references/internal/T-QAL-01.md) — apply, тест під Танею, payslip `п-втк`.
+
+---
+
 ## T-QAL-02 — накладна S00… у «Перевірки в процесі»
 
 Джерело для чату з агентом: [`references/internal/T-QAL-02.md`](./references/internal/T-QAL-02.md) (apply, інцидент колонки, чеклист, коміти `6348d52` / `53b7302`).

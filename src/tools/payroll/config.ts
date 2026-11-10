@@ -7,13 +7,8 @@ export const WORKER_PAY_STRUCT = "Worker Pay";
 export const WORKER_STRUCT_TYPE = "Worker";
 export const CONTRACT_START = "2026-01-01";
 
-/** Paid outside Odoo: no payslips, no Worker setup. */
-export const EXCLUDED_EMPLOYEES = [
-  "Мочалова Єлизавета",
-  "Мочалова Тетяна",
-  "Оксана",
-  "Адмін Daniil",
-];
+/** Skipped in worker-contracts (name contains "(Цех"). ВТК staff — T-QAL-01 via `qal01-vtk`. */
+export const EXCLUDED_EMPLOYEES = ["Адмін Daniil"];
 
 export interface PayrollShop {
   /** Workshop number, as `num` in canon.ts. */

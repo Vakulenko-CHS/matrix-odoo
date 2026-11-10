@@ -2,6 +2,11 @@
 
 ## Entries (newest first)
 
+### 2026-11-10 — T-QAL-01 VTK access + Worker Pay
+
+- **Summary:** User **7** +group **44** Якість. Employees **2,3,33** hr.version → Worker. `qal01-vtk`, `payroll-default-worker` (ВТК default Тетяна). Ліза/Оксана без login.
+- **Files:** `src/commands/qal01VtkSetup.ts`, `apps/tasks/references/internal/T-QAL-01.md`
+
 ### 2026-11-10 — T-QAL-02 SO name on quality.check
 
 - **Summary:** Field **25263** `x_studio_so_order_name` related `production_id.sale_line_id.order_id.name`. Views **3850–3851**. QC in progress sample `S00265`… No Python loc.
