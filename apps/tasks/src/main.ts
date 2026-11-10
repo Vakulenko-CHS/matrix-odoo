@@ -11,6 +11,7 @@ import {
 } from "./board.ts";
 import { extractRepoLinks, hrefToRepoPath, splitRepoHref } from "./repoPaths.ts";
 import { bindRepoLinks, mountRepoBrowser, openRepoPath } from "./repoBrowser.ts";
+import { mountTaskResize } from "./resize.ts";
 
 const { updated, columns } = parseBoard(boardMd);
 
@@ -22,6 +23,10 @@ const cardMetaEl = document.getElementById("card-meta")!;
 const filesEl = document.getElementById("card-files")!;
 
 mountRepoBrowser();
+
+const taskLayout = document.getElementById("task-layout")!;
+const taskSplitter = document.getElementById("task-splitter")!;
+mountTaskResize(taskLayout, taskSplitter);
 
 metaEl.textContent = `apps/tasks/BOARD.md · ${updated} · npm run tasks · :${ports.tasks} · Kanban pipeline · OUTBOUND у BOARD`;
 

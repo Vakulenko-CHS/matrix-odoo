@@ -1,16 +1,33 @@
 .task-layout {
-  display: grid;
-  grid-template-columns: 1fr minmax(220px, 26rem);
+  --task-detail-w: 26rem;
+  --task-detail-h: 45%;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
   flex: 1;
   min-height: 0;
+  min-width: 0;
   border-top: 1px solid var(--rule);
 }
+.task-layout.is-task-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
 .task-kanban-wrap {
+  flex: 1 1 0;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
   background: var(--sheet);
-  border-right: 1px solid var(--rule);
+}
+.task-splitter.splitter {
+  flex: 0 0 14px;
+  align-self: stretch;
+  z-index: 1;
+}
+.task-layout.is-task-resizing .task-splitter::before {
+  opacity: 1;
+  background: var(--steel);
 }
 .task-kanban {
   display: flex;
@@ -126,6 +143,9 @@
 .task-detail {
   display: flex;
   flex-direction: column;
+  flex: 0 0 var(--task-detail-w);
+  width: var(--task-detail-w);
+  max-width: 100%;
   min-width: 0;
   min-height: 0;
   overflow: auto;
@@ -429,11 +449,32 @@
 }
 @media (max-width: 900px) {
   .task-layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: 55% 1fr;
+    flex-direction: column;
+  }
+  .task-layout.is-task-resizing {
+    cursor: row-resize;
+  }
+  .task-splitter.splitter {
+    cursor: row-resize;
+    flex: 0 0 14px;
+    width: 100%;
+  }
+  .task-splitter.splitter::before {
+    top: 5px;
+    bottom: auto;
+    left: 28%;
+    right: 28%;
+    width: auto;
+    height: 4px;
+  }
+  .task-detail {
+    flex: 0 0 var(--task-detail-h);
+    width: 100%;
+    height: var(--task-detail-h);
+    min-height: 12rem;
   }
   .task-kanban-wrap {
-    border-right: 0;
-    border-bottom: 1px solid var(--rule);
+    flex: 1 1 0;
+    min-height: 8rem;
   }
 }

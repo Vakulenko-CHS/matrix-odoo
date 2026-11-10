@@ -23,10 +23,19 @@
         </div>
         <p class="stamp-hint hint" id="meta"></p>
       </header>
-      <div class="task-layout">
-        <div class="task-kanban-wrap">
+      <div class="task-layout" id="task-layout">
+        <div class="task-kanban-wrap" id="task-kanban-wrap">
           <div class="task-kanban" id="kanban" aria-label="Pipeline"></div>
         </div>
+        <div
+          class="splitter task-splitter"
+          id="task-splitter"
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Ширина опису задачі. Подвійний клік — стандарт."
+          title="Потягни: kanban ↔ опис. Подвійний клік — стандартна ширина."
+          tabindex="0"
+        ></div>
         <section class="task-detail">
           <h1 id="card-title">Картка</h1>
           <div class="task-props-wrap" id="card-meta" aria-label="Властивості картки"></div>
