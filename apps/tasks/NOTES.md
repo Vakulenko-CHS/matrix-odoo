@@ -2,7 +2,7 @@
 
 ## T-QAL-02 — накладна S00… у «Перевірки в процесі»
 
-**Apply 2026-11-10.** Related `x_studio_so_order_name` → `production_id.sale_line_id.order_id.name` на `quality.check`. Views **3850–3851**. Команда `npm run studio-qal02-so -- --apply`. Колонка **Накладна** в списку QC (optional show).
+Джерело для чату з агентом: [`references/internal/T-QAL-02.md`](./references/internal/T-QAL-02.md) (apply, інцидент колонки, чеклист, коміти `6348d52` / `53b7302`).
 
 ---
 

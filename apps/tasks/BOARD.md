@@ -1,6 +1,6 @@
 # Дошка
 
-Оновлено: **2026-11-10** (T-QAL-02 apply; T-BED-01 `waiting`). Правила: [README.md](./README.md). **Чат → репо:** [OUTBOUND.md](./OUTBOUND.md). Референси: [references/](./references/). Довгі нотатки: [NOTES.md](./NOTES.md).
+Оновлено: **2026-11-10** (T-QAL-02 лог apply + перевірка UI). Правила: [README.md](./README.md). **Чат → репо:** [OUTBOUND.md](./OUTBOUND.md). Референси: [references/](./references/). Довгі нотатки: [NOTES.md](./NOTES.md).
 
 Пріоритет P0 = блокує правильну роботу клієнта або імпорт ліжок. P1 = база/доступ. P3 = з листа Вадима (низький).
 
@@ -226,16 +226,20 @@
 
 **Блокери.** —
 
-**Стан.** Зроблено: related `x_studio_so_order_name` на `quality.check` (`production_id.sale_line_id.order_id.name`); колонка списку + форма. `npm run studio-qal02-so`.
+**Стан.** Закрито. Повний розбір apply, фікс колонки, чеклист UI — [T-QAL-02 apply + перевірка](./references/internal/T-QAL-02.md#t-qal-02--накладна-s00-у-перевірках-якості).
 
 #### Лог
 
 | Коли | Джерело | Подія |
 |------|---------|--------|
-| 2026-11-10 | Matrix | Apply: поле **25263**, views **3850–3851**; перевірка QC у процесі → `S00265`… |
+| 2026-11-10 | Matrix | Apply: поле **25263**, views **3850–3851**; API QC `quality_state=none` → `S00265`… |
+| 2026-11-10 | Ілля | У списку не було колонки «Накладна» (була лише «Опис замовлення») |
+| 2026-11-10 | Matrix | Fix view **3850**: xpath перед `x_studio_so_line_note`, priority **32**; `53b7302`, повторний apply |
+| 2026-11-10 | Ілля | Підтверджено в UI: **Накладна** в шестерні колонок, значення `S00…` (див. [перевірка](./references/internal/T-QAL-02.md#перевірка-пруфи)) |
 
 #### Файли
 
+- [T-QAL-02 — рішення, фікс, перевірка](./references/internal/T-QAL-02.md#t-qal-02--накладна-s00-у-перевірках-якості)
 - [`src/commands/studioQal02SoOrder.ts`](../../src/commands/studioQal02SoOrder.ts)
 
 ---
