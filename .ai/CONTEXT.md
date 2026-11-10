@@ -3,7 +3,7 @@
 Session notes → [logs/](logs/). Keep this file slim.  
 Start: [.ai/INDEX.md](./INDEX.md) → **this file**. Open logs only when **Log index** matches.
 
-Last updated: **2026-11-10** (T-QAL-02 QC list SO name)
+Last updated: **2026-11-10** (T-COST-01 BOM cost `x_studio_bom_cost`)
 
 ---
 

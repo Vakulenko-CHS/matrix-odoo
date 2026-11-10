@@ -2,6 +2,11 @@
 
 ## Entries (newest first)
 
+### 2026-11-10 — T-COST-01 BOM cost on product
+
+- **Summary:** Field **25265** `x_studio_bom_cost`; line **25268** `x_studio_product_bom_cost` related. Views **3855** product list **«Собівартість»**, **3856** SO line grid, **3852** catalog, **3854** form. Sample **1142.5**.
+- **Files:** `src/commands/studioCost01BomCost.ts`, `apps/tasks/references/internal/T-COST-01.md`
+
 ### 2026-11-10 — T-QAL-01 VTK access + Worker Pay
 
 - **Summary:** User **7** +group **44** Якість. Employees **2,3,33** hr.version → Worker. `qal01-vtk`, `payroll-default-worker` (ВТК default Тетяна). Ліза/Оксана без login.

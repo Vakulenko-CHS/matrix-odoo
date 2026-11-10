@@ -62,7 +62,8 @@
     "studio-so-note": "ts-node --transpile-only src/commands/studioSoLineNote.ts",
     "studio-qal02-so": "ts-node --transpile-only src/commands/studioQal02SoOrder.ts",
     "qal01-vtk": "ts-node --transpile-only src/commands/qal01VtkSetup.ts",
-    "usr01-tanya": "ts-node --transpile-only src/commands/usr01TanyaAccess.ts"
+    "usr01-tanya": "ts-node --transpile-only src/commands/usr01TanyaAccess.ts",
+    "cost01-bom": "ts-node --transpile-only src/commands/studioCost01BomCost.ts"
   },
   "keywords": [],
   "author": "",
