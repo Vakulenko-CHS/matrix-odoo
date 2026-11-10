@@ -14,12 +14,14 @@ const RELATED = "production_id.sale_line_id.order_id.name";
 
 const LIST_VIEW = {
   name: "matrix: QC list SO order",
+  // After T-DESC list column; fallback anchor is product_id (see ensureView priority).
   arch: `<data>
-  <xpath expr="//field[@name='product_id'][@optional='show']" position="before">
-    <field name="${FIELD}" optional="show"/>
+  <xpath expr="//field[@name='x_studio_so_line_note']" position="before">
+    <field name="${FIELD}" string="Накладна" optional="show"/>
   </xpath>
 </data>`,
 };
+
 
 const FORM_VIEW = {
   name: "matrix: QC form SO order",
@@ -108,6 +110,7 @@ async function ensureView(viewName: string, viewType: "form" | "list", arch: str
     1,
   );
   const parent = await inheritParent("quality.check", viewType);
+  const priority = viewType === "list" ? 32 : 16;
   const vals = {
     name: viewName,
     model: "quality.check",
@@ -115,6 +118,7 @@ async function ensureView(viewName: string, viewType: "form" | "list", arch: str
     inherit_id: parent,
     mode: "extension",
     arch_db: arch,
+    priority,
   };
   if (found.length) {
     console.log(`${APPLY ? "UPDATE" : "ok"} view ${viewName} id=${found[0].id} parent=${parent}`);
