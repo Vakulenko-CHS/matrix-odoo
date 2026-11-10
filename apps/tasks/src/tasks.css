@@ -100,11 +100,11 @@
   background: var(--ply-dark);
   color: var(--muted);
 }
-.task-tag--чекає {
+.task-tag--waiting {
   color: var(--oxide);
   background: color-mix(in srgb, var(--oxide) 12%, var(--ply));
 }
-.task-tag--вільна {
+.task-tag--open {
   color: var(--steel);
 }
 .task-tag--P0 {

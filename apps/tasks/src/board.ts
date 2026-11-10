@@ -1,4 +1,12 @@
-export type ColumnId = "free" | "done" | "log" | "doing" | "next" | "backlog" | "low";
+export type ColumnId =
+  | "free"
+  | "doing"
+  | "todo"
+  | "waiting"
+  | "backlog"
+  | "complete"
+  | "canceled"
+  | "log";
 
 export type Card = {
   id: string;
@@ -21,30 +29,59 @@ export type Column = {
   cards: Card[];
 };
 
-/** UI tabs (legacy); Kanban uses PIPELINE_COLS only — one card, one column. */
-const COL_ORDER: ColumnId[] = ["free", "done", "doing", "next", "backlog", "low", "log"];
+const COL_ORDER: ColumnId[] = [
+  "free",
+  "doing",
+  "waiting",
+  "todo",
+  "backlog",
+  "complete",
+  "canceled",
+  "log",
+];
 
-/** Класичний pipeline зліва направо (без віртуальної «вільні»). */
-export const PIPELINE_COLS: ColumnId[] = ["doing", "next", "backlog", "low", "done", "log"];
+/** Kanban зліва направо: черга → взяти → робимо → фідбек → закрито. */
+export const PIPELINE_COLS: ColumnId[] = [
+  "backlog",
+  "todo",
+  "doing",
+  "waiting",
+  "complete",
+  "canceled",
+  "log",
+];
 
-export function isFreeGate(gate: string): boolean {
+export function isOpenGate(gate: string): boolean {
   const g = gate.toLowerCase();
-  return g.startsWith("вільн") || g === "free";
+  return g === "open" || g.startsWith("вільн") || g === "free" || g === "todo";
 }
 
-function isWaitGate(gate: string): boolean {
-  const g = gate.toLowerCase();
-  return g.startsWith("чека") || g === "waiting";
+function gateRedundantWithColumn(card: Card): boolean {
+  const g = card.gate.trim().toLowerCase();
+  if (!g || g === "—") return true;
+  switch (card.column) {
+    case "waiting":
+      return g === "waiting";
+    case "todo":
+    case "backlog":
+      return isOpenGate(card.gate);
+    case "complete":
+      return g === "complete" || g === "done";
+    case "log":
+      return g === "log";
+  }
+  return false;
 }
 
-/** Мітки доступу / контексту — не дублюють колонку pipeline. */
+/** Мітки на картці Kanban — без дублювання pipeline-колонки. */
 export function cardTags(card: Card): string[] {
   const tags: string[] = [];
   const p = card.prio.trim();
   if (p) tags.push(p);
-  if (isFreeGate(card.gate)) tags.push("вільна");
-  else if (isWaitGate(card.gate)) tags.push("чекає");
-  else if (card.gate.trim()) tags.push(card.gate.trim());
+  const gate = card.gate.trim();
+  if (gate && gate !== "—" && !gateRedundantWithColumn(card)) {
+    tags.push(isOpenGate(gate) ? "open" : gate);
+  }
   if (card.beds === "yes") tags.push("ліжка");
   else if (card.beds === "maybe") tags.push("ліжка?");
   if (card.blocked.trim() && card.blocked !== "—") tags.push("блокер");
@@ -78,22 +115,24 @@ function parseTable(block: string): Record<string, string>[] {
 function colIdFromHeading(h: string): ColumnId | null {
   const t = h.toLowerCase();
   if (t.includes("doing")) return "doing";
-  if (t.includes("done")) return "done";
-  if (t.includes("next")) return "next";
-  if (t.includes("backlog")) return "backlog";
-  if (t.includes("low")) return "low";
+  if (t.includes("waiting")) return "waiting";
+  if (t.includes("todo") || t.includes("next")) return "todo";
+  if (t.includes("backlog") || t.includes("low")) return "backlog";
+  if (t.includes("complete") || t.includes("done")) return "complete";
+  if (t.includes("cancel")) return "canceled";
   if (t.includes("log")) return "log";
   return null;
 }
 
 function rowToCard(row: Record<string, string>, column: ColumnId): Card {
   const blocked = stripMd(row["блокери"] ?? row["blocked"] ?? "");
+  const gate = stripMd(row["gate"] ?? row["доступ"] ?? "");
   return {
     id: stripMd(row["id"] ?? ""),
     prio: stripMd(row["p"] ?? ""),
     title: stripMd(row["назва"] ?? ""),
     beds: stripMd(row["beds"] ?? ""),
-    gate: stripMd(row["доступ"] ?? row["gate"] ?? ""),
+    gate,
     blocked,
     created: stripMd(row["створено"] ?? row["created"] ?? row["updated"] ?? ""),
     updated: stripMd(row["updated"] ?? ""),
@@ -138,11 +177,13 @@ export function parseBoard(md: string): { updated: string; columns: Column[] } {
       all.push(c);
     }
   }
-  const freeCards = all.filter((c) => isFreeGate(c.gate) && c.column !== "log" && c.column !== "done");
+  const freeCards = all.filter(
+    (c) => isOpenGate(c.gate) && c.column !== "log" && c.column !== "complete",
+  );
   byCol.set("free", {
     id: "free",
-    heading: "Колонка: вільні",
-    emptyNote: "Немає карток з Доступ «вільна».",
+    heading: "Колонка: open (тег)",
+    emptyNote: "Немає карток з Gate «open» у робочих колонках.",
     cards: freeCards,
   });
 

@@ -33,13 +33,14 @@ metaEl.textContent = `apps/tasks/BOARD.md · ${updated} · npm run tasks · :${p
 const LS_TASK = "matrix-tasks-selected-id";
 
 const COL_LABEL: Record<ColumnId, string> = {
-  free: "Вільні (тег)",
-  doing: "В роботі",
-  next: "Далі",
-  backlog: "Черга",
-  low: "Низький",
-  log: "Журнал",
-  done: "Готово",
+  free: "open (tag)",
+  doing: "doing",
+  waiting: "waiting",
+  todo: "todo",
+  backlog: "backlog",
+  complete: "complete",
+  canceled: "canceled",
+  log: "log",
 };
 
 function findCardById(taskId: string): Card | undefined {
@@ -199,7 +200,7 @@ function renderProps(card: Card): void {
   const rows: [string, string][] = [["id", card.id]];
   if (card.prio.trim()) rows.push(["пріоритет", card.prio]);
   rows.push(["pipeline", COL_LABEL[card.column] ?? card.column]);
-  if (card.gate.trim()) rows.push(["доступ", card.gate]);
+  if (card.gate.trim()) rows.push(["gate", card.gate]);
   if (card.beds.trim()) rows.push(["ліжка", bedsLabel(card.beds)]);
   if (card.created.trim()) rows.push(["створено", card.created]);
   if (card.updated.trim()) rows.push(["оновлено", card.updated]);

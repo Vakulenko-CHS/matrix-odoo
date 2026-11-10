@@ -8,5 +8,6 @@
 | 2026-11-09 **15:48** | [T-SER-02](./BOARD.md#t-ser-02--авто-sn-перевірка-клієнтом) | [outbound/2026-11-09-T-SER-02.md](./outbound/2026-11-09-T-SER-02.md) | Зручність авто-SN; тест на замовленні з 2 диванами |
 | 2026-11-09 **16:46** | [T-DESC-01](./BOARD.md#t-desc-01--опис-рядка-замовлення-в-цеху) | [outbound/2026-11-09-T-DESC-01.md](./outbound/2026-11-09-T-DESC-01.md) | Номери пунктів, де ще показати опис рядка SO |
 | 2026-11-09 **17:43:14** | [T-FAB-01](./BOARD.md#t-fab-01--замовні-тканини) | [outbound/2026-11-09-T-FAB-01.md](./outbound/2026-11-09-T-FAB-01.md) | 8 назв, «к»/$, scope дивани/чохли/ліжка |
+| 2026-11-06 **13:56** | [T-VOL-01](./BOARD.md#t-vol-01--обєм-і-вага-для-автотранспорту) | [T-VOL-01 текст](../../furniture/reference/T-VOL-01-povidomlennya-kliyentu.md) · [Sheet](https://docs.google.com/spreadsheets/d/10UgQuyw-RObE-kdw1vr23cM0XV0IfhSy_54wEastUbw/edit?usp=sharing) | Заповнення об’єм/вага; відповідь у чаті |
 
 **Коміти (техніка):** авто-SN — `54096b0680721cc417bd5979c72c4a78270e4ede`; related SO note — `T-DESC-01` у BOARD.
