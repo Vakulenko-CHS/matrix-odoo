@@ -26,6 +26,7 @@
     "web:build": "vite build --config web/vite.config.ts",
     "web:preview": "vite preview --config web/vite.config.ts",
     "beds": "vite --config apps/beds/vite.config.ts",
+    "beds:build": "vite build --config apps/beds/vite.config.ts",
     "tasks": "vite --config apps/tasks/vite.config.ts",
     "import-template-bom": "ts-node src/commands/importTemplateBom.ts",
     "fix-product-types": "ts-node src/commands/fixProductTypes.ts",

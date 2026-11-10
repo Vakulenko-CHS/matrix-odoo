@@ -1,0 +1,3 @@
+[build]
+  command = "pnpm run beds:build"
+  publish = "apps/beds/dist"
