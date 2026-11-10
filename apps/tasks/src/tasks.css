@@ -212,6 +212,43 @@
   text-transform: uppercase;
   color: var(--steel);
 }
+.task-body h4 + .task-md-table {
+  margin-top: 0;
+}
+.task-body .task-md-table {
+  width: 100%;
+  margin: 0 0 14px;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.45;
+  border: 1px solid var(--rule);
+  background: var(--sheet);
+}
+.task-body .task-md-table th,
+.task-body .task-md-table td {
+  padding: 6px 10px;
+  vertical-align: top;
+  text-align: left;
+  border: 1px solid var(--rule);
+}
+.task-body .task-md-table th {
+  font-family: var(--ui);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--ply);
+  white-space: nowrap;
+}
+.task-body .task-md-table td:first-child {
+  font-family: var(--spec);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.task-body .task-md-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--ply) 55%, transparent);
+}
 .task-body .repo-link,
 .task-file-chip {
   display: inline;

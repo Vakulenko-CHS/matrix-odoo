@@ -83,6 +83,37 @@ function linkToHtml(rawLabel: string, href: string): string {
   return escapeHtml(`[${label}](${href})`);
 }
 
+function isTableRow(line: string): boolean {
+  const t = line.trim();
+  return t.startsWith("|") && t.endsWith("|");
+}
+
+function isTableSeparator(line: string): boolean {
+  return /^\|[\s\-:|]+\|$/.test(line.trim());
+}
+
+function parseTableCells(line: string): string[] {
+  return line
+    .trim()
+    .slice(1, -1)
+    .split("|")
+    .map((c) => c.trim());
+}
+
+function renderTable(lines: string[]): string {
+  const headers = parseTableCells(lines[0]);
+  const rows = lines.slice(2).filter(isTableRow);
+  const head = headers.map((h) => `<th scope="col">${inline(h)}</th>`).join("");
+  const body = rows
+    .map((row) => {
+      const cells = parseTableCells(row);
+      const tds = cells.map((c) => `<td>${inline(c)}</td>`).join("");
+      return `<tr>${tds}</tr>`;
+    })
+    .join("");
+  return `<table class="task-md-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+}
+
 function inline(s: string): string {
   const re = /\[([^\]]+)\]\(([^)]+)\)/g;
   let out = "";
@@ -104,6 +135,14 @@ function renderMd(raw: string): string {
   return blocks
     .map((block) => {
       const lines = block.split("\n");
+      if (
+        lines.length >= 2 &&
+        isTableRow(lines[0]) &&
+        isTableSeparator(lines[1]) &&
+        lines.slice(2).every((l) => !l.trim() || isTableRow(l))
+      ) {
+        return renderTable(lines.filter((l) => l.trim()));
+      }
       if (lines.every((l) => l.startsWith("- "))) {
         const items = lines.map((l) => `<li>${inline(l.slice(2))}</li>`).join("");
         return `<ul>${items}</ul>`;
