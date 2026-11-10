@@ -59,7 +59,8 @@
     "lam-buy": "ts-node --transpile-only src/commands/lamBuyRoutes.ts",
     "assign-mo-serials": "ts-node --transpile-only src/commands/assignMoSerials.ts",
     "studio-auto-serial": "ts-node --transpile-only src/commands/studioAutoSerial.ts",
-    "studio-so-note": "ts-node --transpile-only src/commands/studioSoLineNote.ts"
+    "studio-so-note": "ts-node --transpile-only src/commands/studioSoLineNote.ts",
+    "studio-qal02-so": "ts-node --transpile-only src/commands/studioQal02SoOrder.ts"
   },
   "keywords": [],
   "author": "",

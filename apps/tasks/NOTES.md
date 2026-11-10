@@ -1,5 +1,11 @@
 # Нотатки до карток
 
+## T-QAL-02 — накладна S00… у «Перевірки в процесі»
+
+**Apply 2026-11-10.** Related `x_studio_so_order_name` → `production_id.sale_line_id.order_id.name` на `quality.check`. Views **3850–3851**. Команда `npm run studio-qal02-so -- --apply`. Колонка **Накладна** в списку QC (optional show).
+
+---
+
 ## T-DESC-01 — опис рядка SO в MO / цех / якість
 
 Клієнт 2026-11-09: після «Введіть опис» на рядку продажу хоче той самий текст далі по процесу.
