@@ -2,6 +2,11 @@
 
 ## Entries (newest first)
 
+### 2026-11-10 — T-QAL-02 SO name on quality.check
+
+- **Summary:** Field **25263** `x_studio_so_order_name` related `production_id.sale_line_id.order_id.name`. Views **3850–3851**. QC in progress sample `S00265`… No Python loc.
+- **Files:** `src/commands/studioQal02SoOrder.ts`
+
 ### 2026-11-09 — T-DESC related SO line note
 
 - **Summary:** Fields **25253** MO, **25258** WO, **25260** QC `x_studio_so_line_note` related `sale_line_id.name`. Views **3846–3849**. Loc **93/100**. No Python.
