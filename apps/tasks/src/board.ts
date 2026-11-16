@@ -3,6 +3,7 @@ export type ColumnId =
   | "doing"
   | "todo"
   | "waiting"
+  | "unconfirmed"
   | "backlog"
   | "complete"
   | "canceled"
@@ -33,6 +34,7 @@ const COL_ORDER: ColumnId[] = [
   "free",
   "doing",
   "waiting",
+  "unconfirmed",
   "todo",
   "backlog",
   "complete",
@@ -46,6 +48,7 @@ export const PIPELINE_COLS: ColumnId[] = [
   "todo",
   "doing",
   "waiting",
+  "unconfirmed",
   "complete",
   "canceled",
   "log",
@@ -62,6 +65,8 @@ function gateRedundantWithColumn(card: Card): boolean {
   switch (card.column) {
     case "waiting":
       return g === "waiting";
+    case "unconfirmed":
+      return g === "unconfirmed" || g === "waiting";
     case "todo":
     case "backlog":
       return isOpenGate(card.gate);
@@ -115,6 +120,7 @@ function parseTable(block: string): Record<string, string>[] {
 function colIdFromHeading(h: string): ColumnId | null {
   const t = h.toLowerCase();
   if (t.includes("doing")) return "doing";
+  if (t.includes("unconfirmed")) return "unconfirmed";
   if (t.includes("waiting")) return "waiting";
   if (t.includes("todo") || t.includes("next")) return "todo";
   if (t.includes("backlog") || t.includes("low")) return "backlog";
@@ -178,7 +184,11 @@ export function parseBoard(md: string): { updated: string; columns: Column[] } {
     }
   }
   const freeCards = all.filter(
-    (c) => isOpenGate(c.gate) && c.column !== "log" && c.column !== "complete",
+    (c) =>
+      isOpenGate(c.gate) &&
+      c.column !== "log" &&
+      c.column !== "complete" &&
+      c.column !== "unconfirmed",
   );
   byCol.set("free", {
     id: "free",

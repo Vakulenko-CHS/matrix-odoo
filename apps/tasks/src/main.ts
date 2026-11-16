@@ -36,6 +36,7 @@ const COL_LABEL: Record<ColumnId, string> = {
   free: "open (tag)",
   doing: "doing",
   waiting: "waiting",
+  unconfirmed: "unconfirmed",
   todo: "todo",
   backlog: "backlog",
   complete: "complete",

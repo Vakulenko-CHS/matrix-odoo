@@ -2,6 +2,16 @@
 
 ## Entries (newest first)
 
+### 2026-11-16 — T-QAL-01 → unconfirmed (лайк Тані)
+
+- **Summary:** Після спільного логіну Таня одразу ❤️; текстового ОК немає. T-QAL-01 з `waiting` у **`unconfirmed`** поруч з T-DESC-01 / T-SER-02.
+- **Files:** `apps/tasks/BOARD.md`, `apps/tasks/OUTBOUND.md`, `apps/tasks/outbound/2026-11-16-T-QAL-01-shared-login.md`
+
+### 2026-11-16 — pipeline `unconfirmed` + T-FAB complete
+
+- **Summary:** Колонка **`unconfirmed`**: робота є, прямого ОК немає. T-DESC-01 (❤️ без пунктів) і T-SER-02 (тиждень ігнору) туди, не в `complete`. T-FAB-01 **complete**. T-BED-01 nudge Вадиму **11:57**. T-VOL-01 нагадування **12:25**.
+- **Files:** `apps/tasks/{BOARD.md,README.md,OUTBOUND.md,src/board.ts,src/main.ts,src/tasks.css,outbound/2026-11-16-T-BED-01-vadim-nudge.md,outbound/2026-11-16-T-VOL-01-reminder.md}`
+
 ### 2026-11-16 — T-QAL-01 outbound спільний логін
 
 - **Summary:** Груповий чат (~12:22): 2 users Odoo (Admin + робочий), Таня/Ліза/Оксана — один логін `Tmochalovaa2704@ukr.net`; Таня — спільний пароль, креди в особистих. [`outbound/2026-11-16-T-QAL-01-shared-login.md`](../../apps/tasks/outbound/2026-11-16-T-QAL-01-shared-login.md), `OUTBOUND.md`, BOARD лог T-QAL-01.

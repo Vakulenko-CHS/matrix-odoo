@@ -108,6 +108,10 @@
   color: var(--oxide);
   background: color-mix(in srgb, var(--oxide) 12%, var(--ply));
 }
+.task-tag--unconfirmed {
+  color: var(--oxide);
+  background: color-mix(in srgb, var(--oxide) 12%, var(--ply));
+}
 .task-tag--open {
   color: var(--steel);
 }

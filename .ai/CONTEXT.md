@@ -3,7 +3,7 @@
 Session notes → [logs/](logs/). Keep this file slim.  
 Start: [.ai/INDEX.md](./INDEX.md) → **this file**. Open logs only when **Log index** matches.
 
-Last updated: **2026-11-16** (T-QAL-01 outbound спільний логін якості)
+Last updated: **2026-11-16** (T-QAL-01 → unconfirmed, лайк Тані)
 
 ---
 

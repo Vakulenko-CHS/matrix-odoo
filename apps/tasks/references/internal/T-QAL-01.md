@@ -67,9 +67,9 @@ npm run qal01-vtk -- --apply
 - **Ліза / Оксана:** лише `hr.employee`; **спільний** логін Тані для модуля Якість (підміна), без додаткових ліцензій.
 - Перевірка в Odoo: лише `matrix-mebli@ukr.net` + `Tmochalovaa2704@ukr.net`.
 
-## Очікуємо (waiting)
+## Очікуємо (unconfirmed)
 
-**2026-11-10 14:15** — Ілля → **Карен:** чи з Даніїлом узгоджено **2 users**. [`outbound/2026-11-10-karen-two-users.md`](../../outbound/2026-11-10-karen-two-users.md). Після ОК — картку в **complete**.
+**2026-11-16** — спільний логін у групі; Таня ❤️ одразу. Картка **`unconfirmed`**, не `complete`. [`outbound/2026-11-16-T-QAL-01-shared-login.md`](../../outbound/2026-11-16-T-QAL-01-shared-login.md).
 
 | Пункт | Стан |
 |-------|------|
