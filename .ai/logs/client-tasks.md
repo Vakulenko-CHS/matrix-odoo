@@ -2,6 +2,11 @@
 
 ## Entries (newest first)
 
+### 2026-11-16 — T-PAY-01 outbound 15:58 → waiting
+
+- **Summary:** Зарплата вантажників/прибиральниць — 5 питань у чат (ставка, табель, payroll vs account, прибиральниці, ПІБ). Odoo: 3 вантажники, wage ~1300, payslipів немає. Файл outbound без `-draft`.
+- **Files:** `apps/tasks/{BOARD.md,OUTBOUND.md,outbound/2026-11-16-T-PAY-01.md,references/internal/T-PAY-01.md}`
+
 ### 2026-11-16 — T-PUR-01 outbound 15:30 → waiting
 
 - **Summary:** Інструкція + лінк деки (13 слайдів) і 3 питання Даніїлу в чат. Фінальний текст outbound (без жирності; однина «внесу я»); п.2 правка Іллі — список матеріал→N або self-service за майбутньою декою. Gate **waiting**; TODO дека мін. N.
