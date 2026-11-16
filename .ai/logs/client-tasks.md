@@ -2,6 +2,11 @@
 
 ## Entries (newest first)
 
+### 2026-11-16 — T-QAL-01 outbound спільний логін
+
+- **Summary:** Груповий чат (~12:22): 2 users Odoo (Admin + робочий), Таня/Ліза/Оксана — один логін `Tmochalovaa2704@ukr.net`; Таня — спільний пароль, креди в особистих. [`outbound/2026-11-16-T-QAL-01-shared-login.md`](../../apps/tasks/outbound/2026-11-16-T-QAL-01-shared-login.md), `OUTBOUND.md`, BOARD лог T-QAL-01.
+- **Files:** `apps/tasks/outbound/2026-11-16-T-QAL-01-shared-login.md`, `apps/tasks/OUTBOUND.md`, `apps/tasks/BOARD.md`
+
 ### 2026-11-09 — OUTBOUND + FAB/DESC/SER чекає клієнта
 
 - **Summary:** T-FAB запит **17:43:14** (`temp/1k-usd.md`). T-DESC чеклист **16:46** (`description-places.md`) → backlog `чекає`. **T-SER-02** новa — feedback авто-SN **15:48** (`sn-client-2026-11-09.md`). Журнал [`apps/tasks/OUTBOUND.md`](../../apps/tasks/OUTBOUND.md).
