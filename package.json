@@ -11,6 +11,8 @@
     "check": "ts-node src/index.ts check",
     "ai-check": "ts-node src/index.ts ai-check",
     "add-fabric": "ts-node src/index.ts add-fabric",
+    "fab01-categories": "ts-node --transpile-only src/commands/fab01Categories.ts",
+    "fab01-categories-top": "ts-node --transpile-only src/commands/fab01CategoriesTop.ts",
     "snapshot": "ts-node src/index.ts snapshot",
     "restore": "ts-node src/index.ts restore",
     "dev": "ts-node src/index.ts",
