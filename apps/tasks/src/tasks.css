@@ -79,6 +79,10 @@
   color: var(--graphite);
   text-align: left;
 }
+.task-card:focus-visible {
+  outline: 2px solid var(--steel);
+  outline-offset: 1px;
+}
 .task-card-head {
   display: flex;
   align-items: center;
@@ -123,6 +127,47 @@
   font-family: var(--spec);
   font-size: 11px;
   color: var(--steel);
+}
+.task-id-copy {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--spec);
+  font-size: 11px;
+  font-weight: inherit;
+  color: var(--steel);
+  cursor: copy;
+  text-align: left;
+  border-radius: 2px;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+.task-id-copy:hover {
+  color: var(--grease);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.task-id-copy:focus-visible {
+  outline: 2px solid var(--steel);
+  outline-offset: 2px;
+}
+.task-id-copy--ok {
+  color: var(--oxide);
+  text-decoration: none;
+}
+.task-props .task-id-copy {
+  font-family: var(--ui);
+  font-size: 14px;
+  color: var(--steel);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.task-props .task-id-copy:hover {
+  color: var(--focus);
+}
+.task-props .task-id-copy--ok {
+  color: var(--oxide);
+  text-decoration: none;
 }
 .tt {
   font-size: 13px;

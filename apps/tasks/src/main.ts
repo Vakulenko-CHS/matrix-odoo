@@ -164,6 +164,37 @@ function renderMd(raw: string): string {
     .join("");
 }
 
+async function copyTaskId(id: string, el: HTMLElement): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(id);
+  } catch {
+    const ta = document.createElement("textarea");
+    ta.value = id;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+  }
+  el.classList.add("task-id-copy--ok");
+  window.setTimeout(() => el.classList.remove("task-id-copy--ok"), 1200);
+}
+
+function makeTaskIdCopyButton(taskId: string): HTMLButtonElement {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "tid task-id-copy";
+  btn.textContent = taskId;
+  btn.setAttribute("aria-label", `Копіювати id ${taskId}`);
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    void copyTaskId(taskId, btn);
+  });
+  return btn;
+}
+
 function bedsLabel(beds: string): string {
   if (beds === "yes") return "так";
   if (beds === "maybe") return "можливо";
@@ -218,7 +249,8 @@ function renderProps(card: Card): void {
     th.scope = "row";
     th.textContent = key;
     const td = document.createElement("td");
-    td.textContent = value;
+    if (key === "id") td.appendChild(makeTaskIdCopyButton(value));
+    else td.textContent = value;
     tr.append(th, td);
     tbody.appendChild(tr);
   }
@@ -252,19 +284,17 @@ function show(card: Card | null) {
   persistSelection();
 }
 
-function makeCardButton(card: Card): HTMLButtonElement {
-  const b = document.createElement("button");
-  b.type = "button";
+function makeCardEl(card: Card): HTMLDivElement {
+  const b = document.createElement("div");
   b.className = "task-card";
   b.dataset.id = card.id;
   b.title = card.title;
+  b.setAttribute("role", "button");
+  b.tabIndex = 0;
 
   const head = document.createElement("div");
   head.className = "task-card-head";
-  const id = document.createElement("span");
-  id.className = "tid";
-  id.textContent = card.id;
-  head.appendChild(id);
+  head.appendChild(makeTaskIdCopyButton(card.id));
 
   const tagsEl = document.createElement("div");
   tagsEl.className = "task-tags";
@@ -287,7 +317,17 @@ function makeCardButton(card: Card): HTMLButtonElement {
   dates.textContent = parts.join(" · ");
 
   b.append(head, tagsEl, tt, dates);
-  b.addEventListener("click", () => show(card));
+  const open = () => show(card);
+  b.addEventListener("click", (e) => {
+    if ((e.target as HTMLElement).closest(".task-id-copy")) return;
+    open();
+  });
+  b.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      open();
+    }
+  });
   return b;
 }
 
@@ -317,7 +357,7 @@ function paintKanban(opts?: { pickFirst?: boolean }) {
       list.appendChild(p);
     } else {
       for (const card of col.cards) {
-        list.appendChild(makeCardButton(card));
+        list.appendChild(makeCardEl(card));
       }
     }
     colWrap.appendChild(list);
