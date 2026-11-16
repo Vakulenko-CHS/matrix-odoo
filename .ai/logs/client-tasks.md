@@ -2,6 +2,56 @@
 
 ## Entries (newest first)
 
+### 2026-11-16 — T-PUR-01 outbound 15:30 → waiting
+
+- **Summary:** Інструкція + лінк деки (13 слайдів) і 3 питання Даніїлу в чат. Фінальний текст outbound (без жирності; однина «внесу я»); п.2 правка Іллі — список матеріал→N або self-service за майбутньою декою. Gate **waiting**; TODO дека мін. N.
+- **Files:** `apps/tasks/{BOARD.md,OUTBOUND.md,outbound/2026-11-16-T-PUR-01-daniil.md}`
+
+### 2026-11-16 — T-PUR-01 слайди: шлях до WH/IN
+
+- **Summary:** Додано кроки головна → **Склад** → огляд **Waiting** (не «Відкрито») перед списком надходжень. 13 слайдів; Надходження (1)–(5). Пігулки `2 · Надходження` на слайдах 8–11. Outbound: закупівлю зараз лише **адмін**, опційно спільний акаунт Тані.
+- **Files:** `temp/pur-slides/outlined/pur-inv-00..02*.png`, Google Slides `1UABpnzTzQiQ7L_JhfOPfgjStjn3A3AeTAqsDJK0xmw4`, `apps/tasks/outbound/2026-11-16-T-PUR-01-daniil.md`
+
+### 2026-11-16 — T-PUR-01 даблчек → waiting
+
+- **Summary:** §8 Вадим: PO + WH/IN + поповнення — у декі. Доставка: outbound + лінк. Блокер: 3 питання Даніїлу; min/max apply після відповіді. MO 00820–34 скасовано.
+- **Files:** `apps/tasks/{BOARD.md,outbound/2026-11-16-T-PUR-01-daniil.md,references/internal/T-PUR-01.md}`
+
+### 2026-11-16 — T-PUR-01 слайди: імперсональний текст
+
+- **Summary:** Титул слайд видалено. Відкрий→Відкрити. Без Даніїла/Тані в декі. Фінал «Запам'ятати» — лише ціна/склад/не робити. 12 слайдів.
+- **Files:** Google Slides `1UABpnzTzQiQ7L_JhfOPfgjStjn3A3AeTAqsDJK0xmw4`
+
+### 2026-11-16 — T-PUR-01: клік Замовлення + слайди
+
+- **Summary:** Клік «Замовлення» на Поповненні створив MO (маршрут Виробництво), не PO. Скасовано WH/MO/00820–00834 (qty_producing=0). Слайд 11: бейджі 3/4 на зовнішніх кутах. Підписи «натиснути / можна переглянути». Слайди 1,2,3,8,13 — шапка title зліва, MATRIX справа.
+- **Files:** Google Slides `1UABpnzTzQiQ7L_JhfOPfgjStjn3A3AeTAqsDJK0xmw4`
+
+### 2026-11-16 — T-PUR-01 слайди: CSS-обводка кнопок
+
+- **Summary:** Стрілки знято. Під час скріна DOM: червона рамка на реальному елементі + бейдж (1)–(n) поруч. Усі how-to слайди перезнято. Слайд 7 пункт 6 сидить на «Підтвердити замовлення», не вище.
+- **Files:** `temp/pur-slides/outlined/`, Google Slides `1UABpnzTzQiQ7L_JhfOPfgjStjn3A3AeTAqsDJK0xmw4`
+
+### 2026-11-16 — T-PUR-01 слайди: як Вадим (стрілки на PNG)
+
+- **Summary:** Пігулка ~100×22 `#C2410C`. Стрілки/кружечки червоні, впечені в скрін (номери по центру). Нумерація наскрізна в секції: Замовлення (1)–(6), Надходження (1)–(4), Поповнення (1)–(2).
+- **Files:** `temp/pur-slides/annotate.py`, Google Slides `1UABpnzTzQiQ7L_JhfOPfgjStjn3A3AeTAqsDJK0xmw4`
+
+### 2026-11-16 — T-PUR-01 слайди: стрілки + компактна шапка
+
+- **Summary:** Скрін-слайди: шапка в один ряд (пігулка + заголовок зліва, MATRIX справа), підпис `1. …`. Рожеві кружечки/стрілки як у Вадима на кнопки (Купівля, Новий, постачальник, Додати товар, ціна, Підтвердити, Надходження, Очікування, Перевірте/Підтвердити, Операції/Замовити).
+- **Files:** Google Slides `1UABpnzTzQiQ7L_JhfOPfgjStjn3A3AeTAqsDJK0xmw4`
+
+### 2026-11-16 — T-PUR-01 Google Slides
+
+- **Summary:** Дека 13 слайдів (титул / 3 кроки / 01–02 секції / 8 live скрінів / запам’ятай). Стиль Вадима. URL `1UABpnzTzQiQ7L_JhfOPfgjStjn3A3AeTAqsDJK0xmw4`. Toast сховано. PO/WH не валідували. Title в Drive лишився Untitled.
+- **Files:** `apps/tasks/{BOARD.md,references/internal/T-PUR-01.md}`
+
+### 2026-11-16 — T-PUR-01 doing + outbound Даніїлу
+
+- **Summary:** Купує лише Даніїл. Техніка вже в Odoo (Купівля Admin, 3537 Buy OP, MATRIX IN). Інструкція `references/internal/T-PUR-01.md`. Чат: 3 питання (знижки, мін. запас, scope). Картка **doing**.
+- **Files:** `apps/tasks/{BOARD.md,OUTBOUND.md,outbound/2026-11-16-T-PUR-01-daniil.md,references/internal/T-PUR-01.md}`
+
 ### 2026-11-16 — T-QAL-01 → unconfirmed (лайк Тані)
 
 - **Summary:** Після спільного логіну Таня одразу ❤️; текстового ОК немає. T-QAL-01 з `waiting` у **`unconfirmed`** поруч з T-DESC-01 / T-SER-02.
