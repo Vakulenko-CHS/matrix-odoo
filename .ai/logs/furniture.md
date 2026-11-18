@@ -2,6 +2,13 @@
 
 ## Entries (newest first)
 
+### 2026-11-18 — Vadim даблчек → KNOWLEDGE + shop-9 ламель
+
+- **Agent / human:** agent / user
+- **Summary:** Telegram експорт 2026-11-18. Апруд Скай 116×200. Цех 9 `або` двох наборів → `@Посилений ламельний каркас`; `Купляється` з виробничих НФ. Фаро (Тетріс prefix). Мітки апрув / оновлено-2. T-BED-01 waiting другий перегляд.
+- **Files:** `furniture/KNOWLEDGE.md`, `furniture/beds/**/fixed.md`, `src/tools/bedSpecPrep.ts`, `furniture/inventory.{md,json}`, `apps/beds/src/{main.ts,furniture.css}`, `apps/tasks/BOARD.md`
+- **Git:** not committed
+
 ### 2026-11-09 — bed batch format 40/40
 
 - **Agent / human:** agent / user

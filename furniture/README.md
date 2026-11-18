@@ -9,7 +9,7 @@
 | [reference/README.md](./reference/README.md) | Як оновлювати Specs → inventory | |
 | [inventory.md](./inventory.md) | 40 ліжок — огляд | Старт пакета |
 | [colleague-questions.md](./colleague-questions.md) | Повні питання виробництву (без жаргону) + HackMD | Неясна логіка |
-| [beds/](./beds/) | `original.md` / `fixed.md` / `DIFF.md` на модель | Правка однієї моделі |
+| [beds/](./beds/) | `original.md` / `upd-1.md` (знімок) / `fixed.md` (latest) / `DIFF.md` | Правка; UI `npm run beds` — вибір версій; `npm run bed-snapshot-upd1` перед upd 2 |
 | [../.cursor/skills/furniture-check/SKILL.md](../.cursor/skills/furniture-check/SKILL.md) | Скіл агента | Будь-яка перевірка меблів |
 | [../apps/tasks/BOARD.md](../apps/tasks/BOARD.md) | Клієнтські задачі | Перед імпортом ліжок |
 

@@ -46,6 +46,7 @@
     "pull-hackmd": "ts-node src/index.ts pull-hackmd",
     "batch-format": "ts-node src/index.ts batch-format",
     "bed-batch-format": "ts-node --transpile-only src/index.ts bed-batch-format",
+    "bed-snapshot-upd1": "ts-node --transpile-only src/index.ts bed-snapshot-upd1",
     "fill-laminate": "ts-node src/tools/fill-laminate-boms.ts",
     "push-hackmd": "ts-node src/index.ts push-hackmd",
     "estimate-import": "ts-node src/index.ts estimate-import",

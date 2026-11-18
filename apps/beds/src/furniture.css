@@ -38,19 +38,52 @@
 .furn-list button.on.has-fixed {
   border-left-color: var(--grease);
 }
-.furn-card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 4px;
+.furn-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  column-gap: 8px;
+  row-gap: 4px;
+  width: 100%;
 }
 .furn-name {
+  grid-column: 1;
+  grid-row: 1;
   font-size: 14px;
   font-weight: 500;
   line-height: 1.3;
-  flex: 1;
   min-width: 0;
+}
+.furn-list .st {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 11px;
+  font-family: var(--spec);
+  text-align: left;
+}
+.furn-badge-slot {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-self: end;
+}
+.furn-badge-slot--upd {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+}
+.furn-badge-slot--extra {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: end;
+  min-height: 18px;
 }
 .furn-badge {
   flex-shrink: 0;
@@ -74,11 +107,18 @@
   background: var(--rule);
   color: var(--muted);
 }
-.furn-list .st {
-  display: block;
-  color: var(--muted);
-  font-size: 11px;
-  font-family: var(--spec);
+.furn-badge--approved {
+  background: var(--grease);
+  color: var(--sheet);
+}
+.furn-badge--upd-1 {
+  background: var(--ochre);
+  color: var(--sheet);
+}
+.furn-badge--upd-2 {
+  background: var(--ply-dark);
+  color: var(--graphite);
+  box-shadow: inset 0 0 0 1px var(--rule);
 }
 .furn-main {
   display: flex;
@@ -168,7 +208,7 @@
 }
 .furn-col-h {
   margin: 0;
-  padding: 10px 16px;
+  padding: 8px 12px;
   min-height: 42px;
   box-sizing: border-box;
   display: flex;
@@ -181,6 +221,26 @@
   border-bottom: 1px solid var(--rule);
   border-right: 1px solid var(--rule);
   background: var(--ply);
+}
+.furn-col-h .furn-ver-select {
+  width: 100%;
+}
+.furn-ver-select {
+  min-width: 0;
+  max-width: 100%;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  padding: 4px 8px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--sheet);
+  color: var(--graphite);
+}
+.furn-ver-select:disabled {
+  opacity: 0.6;
 }
 .furn-col-h:nth-child(1) {
   grid-column: 1;

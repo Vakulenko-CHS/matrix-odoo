@@ -262,6 +262,137 @@ function fixOptionalBortikFoamPrefix(content: string): string {
   );
 }
 
+/** Manufactured NFs — not buy. Vadim 2026-11-18 (Террі 90×190 газ). */
+function stripBoughtOnMade(content: string): string {
+  return content.replace(
+    /^(.*(Ізголовье в тканині - нарізані матеріали|Чохол - напівфабрикат\] Бортик|Бортик \+ Поролон|Поролон - нарізані компоненти\] Бортик).*?)(?:\s*<!-- Купляється -->)+/gmu,
+    "$1",
+  );
+}
+
+function karkasSize(line: string): string {
+  return line.match(/(\d+x\d+)/u)?.[1] ?? "";
+}
+
+function isReinforcedKarkas(line: string): boolean {
+  return /крок|шаг|2[,.]5/iu.test(line);
+}
+
+function canonKarkasLine(line: string, size: string): string {
+  const name = isReinforcedKarkas(line)
+    ? `Каркас ${size} крок 2,5см`
+    : `Каркас ${size}`;
+  return `${name} - 1 шт.`;
+}
+
+function enableLamelAttr(content: string): string {
+  if (/"Посилений ламельний каркас",\s*✅/u.test(content)) return content;
+  let out = content.replace(
+    /^("Ізголовье в тканині"[^\n]*)$/mu,
+    `"Посилений ламельний каркас", ✅\n$1`,
+  );
+  if (!/"Посилений ламельний каркас",\s*✅/u.test(out)) {
+    out = out.replace(
+      /^("Дно Каркасу"[^\n]*\n)/mu,
+      `$1"Посилений ламельний каркас", ✅\n`,
+    );
+  }
+  if (
+    !/%Посилений ламельний каркас%/u.test(
+      out.slice(0, out.search(/^# Цех №/mu) || out.length),
+    )
+  ) {
+    out = out.replace(
+      /(7\. %Ізголовье в тканині%:[\s\S]*?Впливає на цех:\s*\(9\)\n)/u,
+      `$1\n8. %Посилений ламельний каркас%\n   Значення атрибута: "Додано", "Немає"\n   Впливає на цех: (9)\n`,
+    );
+  }
+  out = out.replace(
+    /(# Цех №9 Оббивки[^\n]*\n\n[^\n(]+\()([^)]+)(\))/u,
+    (_m, a: string, inner: string, c: string) => {
+      if (inner.includes("%Посилений ламельний каркас%")) return `${a}${inner}${c}`;
+      return `${a}${inner}, %Посилений ламельний каркас%${c}`;
+    },
+  );
+  return out;
+}
+
+/**
+ * Shop 9: `або` of two hardware sets = one product, two каркас.
+ * Vadim 2026-11-18: use @Посилений ламельний каркас, do not duplicate hydr/legs.
+ */
+function isHwLine(line: string): boolean {
+  return /^(Кроватний|Амортизатор|амортизатор|Ніжка)\s/u.test(line);
+}
+
+function isKarkasLine(line: string): boolean {
+  return /^(Каркас|каркас) /u.test(line);
+}
+
+function peelLamelBranch(raw: string): {
+  head: string;
+  extras: string[];
+  karkas: string;
+  hardware: string[];
+  tail: string;
+} | null {
+  const lines = raw.replace(/\s+$/u, "").split("\n");
+  let i = lines.length - 1;
+  while (i >= 0 && lines[i].trim() === "") i--;
+  const hardware: string[] = [];
+  while (i >= 0 && isHwLine(lines[i])) {
+    hardware.unshift(lines[i]);
+    i--;
+  }
+  if (i < 0 || !isKarkasLine(lines[i])) return null;
+  const karkas = lines[i];
+  i--;
+  const extras: string[] = [];
+  while (i >= 0 && lines[i].trim() !== "" && !isKarkasLine(lines[i]) && !isHwLine(lines[i]) && !lines[i].startsWith("🧩") && !lines[i].startsWith("🪤") && !lines[i].startsWith("//")) {
+    extras.unshift(lines[i]);
+    i--;
+  }
+  return {
+    head: lines.slice(0, i + 1).join("\n"),
+    extras,
+    karkas,
+    hardware,
+    tail: "",
+  };
+}
+
+export function fixShop9LamelAbo(content: string): { text: string; changed: boolean } {
+  const start = content.search(/^# Цех №9 Оббивки/mu);
+  if (start === -1) return { text: content, changed: false };
+  const rest = content.slice(start);
+  const endRel = rest.search(/^# Цех №10|^# ВТК/mu);
+  const end = endRel === -1 ? content.length : start + endRel;
+  const shop = content.slice(start, end);
+  const abo = shop.search(/\nабо\n\n/u);
+  if (abo === -1) return { text: content, changed: false };
+  const left = peelLamelBranch(shop.slice(0, abo));
+  const rightRaw = shop.slice(abo + "\nабо\n\n".length);
+  const priceAt = rightRaw.search(/\nЦіна /u);
+  const rightBody = priceAt === -1 ? rightRaw : rightRaw.slice(0, priceAt);
+  const rightTail = priceAt === -1 ? "" : rightRaw.slice(priceAt);
+  const right = peelLamelBranch(rightBody);
+  if (!left || !right) {
+    return { text: content, changed: false };
+  }
+  if (!isReinforcedKarkas(left.karkas) && !isReinforcedKarkas(right.karkas)) {
+    return { text: content, changed: false };
+  }
+  const size = karkasSize(left.karkas) || karkasSize(right.karkas);
+  const plain = isReinforcedKarkas(left.karkas) ? right.karkas : left.karkas;
+  const strong = isReinforcedKarkas(left.karkas) ? left.karkas : right.karkas;
+  const extras = left.extras.length ? `${left.extras.join("\n")}\n` : "";
+  const hw = left.hardware.length ? `${left.hardware.join("\n")}\n` : "";
+  const block = `${left.head}\n${extras}${hw}// Посилений ламельний каркас\n${canonKarkasLine(plain, size)} // @Посилений ламельний каркас=Немає\n${canonKarkasLine(strong, size)} // @Посилений ламельний каркас=Додано\n${rightTail}`;
+  let text = content.slice(0, start) + block + content.slice(end);
+  text = enableLamelAttr(text);
+  return { text, changed: true };
+}
+
 export function applyBedPostFormatFixes(content: string, slug: string): string {
   let out = content;
   out = fixLaminateChain(out, slug);
@@ -269,5 +400,66 @@ export function applyBedPostFormatFixes(content: string, slug: string): string {
   out = fixFoamSizeTypo(out, slug);
   out = fixKnownClientTypos(out);
   out = fixOptionalBortikFoamPrefix(out);
+  out = stripBoughtOnMade(out);
+  out = fixShop9LamelAbo(out).text;
   return out;
+}
+
+/** shortcut: assert-based self-check, run: ts-node --transpile-only src/tools/bedSpecPrep.ts */
+if (require.main === module) {
+  const sample = `# Цех №9 Оббивки - Ц9обв
+
+Ліжко Балі 140х200 (%Тканина%, %Дно Каркасу%, %Ізголовье в тканині%)
+Каркас 140x200 - 1 шт.
+Кроватний гідравл б/б - 1 шт.
+Амортизатор 1000 - 2 шт.
+Ніжка 115x115 хром - 4 шт.
+
+або
+
+Каркас 120x200 крок 2,5см - 1 шт.
+Кроватний гідравл б/б - 1 шт.
+амортизатор 1000 - 2 шт.
+Ніжка 115x115 хром - 4 шт.
+
+Ціна 400 грн
+
+# Цех №10 Упаковки
+`;
+  const { text, changed } = fixShop9LamelAbo(sample);
+  if (!changed) throw new Error("shop9 lamel: expected change");
+  if (text.includes("\nабо\n")) throw new Error("shop9 lamel: або still there");
+  if (text.includes("120x200")) throw new Error("shop9 lamel: kept wrong size");
+  if (!text.includes("Каркас 140x200 крок 2,5см")) {
+    throw new Error("shop9 lamel: missing reinforced same size");
+  }
+  if ((text.match(/Кроватний гідравл/g) || []).length !== 1) {
+    throw new Error("shop9 lamel: hardware still duplicated");
+  }
+  const faro = `# Цех №9 Оббивки
+
+Ліжко Фаро 160х200 (%Тканина%)
+Тетріс(Балюта) - 1 шт.
+Каркас 160x200 - 1 шт.
+Кроватний гідравл б/б - 1 шт.
+Ніжка 115x115 хром - 4 шт.
+
+або
+
+Тетріс(Балюта) - 1 шт.
+Каркас 120x200 крок 2,5см - 1 шт.
+Кроватний гідравл б/б - 1 шт.
+Ніжка 115x115 хром - 4 шт.
+
+# Цех №10
+`;
+  const f = fixShop9LamelAbo(faro);
+  if (!f.changed || f.text.includes("\nабо\n") || !f.text.includes("Тетріс(Балюта)") || (f.text.match(/Тетріс/g) || []).length !== 1) {
+    throw new Error("shop9 lamel: faro prefix");
+  }
+  const bought = stripBoughtOnMade(
+    `🧩[Ізголовье в тканині - нарізані матеріали] (%Тканина%) - 1 шт. // @Ізголовье в тканині=Додано <!-- Купляється -->\n`,
+  );
+  if (bought.includes("Купляється")) throw new Error("strip bought failed");
+  console.log("bedSpecPrep self-check ok");
 }

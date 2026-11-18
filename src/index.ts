@@ -74,6 +74,12 @@ async function main() {
       break;
     }
 
+    case "bed-snapshot-upd1": {
+      const { runBedSnapshotUpd1 } = await import("./commands/bedSnapshotUpd1");
+      runBedSnapshotUpd1(args);
+      break;
+    }
+
     case "estimate-import": {
       const { runEstimateImport } = await import("./tools/template-bom-estimate");
       await runEstimateImport(args);

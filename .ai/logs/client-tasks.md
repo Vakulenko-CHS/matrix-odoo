@@ -2,6 +2,11 @@
 
 ## Entries (newest first)
 
+### 2026-11-18 — T-BED-01 Vadim даблчек → waiting другий pass
+
+- **Summary:** Відповідь Вадима (експорт чату). KNOWLEDGE 2026-11-18. Апруд Скай 116×200; решта з правками = оновлено-2. Імпорт Odoo ще ні.
+- **Files:** `apps/tasks/BOARD.md`, `furniture/KNOWLEDGE.md`, `furniture/inventory.md`
+
 ### 2026-11-16 — T-PAY-01 outbound 15:58 → waiting
 
 - **Summary:** Зарплата вантажників/прибиральниць — 5 питань у чат (ставка, табель, payroll vs account, прибиральниці, ПІБ). Odoo: 3 вантажники, wage ~1300, payslipів немає. Файл outbound без `-draft`.

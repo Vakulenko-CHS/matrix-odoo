@@ -3,7 +3,7 @@
 Session notes → [logs/](logs/). Keep this file slim.  
 Start: [.ai/INDEX.md](./INDEX.md) → **this file**. Open logs only when **Log index** matches.
 
-Last updated: **2026-11-16** (T-PAY-01 waiting — outbound 15:58)
+Last updated: **2026-11-18** (T-BED-01 Vadim даблчек → оновлено-2)
 
 ---
 
@@ -105,8 +105,8 @@ UOM: `m²` id=10, `m` id=8.
 
 | ID | File | Topics | Read when | Updated |
 |----|------|--------|-----------|---------|
-| L-tasks | [logs/client-tasks.md](logs/client-tasks.md) | tasks, slack, kanban, замовна тканина, якість, войлок, серійний, опис рядка, закупівля, слайди | клієнтські задачі / `apps/tasks/BOARD.md` | 2026-11-16 |
-| L-furn | [logs/furniture.md](logs/furniture.md) | furniture, ліжко, ліжка, beds, knowledge, beds UI, git diff | перевірка ліжок / furniture/ / `apps/beds` | 2026-11-09 |
+| L-tasks | [logs/client-tasks.md](logs/client-tasks.md) | tasks, slack, kanban, замовна тканина, якість, войлок, серійний, опис рядка, закупівля, слайди | клієнтські задачі / `apps/tasks/BOARD.md` | 2026-11-18 |
+| L-furn | [logs/furniture.md](logs/furniture.md) | furniture, ліжко, ліжка, beds, knowledge, beds UI, git diff, vadim | перевірка ліжок / furniture/ / `apps/beds` | 2026-11-18 |
 | L-1027 | [logs/2026-10-27-terry-beds.md](logs/2026-10-27-terry-beds.md) | террі, terry, ліжко, hackmd, size variants | Террі beds / HackMD size specs | 2026-10-27 |
 | L-odoo | [logs/odoo-db.md](logs/odoo-db.md) | odoo, ids, attr, workcenter, uom, api, is_storable, orderpoint, buy, loc, studio, serial, invoice | будь-яка робота з живою базою / IDs | 2026-11-09 |
 | L-nakladky | [logs/nakladky.md](logs/nakladky.md) | накладки, nakladky, ламінат кольоровий, кромка, ширина кромки | sync/fix overlays & colored sheets | 2026-10-23 |

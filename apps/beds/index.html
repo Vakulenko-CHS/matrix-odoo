@@ -28,7 +28,7 @@
       <div class="furn-layout">
         <aside class="furn-list" id="list" aria-label="Ліжка"></aside>
         <section class="furn-main">
-          <details class="furn-diff-note" id="diff-note">
+          <details class="furn-diff-note" id="diff-note" open>
             <summary id="diff-note-summary">DIFF — пояснення змін (показати / сховати)</summary>
             <div id="diff-md-host"></div>
           </details>
@@ -54,8 +54,12 @@
             </button>
           </div>
           <div class="furn-grid" id="split-view">
-            <h3 class="furn-col-h" id="col-h-orig">original</h3>
-            <h3 class="furn-col-h" id="col-h-fix">fixed</h3>
+            <h3 class="furn-col-h" id="col-h-orig">
+              <select id="sel-left" class="furn-ver-select" aria-label="Версія лівої колонки"></select>
+            </h3>
+            <h3 class="furn-col-h" id="col-h-fix">
+              <select id="sel-right" class="furn-ver-select" aria-label="Версія правої колонки"></select>
+            </h3>
             <h3 class="furn-col-h furn-col-h--uni" id="col-h-uni" hidden>накладений diff</h3>
             <div class="furn-pane furn-pane--orig" id="pane-orig"></div>
             <div class="furn-pane furn-pane--fix" id="pane-fix"></div>
